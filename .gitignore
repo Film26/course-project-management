@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Environment / secrets — never commit real secrets
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.sqlite
+*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
