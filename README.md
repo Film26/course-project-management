@@ -22,7 +22,50 @@ CPE 334 group project — a system for instructors and students to manage course
 
 See [`docs/`](docs/) — SRS, features, traceability, system SDS, sprint plan and Sprint 1 contracts.
 
+## Stack
+
+| Layer | Technology |
+|---|---|
+| UI | React 18 + Vite (`client/`) — proxies `/api` to the API in development |
+| API / application | Node.js 20+ + Express 5 (`server/src/`) |
+| Database | PostgreSQL 15+ via Prisma 6 (schema, migrations, seed in `server/prisma/`) |
+| Auth | bcrypt password hashes, server-side sessions in an httpOnly cookie |
+| Tests | Vitest + Supertest (unit, API/DB integration), Playwright (E2E) |
+
 ## Local setup
 
-_To be completed once the stack is set up (dependencies, environment variables,
-database migration/seed, run/build/test commands)._
+Prerequisites: Node.js 20+, PostgreSQL running locally.
+
+```bash
+npm install                                   # installs server + client workspaces
+
+# Environment — copy and edit (put your own local PostgreSQL password)
+cp server/.env.example server/.env            # DATABASE_URL -> .../cpms_dev
+cp server/.env.example server/.env.test       # change database name to cpms_test
+
+npm run db:migrate                            # apply migrations to cpms_dev
+npm run db:seed                               # synthetic accounts + course + teams
+
+npm run dev:server                            # API  -> http://localhost:3000
+npm run dev:client                            # UI   -> http://localhost:5173
+```
+
+### Test and build
+
+```bash
+npm test          # server unit + API/DB integration tests (uses cpms_test, migrated automatically)
+npm run build     # production build of the client
+```
+
+### Seeded accounts (synthetic, local only)
+
+All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
+
+| Email | Role | Team |
+|---|---|---|
+| instructor1@cpms.test | INSTRUCTOR | teaches CPE334 |
+| student1@cpms.test | STUDENT | Team Alpha |
+| student2@cpms.test | STUDENT | Team Alpha |
+| student3@cpms.test | STUDENT | Team Beta |
+
+Never commit `server/.env` / `server/.env.test` or any real password.
