@@ -7,11 +7,12 @@
     "start": "node src/server.js",
     "start:e2e": "node scripts/start-e2e.js",
     "test": "vitest run",
-    "db:dev": "dotenv -e .env -o -- prisma migrate dev",
-    "db:deploy": "dotenv -e .env -o -- prisma migrate deploy",
-    "db:seed": "dotenv -e .env -o -- prisma db seed",
+    "db:dev": "dotenv-cli -e .env -o -- prisma migrate dev",
+    "db:deploy": "dotenv-cli -e .env -o -- prisma migrate deploy",
+    "db:seed": "dotenv-cli -e .env -o -- prisma db seed",
+    "postinstall": "prisma generate",
     "db:generate": "prisma generate",
-    "db:studio": "dotenv -e .env -o -- prisma studio"
+    "db:studio": "dotenv-cli -e .env -o -- prisma studio"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
