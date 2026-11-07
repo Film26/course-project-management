@@ -12,6 +12,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507216 | First version: every FR/BR/NFR mapped to a feature or system responsibility, sprint, AC and test; coverage gaps and approved changes |
+| 0.2 | 2026-11-07 | 67070507216 | Aligned with `features.md` v0.1 (PR #8): NFR rows name system responsibilities SR-01–SR-04; G-01 plan moved to S3 hardening as in `plan.md` |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
@@ -70,21 +71,21 @@ F-01 has no business rule of its own. Its internal rules R1–R6 (identical logi
 
 ## 3. Non-functional requirements (cross-cutting)
 
-NFRs are system responsibilities, so one NFR can link to several features. *Established* = the sprint where the mechanism is built; *Verified* = the sprint(s) where its check runs.
+NFRs are system responsibilities (SR-01–SR-04 in `features.md` §2), so one NFR can link to several features. *Established* = the sprint where the mechanism is built; *Verified* = the sprint(s) where its check runs.
 
 | Req | Summary | Responsibility / features | Established | Verified | Sprint 1 evidence (AC → tests, file) | Status |
 |---|---|---|---|---|---|---|
 | NFR-01 | bcrypt hashes only; no password / token hash in any response | F-01 (`auth/password.js`, `auth/session.js`) | S1 | S1 | AC-01-01, AC-01-09 → TEST-01-02, TEST-01-03 (A-U); TEST-01-04, TEST-01-12 (A-API) | Verified (auto) |
-| NFR-02 | Unauthenticated → 401, no private data | `requireAuth` middleware; every feature | S1 | S1, re-checked each sprint | AC-01-05 → TEST-01-08, TEST-01-09 (A-API); AC-02-12 → TEST-02-18 (P-API) | Verified (auto) for F-01, F-02 |
-| NFR-03 | Role + ownership enforced in backend, 403, no private data | `requireRole` + ownership checks in services; every feature | S1 | every sprint | AC-01-07, AC-01-08 → TEST-01-11, TEST-01-12; AC-02-10, AC-02-11 → TEST-02-16, TEST-02-17; UI 403 → TEST-01-13, TEST-02-20 | Verified (auto) for F-01, F-02 |
+| NFR-02 | Unauthenticated → 401, no private data | SR-01 Access control (`requireAuth`); every feature | S1 | S1, re-checked each sprint | AC-01-05 → TEST-01-08, TEST-01-09 (A-API); AC-02-12 → TEST-02-18 (P-API) | Verified (auto) for F-01, F-02 |
+| NFR-03 | Role + ownership enforced in backend, 403, no private data | SR-01 Access control (`requireRole` + ownership checks); every feature | S1 | every sprint | AC-01-07, AC-01-08 → TEST-01-11, TEST-01-12; AC-02-10, AC-02-11 → TEST-02-16, TEST-02-17; UI 403 → TEST-01-13, TEST-02-20 | Verified (auto) for F-01, F-02 |
 | NFR-04 | Session expiry (8 h) and revocation on logout | F-01 (`auth/session.js`) | S1 | S1 | AC-01-05, AC-01-06 → TEST-01-01 boundary (A-U); TEST-01-09, TEST-01-10 (A-API) | Verified (auto) |
-| NFR-05 | One error shape; 5xx without stack/SQL | `errors.js`; every route | S1 | S2 | 400/401/403/404/409 shapes asserted in A-API and P-API; unknown route → H "unknown API route returns the standard error shape" | Partial — forced-500 test planned S2 (G-02) |
-| NFR-06 | Rules + DB constraints; no partial data on rejection | services + Prisma schema; every feature | S1 | every sprint | DB state checked after negative tests: TEST-02-06, TEST-02-08, TEST-02-09, TEST-02-12, TEST-02-13, TEST-02-15, TEST-02-16, TEST-02-17; TEST-01-05 (no session row) | Verified (auto) for S1; see G-01 |
-| NFR-07 | Clone → `.env` → migrate → seed → test in ≤ 15 min from README | README; whole repo | S1 | S1, S3 | Manual: teammate follows README on a clean machine, time recorded in the release PR | Planned S1 manual check (G-06) |
-| NFR-08 | Config via env vars; no secrets in Git/client; single Docker container | `config.js`, `.env.example`; deployment (Lab 5) | S1 design | Lab 5 (S2) | `.env` and `.env.test` git-ignored; `.env.example` has placeholders only | Partial — secret scan + Docker build in Lab 5 |
-| NFR-09 | Loading / empty / error states; field validation messages | client pages; every feature with UI | S1 | every sprint | TEST-01-13 (invalid login error), TEST-02-20 (A-E2E, P-E2E); screenshots `F01-1-invalid-login.png`, `F02-1-student-validation.png` | Partial — UI review checklist per sprint (G-07) |
-| NFR-10 | List endpoints p95 < 500 ms at 50 teams × 3 students | roster, proposal list, dashboard | S3 | S3 | — | Planned |
-| NFR-11 | ≥ 80 % line coverage of domain-rule modules; every AC verified | test suite; every feature | S2 | S2, S3 | Every Sprint 1 AC (AC-01-01…11, AC-02-01…14) has ≥ 1 test above; coverage tool not configured yet | Partial — `vitest --coverage` from S2 |
+| NFR-05 | One error shape; 5xx without stack/SQL | SR-02 Error handling & integrity (`errors.js`) | S1 | S2 | 400/401/403/404/409 shapes asserted in A-API and P-API; unknown route → H "unknown API route returns the standard error shape" | Partial — forced-500 test planned S2 (G-02) |
+| NFR-06 | Rules + DB constraints; no partial data on rejection | SR-02 Error handling & integrity (services + Prisma schema) | S1 | every sprint | DB state checked after negative tests: TEST-02-06, TEST-02-08, TEST-02-09, TEST-02-12, TEST-02-13, TEST-02-15, TEST-02-16, TEST-02-17; TEST-01-05 (no session row) | Verified (auto) for S1; see G-01 |
+| NFR-07 | Clone → `.env` → migrate → seed → test in ≤ 15 min from README | SR-03 Engineering baseline (README) | S1 | S1, S3 | Manual: teammate follows README on a clean machine, time recorded in the release PR | Planned S1 manual check (G-06) |
+| NFR-08 | Config via env vars; no secrets in Git/client; single Docker container | SR-03 Engineering baseline (`config.js`, `.env.example`; Lab 5 deployment) | S1 design | Lab 5 (S2) | `.env` and `.env.test` git-ignored; `.env.example` has placeholders only | Partial — secret scan + Docker build in Lab 5 |
+| NFR-09 | Loading / empty / error states; field validation messages | SR-04 Quality & UX standards (client pages) | S1 | every sprint | TEST-01-13 (invalid login error), TEST-02-20 (A-E2E, P-E2E); screenshots `F01-1-invalid-login.png`, `F02-1-student-validation.png` | Partial — UI review checklist per sprint (G-07) |
+| NFR-10 | List endpoints p95 < 500 ms at 50 teams × 3 students | SR-04 Quality & UX standards (roster, proposal list, F-08 dashboard) | S3 | S3 | — | Planned |
+| NFR-11 | ≥ 80 % line coverage of domain-rule modules; every AC verified | SR-04 Quality & UX standards (test suite) | S2 | S2, S3 | Every Sprint 1 AC (AC-01-01…11, AC-02-01…14) has ≥ 1 test above; coverage tool not configured yet | Partial — `vitest --coverage` from S2 |
 
 ### 3.1 Sprint 1 AC coverage check
 Every Sprint 1 acceptance criterion maps to at least one test:
@@ -112,7 +113,7 @@ Requirements, or parts of them, that are not fully verified at the end of Sprint
 
 | ID | Requirement | Gap | Plan |
 |---|---|---|---|
-| G-01 | BR-01, NFR-06 | BR-01 is enforced by a transaction with a team row lock (`SELECT … FOR UPDATE`), **not** by a DB constraint. A partial unique index (`WHERE status <> 'REJECTED'`) cannot be expressed in the Prisma schema. | Accepted limitation (F-02 §4, §9). TEST-02-08 proves 5 concurrent creates give exactly one row. Revisit if Prisma supports partial indexes. |
+| G-01 | BR-01, NFR-06 | BR-01 is enforced by a transaction with a team row lock (`SELECT … FOR UPDATE`), **not** by a DB constraint. A partial unique index (`WHERE status <> 'REJECTED'`) cannot be expressed in the Prisma schema. | Accepted limitation for S1 (F-02 §4, §9); TEST-02-08 proves 5 concurrent creates give exactly one row. A DB-level guard (e.g. a raw-SQL partial index in a migration) is planned for S3 hardening if feasible (`plan.md` §5). |
 | G-02 | NFR-05 | No test forces an unexpected error to prove a 500 response hides stack traces and SQL. | Add forced-error API test in S2. |
 | G-03 | FR-22 | F-02 decisions (approve/reject) are not written to an audit log yet; `decidedAt`, `decidedById` and `rejectReason` on `Proposal` are the Sprint 1 record. | F-09 in S3 adds `AuditLog` entries for proposal decisions. |
 | G-04 | FR-13, BR-12 | BR-12 refers to a milestone's maximum score, but FR-13 lists only title, description, due date and weight. | Add max score to FR-13 when the F-04 contract is written (S2). |
