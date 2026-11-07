@@ -42,6 +42,7 @@ npm install                                   # installs server + client workspa
 # Environment — copy and edit (put your own local PostgreSQL password)
 cp server/.env.example server/.env            # DATABASE_URL -> .../cpms_dev
 cp server/.env.example server/.env.test       # change database name to cpms_test
+cp server/.env.example server/.env.e2e        # change database name to cpms_e2e and PORT to 3100 (Playwright only)
 
 npm run db:migrate                            # apply migrations to cpms_dev
 npm run db:seed                               # synthetic accounts + course + teams
@@ -55,8 +56,9 @@ npm run dev:client                            # UI   -> http://localhost:5173
 ```bash
 npm test          # server unit + API/DB integration tests (uses cpms_test, migrated automatically)
 npm run build     # production build of the client
-npm run test:e2e  # Playwright UI journeys (needs db:migrate + db:seed; starts API and UI automatically)
-                  # note: the F-02 journey deletes the proposals of the seeded CPE334 course in cpms_dev first
+npm run test:e2e  # Playwright UI journeys against the separate cpms_e2e database (never cpms_dev):
+                  # starts its own API on :3100 (migrate + seed cpms_e2e first) and UI on :5174
+                  # needs: database cpms_e2e created + server/.env.e2e
                   # first time only: npx playwright install chromium
 ```
 

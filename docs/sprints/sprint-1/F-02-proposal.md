@@ -17,6 +17,7 @@
 |---|---|---|---|---|
 | 1.0 | 2026-11-07 | jaruwan18 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation |
 | 1.1 | 2026-11-07 | jaruwan18 | Order of checks: role (403) is checked by `requireRole` **before** input validation (400); review list opens on the "Submitted" filter | Reuses the F-01 `requireRole` middleware as planned in the F-01 contract; no AC or test changed (every AC-02 test uses a valid body for forbidden-role calls). Instructors mostly need the submitted queue |
+| 1.2 | 2026-11-07 | jaruwan18 | E2E tests use their own database `cpms_e2e` (`server/.env.e2e`), own API port 3100 and UI port 5174; they refuse to run unless the database name contains `e2e`. TEST-02-20 precondition updated | PR #6 review by Film26: the E2E cleanup (`deleteMany`) ran against `cpms_dev` and could delete development data |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -118,7 +119,7 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 - Uses `Proposal`, `Team`, `TeamMember`, `Course.proposalDeadline` from baseline migration `20261107000000_init`. **No new migration, no schema change.**
 - `Proposal.status` enum `DRAFT | SUBMITTED | APPROVED | REJECTED` (default `DRAFT`); `rejectReason`, `submittedAt`, `decidedAt`, `decidedById` nullable; FK `teamId` (cascade), FK `decidedById → User`; index on `teamId`.
 - BR-01 is enforced in a transaction with a team row lock (P1), not by a DB constraint: a partial unique index (`WHERE status <> 'REJECTED'`) cannot be expressed in the Prisma schema and would be reported as drift by `prisma migrate dev`. Recorded as a known limitation.
-- Seed: unchanged (Team Alpha = student1 + student2, Team Beta = student3, CPE334 deadline 2026-12-31 23:59:59 Asia/Bangkok, no proposals).
+- Seed data unchanged (Team Alpha = student1 + student2, Team Beta = student3, CPE334 deadline 2026-12-31 23:59:59 Asia/Bangkok, no proposals). *(v1.2)* `seed.js` reads `.env.e2e` when `NODE_ENV=e2e`, so the same seed fills `cpms_e2e`.
 
 ## 5. UI
 | Screen / element | Behaviour |
@@ -169,7 +170,7 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 | TEST-02-17 | AC-02-11 | API+DB | SUBMITTED in A's course; instructor B owns another course | student1: list/approve/reject; B: GET, list, approve, reject | all 403; DB still SUBMITTED |
 | TEST-02-18 | AC-02-12 | API | no cookie | call each F-02 endpoint | 401 `UNAUTHENTICATED`, no `proposal(s)` |
 | TEST-02-19 | AC-02-13 | API+DB | Alpha: 1 REJECTED + 1 SUBMITTED; Beta: DRAFT | student1 GET my-team & GET proposal; A GET list, `?status=SUBMITTED`, `?status=BOGUS`; GET unknown proposal; student without team GET my-team | member sees team + 2 proposals newest first with reason; list returns 3 / filtered 1 with team names; 400; 404; 404 |
-| TEST-02-20 | AC-02-14 | E2E (Playwright) | seeded DB (proposals of seeded course cleared at test start), API + UI running | student3 creates + submits → instructor1 rejects with reason → student3 sees reason, creates + submits new → instructor1 approves → student3 sees APPROVED | each step visible in the UI; screenshots saved to `evidence/screenshots/F02-*.png` |
+| TEST-02-20 | AC-02-14 | E2E (Playwright) | *(v1.2)* separate E2E database `cpms_e2e`, migrated + seeded when the E2E API starts; proposals of the seeded course cleared in `cpms_e2e` only | student3 creates + submits → instructor1 rejects with reason → student3 sees reason, creates + submits new → instructor1 approves → student3 sees APPROVED | each step visible in the UI; screenshots saved to `evidence/screenshots/F02-*.png` |
 
 ## 8. Definition of Done (F-02 instance of the Product DoD)
 - [ ] AC-02-01 … AC-02-14 implemented.

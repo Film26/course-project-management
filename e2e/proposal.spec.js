@@ -1,16 +1,13 @@
 // TEST-02-20 (AC-02-14) — UI end-to-end journey for F-02 Project Proposal Workflow.
-// Runs against the seeded development database. Proposals of the seeded course are cleared first so the
-// journey can be repeated (seed data itself is unchanged). Password comes from server/.env, never hard-coded.
+// Runs against the separate E2E database (server/.env.e2e → cpms_e2e), never cpms_dev. Proposals of the seeded
+// course are cleared in that database first so the journey can be repeated. Password comes from server/.env.e2e.
 import { test, expect } from '@playwright/test';
-import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
-
-const env = dotenv.config({ path: 'server/.env', quiet: true }).parsed ?? {};
-const { SEED_PASSWORD, DATABASE_URL } = env;
+import { SEED_PASSWORD, DATABASE_URL, assertE2eDatabase } from './e2eEnv.js';
 const shots = 'docs/sprints/sprint-1/evidence/screenshots';
 
 test.beforeAll(async () => {
-  if (!SEED_PASSWORD) throw new Error('SEED_PASSWORD missing in server/.env — run the seed first');
+  assertE2eDatabase(); // refuses to delete anything unless the database name contains "e2e"
   const prisma = new PrismaClient({ datasourceUrl: DATABASE_URL });
   try {
     await prisma.proposal.deleteMany({ where: { team: { course: { code: 'CPE334' } } } });
