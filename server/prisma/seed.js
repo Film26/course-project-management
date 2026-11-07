@@ -1,8 +1,9 @@
 // Reproducible synthetic seed data. Safe to run repeatedly (upserts).
 // Password for every seeded account comes from SEED_PASSWORD in server/.env — never a real password.
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+dotenv.config({ override: true, quiet: true });
 
 const prisma = new PrismaClient();
 

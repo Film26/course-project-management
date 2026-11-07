@@ -6,10 +6,11 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "vitest run",
-    "db:dev": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "db:seed": "prisma db seed",
-    "db:generate": "prisma generate"
+    "db:dev": "dotenv -e .env -o -- prisma migrate dev",
+    "db:deploy": "dotenv -e .env -o -- prisma migrate deploy",
+    "db:seed": "dotenv -e .env -o -- prisma db seed",
+    "db:generate": "prisma generate",
+    "db:studio": "dotenv -e .env -o -- prisma studio"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -22,6 +23,7 @@
     "express": "^5.3.0"
   },
   "devDependencies": {
+    "dotenv-cli": "^11.1.0",
     "prisma": "^6.19.3",
     "supertest": "^7.3.1",
     "vitest": "^3.2.7"
