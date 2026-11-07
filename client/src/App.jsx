@@ -1,23 +1,54 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from './api.js';
+import LoginPage from './pages/LoginPage.jsx';
+import HomePage from './pages/HomePage.jsx';
+import RosterPage from './pages/RosterPage.jsx';
 
-// Baseline shell. F-01 adds the login page and current-user header;
-// F-02 adds the proposal screens.
+// F-01: session restore via /auth/me, header with current user, logout.
 export default function App() {
-  const [health, setHealth] = useState('checking…');
+  const [user, setUser] = useState(undefined); // undefined = checking, null = logged out
+  const [view, setView] = useState({ name: 'home' });
 
   useEffect(() => {
-    api('/health')
-      .then((d) => setHealth(d.status))
-      .catch(() => setHealth('API unreachable'));
+    api('/auth/me')
+      .then((d) => setUser(d.user))
+      .catch(() => setUser(null));
   }, []);
 
+  const logout = useCallback(async () => {
+    try {
+      await api('/auth/logout', { method: 'POST' });
+    } finally {
+      setUser(null);
+      setView({ name: 'home' });
+    }
+  }, []);
+
+  // Any 401 from a protected call means the session is gone → back to login.
+  const onUnauthenticated = useCallback(() => setUser(null), []);
+
+  if (user === undefined) return <main className="container">Loading…</main>;
+  if (user === null) return <LoginPage onLoggedIn={setUser} />;
+
   return (
-    <main className="container">
-      <h1>Course Project Management</h1>
-      <p>
-        API status: <strong>{health}</strong>
-      </p>
-    </main>
+    <>
+      <header className="topbar">
+        <strong className="brand" onClick={() => setView({ name: 'home' })}>
+          Course Project Management
+        </strong>
+        <span className="who" data-testid="current-user">
+          {user.displayName} <span className="badge">{user.role}</span>
+        </span>
+        <button onClick={logout}>Log out</button>
+      </header>
+      <main className="container">
+        {view.name === 'home' && (
+          <HomePage user={user} onOpenRoster={(c) => setView({ name: 'roster', courseId: c.id })} onUnauthenticated={onUnauthenticated} />
+        )}
+        {view.name === 'roster' && (
+          <RosterPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
+        )}
+      </main>
+    </>
   );
 }

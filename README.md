@@ -55,6 +55,8 @@ npm run dev:client                            # UI   -> http://localhost:5173
 ```bash
 npm test          # server unit + API/DB integration tests (uses cpms_test, migrated automatically)
 npm run build     # production build of the client
+npm run test:e2e  # Playwright UI journeys (needs db:migrate + db:seed; starts API and UI automatically)
+                  # first time only: npx playwright install chromium
 ```
 
 ### Seeded accounts (synthetic, local only)

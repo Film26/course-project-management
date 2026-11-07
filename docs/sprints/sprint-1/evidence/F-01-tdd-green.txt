@@ -1,0 +1,27 @@
+# F-01 TDD GREEN run (after implementation)
+# branch: feature/F-01-auth  base commit: daa7d63 + implementation commit that adds this file
+# date: 2026-11-07T08:00:37+07:00
+# command: cd server && npx vitest run
+
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-04 valid credentials → 200, user only, HttpOnly cookie, hashed session token (AC-01-01, AC-01-09) 265ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-05 wrong password and unknown email → identical 401, no cookie, no session (AC-01-02) 58ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-06 missing / empty fields → 400 VALIDATION_ERROR naming the fields (AC-01-03) 50ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-07 identity comes from the session, client-supplied id/role are ignored (AC-01-04) 57ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-08 no cookie or an unknown token → 401 without private data (AC-01-05) 56ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-09 an expired session → 401 (AC-01-05, NFR-04) 59ms
+ ✓ tests/auth.api.test.js > POST /api/auth/logout > TEST-01-10 logout revokes the session; the old cookie no longer works (AC-01-06) 62ms
+ ✓ tests/auth.api.test.js > GET /api/courses — list scoped to the current user > TEST-01-14 instructor sees courses they teach; student sees courses of their team; other instructor sees none (AC-01-11) 84ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-11 a STUDENT is forbidden (AC-01-07) 57ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-12 owning instructor 200; other instructor 403; unknown course 404 (AC-01-08) 72ms
+ ✓ tests/health.test.js > baseline > GET /api/health returns ok 29ms
+ ✓ tests/health.test.js > baseline > unknown API route returns the standard error shape 5ms
+ ✓ tests/health.test.js > baseline > test database is migrated and writable 78ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is active when not revoked and expiresAt is in the future 1ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is expired exactly at expiresAt (boundary) 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive once revoked, even before expiry 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive for a missing session 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-02 password hashing (AC-01-09) > stores a bcrypt hash, not the plaintext, and verifies correctly 8ms
+ ✓ tests/auth.unit.test.js > TEST-01-03 session token hashing (AC-01-09, rule R3) > produces a random token and a deterministic SHA-256 hex hash 1ms
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Duration  5.27s (transform 93ms, setup 40ms, collect 768ms, tests 947ms, environment 1ms, prepare 309ms)
