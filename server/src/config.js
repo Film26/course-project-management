@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
+import { envFileFor } from './envFile.js';
 
 // The project's own env file always wins over machine-wide variables, so a DATABASE_URL
 // left over from another project can never point this app at the wrong database.
-dotenv.config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env', override: true, quiet: true });
+dotenv.config({ path: envFileFor(process.env.NODE_ENV), override: true, quiet: true });
 
 function required(name) {
   const value = process.env[name];

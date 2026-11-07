@@ -96,3 +96,60 @@ button.link {
 .error {
   color: #b42318;
 }
+/* F-02 proposal screens */
+textarea,
+select {
+  padding: 8px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font: inherit;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+label.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+button.danger {
+  background: #cf222e;
+  border-color: #cf222e;
+}
+button.secondary {
+  background: #fff;
+  color: #1f2328;
+  border-color: #d0d7de;
+}
+.reject-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.pre {
+  white-space: pre-wrap;
+}
+.ok {
+  color: #1a7f37;
+}
+.status-draft {
+  background: #eaeef2;
+  color: #57606a;
+}
+.status-submitted {
+  background: #fff8c5;
+  color: #9a6700;
+}
+.status-approved {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+.status-rejected {
+  background: #ffebe9;
+  color: #cf222e;
+}
+.card h3 {
+  margin: 0;
+}

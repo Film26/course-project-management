@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "start:e2e": "node scripts/start-e2e.js",
     "test": "vitest run",
     "db:dev": "dotenv -e .env -o -- prisma migrate dev",
     "db:deploy": "dotenv -e .env -o -- prisma migrate deploy",

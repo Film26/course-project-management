@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
-export default function HomePage({ user, onOpenRoster, onUnauthenticated }) {
+export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTeamProposal, onUnauthenticated }) {
   const [state, setState] = useState({ loading: true, courses: [], error: '' });
 
   useEffect(() => {
@@ -28,8 +28,14 @@ export default function HomePage({ user, onOpenRoster, onUnauthenticated }) {
               <span>
                 <strong>{c.code}</strong> {c.name}
               </span>
-              {/* Convenience only — the API enforces INSTRUCTOR + ownership (403 otherwise). */}
-              {user.role === 'INSTRUCTOR' && <button onClick={() => onOpenRoster(c)}>View roster</button>}
+              {/* Convenience only — the API enforces role + ownership (403 otherwise). */}
+              {user.role === 'INSTRUCTOR' && (
+                <span className="actions">
+                  <button onClick={() => onOpenRoster(c)}>View roster</button>
+                  <button onClick={() => onOpenProposals(c)}>Review proposals</button>
+                </span>
+              )}
+              {user.role === 'STUDENT' && <button onClick={() => onOpenTeamProposal(c)}>My team proposal</button>}
             </li>
           ))}
         </ul>

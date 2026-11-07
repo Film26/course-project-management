@@ -1,14 +1,11 @@
 // TEST-01-13 (AC-01-10, AC-01-02, AC-01-07) — UI end-to-end journey for F-01.
-// Uses the seeded synthetic accounts; the password is read from server/.env (never hard-coded).
+// Uses the seeded synthetic accounts in the E2E database; the password is read from server/.env.e2e (never hard-coded).
 import { test, expect } from '@playwright/test';
-import dotenv from 'dotenv';
+import { SEED_PASSWORD, assertE2eDatabase } from './e2eEnv.js';
 
-const { SEED_PASSWORD } = dotenv.config({ path: 'server/.env', quiet: true }).parsed ?? {};
 const shots = 'docs/sprints/sprint-1/evidence/screenshots';
 
-test.beforeAll(() => {
-  if (!SEED_PASSWORD) throw new Error('SEED_PASSWORD missing in server/.env — run the seed first');
-});
+test.beforeAll(assertE2eDatabase);
 
 async function fillLogin(page, email, password) {
   await page.getByLabel('Email').fill(email);

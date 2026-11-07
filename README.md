@@ -42,6 +42,7 @@ npm install                                   # installs server + client workspa
 # Environment — copy and edit (put your own local PostgreSQL password)
 cp server/.env.example server/.env            # DATABASE_URL -> .../cpms_dev
 cp server/.env.example server/.env.test       # change database name to cpms_test
+cp server/.env.example server/.env.e2e        # change database name to cpms_e2e and PORT to 3100 (Playwright only)
 
 npm run db:migrate                            # apply migrations to cpms_dev
 npm run db:seed                               # synthetic accounts + course + teams
@@ -55,7 +56,9 @@ npm run dev:client                            # UI   -> http://localhost:5173
 ```bash
 npm test          # server unit + API/DB integration tests (uses cpms_test, migrated automatically)
 npm run build     # production build of the client
-npm run test:e2e  # Playwright UI journeys (needs db:migrate + db:seed; starts API and UI automatically)
+npm run test:e2e  # Playwright UI journeys against the separate cpms_e2e database (never cpms_dev):
+                  # starts its own API on :3100 (migrate + seed cpms_e2e first) and UI on :5174
+                  # needs: database cpms_e2e created + server/.env.e2e
                   # first time only: npx playwright install chromium
 ```
 
@@ -69,5 +72,15 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 | student1@cpms.test | STUDENT | Team Alpha |
 | student2@cpms.test | STUDENT | Team Alpha |
 | student3@cpms.test | STUDENT | Team Beta |
+
+### Sprint 1 journey (F-01 + F-02)
+
+1. Log in as `student3@cpms.test` → **My team proposal** → create a draft → **Submit proposal**.
+2. Log in as `instructor1@cpms.test` → **Review proposals** → **Approve**, or **Reject** with a reason.
+3. Log in as the student again → the status and the decision/reason are shown; after a rejection the team can create a new proposal.
+
+Rules enforced by the API: one active proposal per team, no submission after the course deadline,
+only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
+the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
 
 Never commit `server/.env` / `server/.env.test` or any real password.
