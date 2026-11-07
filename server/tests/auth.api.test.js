@@ -143,6 +143,25 @@ describe('POST /api/auth/logout', () => {
   });
 });
 
+describe('GET /api/courses — list scoped to the current user', () => {
+  it('TEST-01-14 instructor sees courses they teach; student sees courses of their team; other instructor sees none (AC-01-11)', async () => {
+    const expected = [{ id: course.id, code: 'CPE334', name: 'Software Engineering' }];
+
+    const a = await request(app).get('/api/courses').set('Cookie', await login('inst-a@cpms.test'));
+    expect(a.status).toBe(200);
+    expect(a.body.courses).toEqual(expected);
+
+    const s = await request(app).get('/api/courses').set('Cookie', await login('student1@cpms.test'));
+    expect(s.body.courses).toEqual(expected);
+
+    const b = await request(app).get('/api/courses').set('Cookie', await login('inst-b@cpms.test'));
+    expect(b.body.courses).toEqual([]);
+
+    const anon = await request(app).get('/api/courses');
+    expect(anon.status).toBe(401);
+  });
+});
+
 describe('GET /api/courses/:courseId/roster — role and ownership', () => {
   it('TEST-01-11 a STUDENT is forbidden (AC-01-07)', async () => {
     const cookie = await login('student1@cpms.test');

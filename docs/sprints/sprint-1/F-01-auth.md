@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-07 | Film26 | Initial contract: design, API, AC, STS | Written before implementation |
+| 1.1 | 2026-11-07 | Film26 | Added `GET /api/courses`, AC-01-11, TEST-01-14 | During UI work the Home page needed the current user's courses to link to the roster; scoped by the session user, no new data |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -66,6 +67,7 @@ All errors use `{ "error": { "code": string, "message": string, "details"?: obje
 | `POST /api/auth/login` | public | `{ "email", "password" }` | `200 { "user": { id, email, displayName, role } }` + `Set-Cookie: sid=…; HttpOnly; SameSite=Lax; Path=/; Max-Age=TTL` (`Secure` when `COOKIE_SECURE=true`) | 400 `VALIDATION_ERROR`, 401 `INVALID_CREDENTIALS` |
 | `POST /api/auth/logout` | session | — | `204`, session revoked, cookie cleared | 401 `UNAUTHENTICATED` |
 | `GET /api/auth/me` | session | — | `200 { "user": { id, email, displayName, role } }` | 401 `UNAUTHENTICATED` |
+| `GET /api/courses` *(v1.1)* | session | — | `200 { "courses": [ { id, code, name } ] }` — INSTRUCTOR: courses they teach; STUDENT: courses of teams they belong to | 401 `UNAUTHENTICATED` |
 | `GET /api/courses/:courseId/roster` | session, INSTRUCTOR, owns course | — | `200 { "course": { id, code, name }, "teams": [ { id, name, members: [ { id, displayName, email } ] } ] }` | 400 `VALIDATION_ERROR` (non-integer id), 401, 403 `FORBIDDEN`, 404 `NOT_FOUND` |
 
 `passwordHash` and `tokenHash` never appear in any response.
@@ -106,6 +108,7 @@ All errors use `{ "error": { "code": string, "message": string, "details"?: obje
 | AC-01-07 | A STUDENT calling `GET /api/courses/:id/roster` gets 403 `FORBIDDEN` with no roster data. | NFR-03, R5 |
 | AC-01-08 | The course's Instructor gets 200 with teams and members; a different Instructor gets 403; an unknown course gets 404. | FR-04, R6 |
 | AC-01-09 | Stored passwords are bcrypt hashes, not plaintext; tokens are stored only as SHA-256 hashes. | NFR-01, R3 |
+| AC-01-11 *(v1.1)* | `GET /api/courses` returns only courses the session user teaches (INSTRUCTOR) or belongs to through a team (STUDENT); unauthenticated → 401. | FR-03, NFR-03 |
 | AC-01-10 | UI: a user logs in, sees their name and role, (Instructor) opens the roster, logs out and is returned to the Login page; invalid login shows an error message. | FR-01–FR-04 |
 
 ## 7. Software Test Specification
@@ -124,11 +127,12 @@ All errors use `{ "error": { "code": string, "message": string, "details"?: obje
 | TEST-01-10 | AC-01-06 | API+DB | logged in | POST logout, then GET `/api/auth/me` with same cookie | 204; then 401; session `revokedAt` not null |
 | TEST-01-11 | AC-01-07 | API+DB | course + team seeded, logged in as student | GET `/api/courses/:id/roster` | 403 `FORBIDDEN`, no `teams` |
 | TEST-01-12 | AC-01-08 | API+DB | course owned by instructor A, instructor B exists | GET roster as A; as B; unknown id as A | 200 with team + members (no password hashes); 403; 404 |
+| TEST-01-14 *(v1.1)* | AC-01-11 | API+DB | course taught by A with student in a team; instructor B | GET `/api/courses` as A, student, B, anonymous | A and student: `[CPE334]`; B: `[]`; anonymous: 401 |
 | TEST-01-13 | AC-01-10, AC-01-02 | E2E (Playwright) | seeded DB, API + UI running | Invalid login → error shown; login as instructor1 → header shows name/INSTRUCTOR → open roster → logout | Error banner; header correct; roster lists Team Alpha; back on Login page |
 
 ## 8. Definition of Done (F-01 instance of the Product DoD)
-- [ ] All AC-01-01 … AC-01-10 implemented.
-- [ ] TEST-01-01 … TEST-01-13 automated and passing; red → green evidence kept for TEST-01-01, TEST-01-05, TEST-01-11.
+- [ ] All AC-01-01 … AC-01-11 implemented.
+- [ ] TEST-01-01 … TEST-01-14 automated and passing; red → green evidence kept for TEST-01-01, TEST-01-05, TEST-01-11.
 - [ ] No secrets in Git; `.env.example` current; README setup still works from a clean clone.
 - [ ] PR into `sprint-1` reviewed and approved by jaruwan18 with a specific review comment.
 - [ ] Contract updated (version history) if behaviour changed during implementation.
