@@ -12,6 +12,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft: architecture, data model, UI/API conventions, access matrix, auth, configuration, deployment plan |
+| 0.2 | 2026-11-07 | 67070507202 | §5 F-02 rows now list the real endpoints from PR #6; §2.2 records how BR-01 is enforced |
 
 ---
 
@@ -92,7 +93,7 @@
 | **Course** | id, code, name, instructorId, proposalDeadline | `code` UNIQUE; FK instructor → User. **Owner:** the instructor. |
 | **Team** | id, name, courseId | UNIQUE (courseId, name); FK course (cascade). |
 | **TeamMember** | teamId, userId | PK (teamId, userId); FKs cascade. **Owner of team data:** its members. |
-| **Proposal** | id, teamId, title, description, status (`DRAFT`/`SUBMITTED`/`APPROVED`/`REJECTED`), rejectReason?, submittedAt?, decidedAt?, decidedById?, createdAt, updatedAt | FK team (cascade); FK decidedBy → User; index teamId. **Readable by:** team members and the course instructor. |
+| **Proposal** | id, teamId, title, description, status (`DRAFT`/`SUBMITTED`/`APPROVED`/`REJECTED`), rejectReason?, submittedAt?, decidedAt?, decidedById?, createdAt, updatedAt | FK team (cascade); FK decidedBy → User; index teamId. **Readable by:** team members and the course instructor. BR-01 (one active proposal per team) is enforced in a transaction that locks the team row, not by a DB constraint. A partial unique index cannot be expressed in the Prisma schema (see the F-02 contract). |
 
 ### 2.3 Entities and changes planned for Sprints 2–3 (each via a new migration)
 
@@ -176,11 +177,14 @@ Detailed endpoints are specified in each feature contract (`docs/sprints/sprint-
 | Current user / log out | `GET /api/auth/me`, `POST /api/auth/logout` | ✔ | ✔ | own session |
 | List my courses | `GET /api/courses` | own | own | instructor: teaches course; student: member of a team in it |
 | View course roster | `GET /api/courses/:id/roster` | own | ✘ | `course.instructorId = me` |
-| Create / edit draft proposal | F-02 | ✘ | own | member of the team |
-| Submit proposal | F-02 | ✘ | own | member of the team (BR-02, BR-03) |
-| View team proposal | F-02 | own | own | instructor of the course **or** team member |
-| List course proposals | F-02 | own | ✘ | instructor of the course |
-| Approve / reject proposal | F-02 | own | ✘ | instructor of the course (BR-03, BR-04) |
+| View my team in a course | `GET /api/courses/:courseId/my-team` | ✘ | own | member of a team in the course |
+| Create draft proposal | `POST /api/teams/:teamId/proposals` | ✘ | own | member of the team (BR-01, BR-05) |
+| Edit draft proposal | `PATCH /api/proposals/:id` | ✘ | own | member of the team; only `DRAFT` |
+| Submit proposal | `POST /api/proposals/:id/submit` | ✘ | own | member of the team (BR-02, BR-03) |
+| View a proposal | `GET /api/proposals/:id` | own | own | instructor of the course **or** team member |
+| List course proposals | `GET /api/courses/:courseId/proposals` | own | ✘ | instructor of the course |
+| Approve proposal | `POST /api/proposals/:id/approve` | own | ✘ | instructor of the course (BR-03) |
+| Reject proposal | `POST /api/proposals/:id/reject` | own | ✘ | instructor of the course (BR-03, BR-04) |
 | Create / join / leave team | S2 (F-03) | ✘ | ✔ / own | BR-06…BR-08 |
 | Manage milestones | S2 (F-04) | own | ✘ | instructor of the course |
 | View milestones | S2 (F-04) | own | own | course member |
