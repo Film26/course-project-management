@@ -56,6 +56,7 @@ npm run dev:client                            # UI   -> http://localhost:5173
 npm test          # server unit + API/DB integration tests (uses cpms_test, migrated automatically)
 npm run build     # production build of the client
 npm run test:e2e  # Playwright UI journeys (needs db:migrate + db:seed; starts API and UI automatically)
+                  # note: the F-02 journey deletes the proposals of the seeded CPE334 course in cpms_dev first
                   # first time only: npx playwright install chromium
 ```
 
@@ -69,5 +70,15 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 | student1@cpms.test | STUDENT | Team Alpha |
 | student2@cpms.test | STUDENT | Team Alpha |
 | student3@cpms.test | STUDENT | Team Beta |
+
+### Sprint 1 journey (F-01 + F-02)
+
+1. Log in as `student3@cpms.test` → **My team proposal** → create a draft → **Submit proposal**.
+2. Log in as `instructor1@cpms.test` → **Review proposals** → **Approve**, or **Reject** with a reason.
+3. Log in as the student again → the status and the decision/reason are shown; after a rejection the team can create a new proposal.
+
+Rules enforced by the API: one active proposal per team, no submission after the course deadline,
+only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
+the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
 
 Never commit `server/.env` / `server/.env.test` or any real password.

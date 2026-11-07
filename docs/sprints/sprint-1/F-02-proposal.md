@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-07 | jaruwan18 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation |
+| 1.1 | 2026-11-07 | jaruwan18 | Order of checks: role (403) is checked by `requireRole` **before** input validation (400); review list opens on the "Submitted" filter | Reuses the F-01 `requireRole` middleware as planned in the F-01 contract; no AC or test changed (every AC-02 test uses a valid body for forbidden-role calls). Instructors mostly need the submitted queue |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -84,7 +85,7 @@ State machine (BR-03). Any pair not listed is rejected with `409 INVALID_TRANSIT
 | `status` query | optional; one of `DRAFT`, `SUBMITTED`, `APPROVED`, `REJECTED` | 400 `VALIDATION_ERROR`, `details.status` |
 | path ids | positive integers | 400 `VALIDATION_ERROR` |
 
-Validation runs before any rule check, so a 400 never changes data.
+Validation runs before any database read or rule check, so a 400 never changes data.
 
 ## 3. API contract
 
@@ -103,7 +104,7 @@ All errors use `{ "error": { "code", "message", "details"? } }`. All endpoints r
 | `POST /api/proposals/:id/approve` | INSTRUCTOR, owns course | — | `200 { proposal: P }` with `APPROVED`, `decidedAt`, `decidedBy` | 403, 404, 409 `INVALID_TRANSITION` |
 | `POST /api/proposals/:id/reject` | INSTRUCTOR, owns course | `{ reason }` | `200 { proposal: P }` with `REJECTED`, `rejectReason`, `decidedAt`, `decidedBy` | 400, 403, 404, 409 `INVALID_TRANSITION` |
 
-Order of checks per request: authenticate (401) → validate input (400) → load resource (404) → role/ownership (403) → business rule (409) → write.
+Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRole` (403) → validate input (400) → load resource (404) → team/course ownership (403) → business rule (409) → write.
 
 ### Application-layer components (server)
 | Module | Responsibility |
@@ -124,7 +125,7 @@ Order of checks per request: authenticate (401) → validate input (400) → loa
 |---|---|
 | Home — course card | STUDENT: button **"My team proposal"**. INSTRUCTOR: buttons **"View roster"** and **"Review proposals"**. Hidden buttons are convenience only — the API returns 403. |
 | My team proposal (Student) | Loading state; shows team name, members, deadline (Asia/Bangkok). No active proposal → **create form** (title, description, field errors before submit). `DRAFT` → edit form with **Save draft** and **Submit proposal**. `SUBMITTED` → read-only "Waiting for instructor decision". `APPROVED` → read-only, green status. `REJECTED` → shows the reason and a create form for a new proposal. Earlier proposals listed under "History". Server errors (e.g. `DEADLINE_PASSED`, `ACTIVE_PROPOSAL_EXISTS`) shown in an alert. No team → "You are not in a team for this course." |
-| Review proposals (Instructor) | Status filter (All / Draft / Submitted / Approved / Rejected); loading, empty ("No proposals"), error (403 "You do not have access to this course") states. Each row: team, title, status badge, submitted time. `SUBMITTED` rows have **Approve** and **Reject**; Reject opens a reason text area (required, ≤ 500 chars, counter) and **Confirm reject**. List refreshes after a decision. |
+| Review proposals (Instructor) | Status filter (All / Draft / Submitted / Approved / Rejected), opens on **Submitted** *(v1.1)*; loading, empty ("No proposals"), error (403 "You do not have access to this course") states. Each row: team, title, status badge, submitted time. `SUBMITTED` rows have **Approve** and **Reject**; Reject opens a reason text area (required, ≤ 500 chars, counter) and **Confirm reject**. List refreshes after a decision. |
 
 ## 6. Acceptance criteria
 

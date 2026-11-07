@@ -3,6 +3,9 @@ import { Router } from 'express';
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { requireAuth, requireRole } from '../auth/middleware.js';
+import { parseStatusFilter } from '../proposals/rules.js';
+import { listCourseProposals, getMyTeam } from '../proposals/service.js';
+import { parseId } from './proposals.js';
 
 export const coursesRouter = Router();
 
@@ -58,6 +61,27 @@ coursesRouter.get('/', requireAuth, async (req, res, next) => {
       orderBy: { code: 'asc' },
     });
     res.json({ courses });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// F-02 FR-07: proposals of a course — INSTRUCTOR who teaches it, optional ?status= filter.
+coursesRouter.get('/:courseId/proposals', requireAuth, requireRole('INSTRUCTOR'), async (req, res, next) => {
+  try {
+    const courseId = parseId(req.params.courseId, 'courseId');
+    const filter = parseStatusFilter(req.query.status);
+    if (!filter.ok) throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid status filter', filter.details);
+    res.json(await listCourseProposals(courseId, req.user, filter.value));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// F-02 FR-09: the current student's team in a course with its proposals and decisions.
+coursesRouter.get('/:courseId/my-team', requireAuth, requireRole('STUDENT'), async (req, res, next) => {
+  try {
+    res.json(await getMyTeam(parseId(req.params.courseId, 'courseId'), req.user));
   } catch (err) {
     next(err);
   }
