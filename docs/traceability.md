@@ -13,12 +13,13 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507216 | First version: every FR/BR/NFR mapped to a feature or system responsibility, sprint, AC and test; coverage gaps and approved changes |
 | 0.2 | 2026-11-07 | 67070507216 | Aligned with `features.md` v0.1 (PR #8): NFR rows name system responsibilities SR-01–SR-04; G-01 plan moved to S3 hardening as in `plan.md` |
+| 0.3 | 2026-11-07 | 67070507216 | PR #9 review by Film26: FR-06 status split into the Sprint 1 scope (verified) and the BR-07 minimum-team-size check (planned S2); NFR-07 status states that the README run has not been done yet |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
 - **Sprint 1** rows name the real acceptance criteria (`AC-0x-yy`) and tests (`TEST-0x-yy`) from the Sprint 1 contracts. Every test ID is also in the test name in the file shown, so `npx vitest -t "TEST-02-08"` finds it.
 - **Sprint 2–3** rows are *planned*: they have a feature and a sprint now. Their AC and tests are written in that sprint's contract (the deliverable does not require them yet).
-- **Status**: *Verified (auto)* = automated test in `npm test` / `npm run test:e2e`; *Verified (manual)* = recorded manual check; *Partial* = part of the requirement is verified, the rest is planned (see §4); *Planned* = allocated, not built yet. Build/test output with the tested commit is in Deliverable Part F.
+- **Status**: *Verified (auto)* = automated test in `npm test` / `npm run test:e2e`; *Verified (manual)* = recorded manual check; *Partial* = the Sprint 1 part of the requirement is verified, the rest is planned (the row says which part); *Planned* = allocated, not built yet. Build/test output with the tested commit is in Deliverable Part F.
 
 Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.js` (A-API), `server/tests/proposal.unit.test.js` (P-U), `server/tests/proposal.api.test.js` (P-API), `server/tests/health.test.js` (H), `e2e/auth.spec.js` (A-E2E), `e2e/proposal.spec.js` (P-E2E).
 
@@ -31,7 +32,7 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 | FR-03 | Current user + role from the session only | F-01 | S1 | AC-01-04, AC-01-11 | TEST-01-07, TEST-01-14 (A-API) | Verified (auto) |
 | FR-04 | Instructor views roster of own course | F-01 | S1 | AC-01-08, AC-01-10 | TEST-01-12 (A-API); TEST-01-13 (A-E2E) | Verified (auto) |
 | FR-05 | Student creates / edits a draft proposal for own team | F-02 Proposal workflow | S1 | AC-02-01, AC-02-03, AC-02-04, AC-02-14 | TEST-02-04 (P-U); TEST-02-05, TEST-02-09, TEST-02-10 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
-| FR-06 | Student submits draft → `SUBMITTED`, time recorded | F-02 | S1 (revised S2, see C-02) | AC-02-05, AC-02-14 | TEST-02-02 (P-U); TEST-02-11 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
+| FR-06 | Student submits draft → `SUBMITTED`, time recorded | F-02 | S1 (revised S2, see C-02) | AC-02-05, AC-02-14 | TEST-02-02 (P-U); TEST-02-11 (P-API); TEST-02-20 (P-E2E) | Partial — Sprint 1 scope Verified (auto): submit, status change, `submittedAt`, deadline (BR-02). Minimum team size before submit (BR-07) Planned S2 with F-03 |
 | FR-07 | Instructor lists course proposals by status | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
 | FR-08 | Instructor approves / rejects with reason; decider + time recorded | F-02 | S1 | AC-02-08, AC-02-09, AC-02-14 | TEST-02-14, TEST-02-15 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
 | FR-09 | Team members view proposal, status, decision/reason | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
@@ -81,7 +82,7 @@ NFRs are system responsibilities (SR-01–SR-04 in `features.md` §2), so one NF
 | NFR-04 | Session expiry (8 h) and revocation on logout | F-01 (`auth/session.js`) | S1 | S1 | AC-01-05, AC-01-06 → TEST-01-01 boundary (A-U); TEST-01-09, TEST-01-10 (A-API) | Verified (auto) |
 | NFR-05 | One error shape; 5xx without stack/SQL | SR-02 Error handling & integrity (`errors.js`) | S1 | S2 | 400/401/403/404/409 shapes asserted in A-API and P-API; unknown route → H "unknown API route returns the standard error shape" | Partial — forced-500 test planned S2 (G-02) |
 | NFR-06 | Rules + DB constraints; no partial data on rejection | SR-02 Error handling & integrity (services + Prisma schema) | S1 | every sprint | DB state checked after negative tests: TEST-02-06, TEST-02-08, TEST-02-09, TEST-02-12, TEST-02-13, TEST-02-15, TEST-02-16, TEST-02-17; TEST-01-05 (no session row) | Verified (auto) for S1; see G-01 |
-| NFR-07 | Clone → `.env` → migrate → seed → test in ≤ 15 min from README | SR-03 Engineering baseline (README) | S1 | S1, S3 | Manual: teammate follows README on a clean machine, time recorded in the release PR | Planned S1 manual check (G-06) |
+| NFR-07 | Clone → `.env` → migrate → seed → test in ≤ 15 min from README | SR-03 Engineering baseline (README) | S1 | S1, S3 | Manual: teammate follows README on a clean machine, time recorded in the release PR | **Not done yet** — planned before release PR #5 (G-06). Becomes Verified (manual) only when the run is recorded |
 | NFR-08 | Config via env vars; no secrets in Git/client; single Docker container | SR-03 Engineering baseline (`config.js`, `.env.example`; Lab 5 deployment) | S1 design | Lab 5 (S2) | `.env` and `.env.test` git-ignored; `.env.example` has placeholders only | Partial — secret scan + Docker build in Lab 5 |
 | NFR-09 | Loading / empty / error states; field validation messages | SR-04 Quality & UX standards (client pages) | S1 | every sprint | TEST-01-13 (invalid login error), TEST-02-20 (A-E2E, P-E2E); screenshots `F01-1-invalid-login.png`, `F02-1-student-validation.png` | Partial — UI review checklist per sprint (G-07) |
 | NFR-10 | List endpoints p95 < 500 ms at 50 teams × 3 students | SR-04 Quality & UX standards (roster, proposal list, F-08 dashboard) | S3 | S3 | — | Planned |
@@ -118,7 +119,7 @@ Requirements, or parts of them, that are not fully verified at the end of Sprint
 | G-03 | FR-22 | F-02 decisions (approve/reject) are not written to an audit log yet; `decidedAt`, `decidedById` and `rejectReason` on `Proposal` are the Sprint 1 record. | F-09 in S3 adds `AuditLog` entries for proposal decisions. |
 | G-04 | FR-13, BR-12 | BR-12 refers to a milestone's maximum score, but FR-13 lists only title, description, due date and weight. | Add max score to FR-13 when the F-04 contract is written (S2). |
 | G-05 | BR-11 | Wording does not say whether a team whose first submission was already late may resubmit late. | Resolve in the F-05 contract (S2) and record in SRS §9. |
-| G-06 | NFR-07 | Clean-machine README run (≤ 15 min) not yet recorded. | Teammate runs it before the Sprint 1 release PR into `main`; time and commit recorded in that PR. |
+| G-06 | NFR-07 | Clean-machine README run (≤ 15 min) has not been done or recorded yet. `features.md` (SR-03) and `plan.md` §3 must say the same until it is. | Teammate runs it before the Sprint 1 release PR #5 into `main`; time, steps and commit recorded in that PR; then all three documents change to Verified (manual). |
 | G-07 | NFR-09 | Empty/loading states are implemented on all Sprint 1 screens but only error/validation states are covered by E2E tests. | UI review checklist recorded per sprint from S2. |
 | G-08 | Sprint 1 scope | SRS Q-05 is open: the Sprint 1 slice is not yet confirmed against the theme's Sprint 1 example in `group_work_specs.docx`. | Team confirms before the release to `main`; resolution recorded in SRS §9. |
 
