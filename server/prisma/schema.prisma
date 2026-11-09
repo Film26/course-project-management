@@ -1,0 +1,98 @@
+// Course Project Management System — baseline data model (Sprint 1)
+// Change this file only through a new migration: `npm run db:dev -w server -- --name <change>`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  INSTRUCTOR
+  STUDENT
+}
+
+enum ProposalStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id               Int          @id @default(autoincrement())
+  email            String       @unique
+  passwordHash     String
+  displayName      String
+  role             Role
+  createdAt        DateTime     @default(now())
+  sessions         Session[]
+  memberships      TeamMember[]
+  coursesTaught    Course[]     @relation("CourseInstructor")
+  decidedProposals Proposal[]   @relation("ProposalDecider")
+}
+
+// Server-side session: the cookie holds a random token, only its SHA-256 hash is stored.
+// Logout sets revokedAt, so the token can never be reused.
+model Session {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  @@index([userId])
+}
+
+model Course {
+  id               Int      @id @default(autoincrement())
+  code             String   @unique
+  name             String
+  instructorId     Int
+  instructor       User     @relation("CourseInstructor", fields: [instructorId], references: [id])
+  proposalDeadline DateTime
+  teams            Team[]
+}
+
+model Team {
+  id        Int          @id @default(autoincrement())
+  name      String
+  courseId  Int
+  course    Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+  proposals Proposal[]
+
+  @@unique([courseId, name])
+}
+
+model TeamMember {
+  teamId Int
+  userId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+}
+
+model Proposal {
+  id           Int            @id @default(autoincrement())
+  teamId       Int
+  team         Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  status       ProposalStatus @default(DRAFT)
+  rejectReason String?
+  submittedAt  DateTime?
+  decidedAt    DateTime?
+  decidedById  Int?
+  decidedBy    User?          @relation("ProposalDecider", fields: [decidedById], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([teamId])
+}
