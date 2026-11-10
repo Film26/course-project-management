@@ -13,6 +13,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial inventory F-01 to F-09 and system responsibilities SR-01 to SR-04 |
+| 0.2 | 2026-11-09 | 67070507202 | SR-03: records the NFR-07 README run (21 min 36 s, not met, fix in S2), aligned with `traceability.md` (PR #9 and PR #12 reviews) |
 
 ---
 
@@ -40,7 +41,7 @@ Some NFRs do not belong to one feature. The table names the responsibility that 
 |---|---|---|---|---|---|
 | **SR-01** | Access control (session, role and ownership checks on every protected endpoint) | NFR-02, NFR-03 | S1 (F-01 middleware) | S1, then again in S2 and S3 for each new endpoint | Each feature contract adds API tests for 401/403 on its own endpoints. |
 | **SR-02** | API error handling and data integrity (single error shape, safe 5xx, no partial writes) | NFR-05, NFR-06 | S1 (`errors.js`, F-02 transactions) | S1 (4xx shapes, DB state after rejected requests), S2 (forced 500 test) | |
-| **SR-03** | Engineering baseline (reproducible setup, configuration and secrets, deployability) | NFR-07, NFR-08 | S1 (README, `.env.example`, migrations, seed) | S1 (teammate followed README), S2 / Lab 5 (Docker, Cloud Run) | |
+| **SR-03** | Engineering baseline (reproducible setup, configuration and secrets, deployability) | NFR-07, NFR-08 | S1 (README, `.env.example`, migrations, seed) | S1: README run by the teammate on 2026-11-09 (PR #10 comment, `bb734b0`): all steps and tests passed in 21 min 36 s, **NFR-07 not met** (target ≤ 15 min). S2: add a PostgreSQL subsection to the README, then repeat the run. S2 / Lab 5 (Docker, Cloud Run) for NFR-08. | PR #10 fixed two clean-clone setup failures found before the run. Traceability G-06. |
 | **SR-04** | Quality and UX standards (loading/empty/error states, test coverage, performance) | NFR-09, NFR-10, NFR-11 | S1 (NFR-09), S2 (NFR-11), S3 (NFR-10) | NFR-09 in every sprint (E2E), NFR-11 in S2 and S3, NFR-10 in S3 | |
 
 ## 3. Coverage check
