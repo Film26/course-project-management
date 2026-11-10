@@ -14,7 +14,7 @@
 | 0.1 | 2026-11-07 | 67070507216 | First version: every FR/BR/NFR mapped to a feature or system responsibility, sprint, AC and test; coverage gaps and approved changes |
 | 0.2 | 2026-11-07 | 67070507216 | Aligned with `features.md` v0.1 (PR #8): NFR rows name system responsibilities SR-01–SR-04; G-01 plan moved to S3 hardening as in `plan.md` |
 | 0.3 | 2026-11-07 | 67070507216 | PR #9 review by Film26: FR-06 status split into the Sprint 1 scope (verified) and the BR-07 minimum-team-size check (planned S2); NFR-07 status states that the README run has not been done yet |
-| 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4` |
+| 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4`; G-08 records how Q-05 was closed (PR #14) |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
@@ -122,7 +122,7 @@ Requirements, or parts of them, that are not fully verified at the end of Sprint
 | G-05 | BR-11 | Wording does not say whether a team whose first submission was already late may resubmit late. | Resolve in the F-05 contract (S2) and record in SRS §9. |
 | G-06 | NFR-07 | The README run on 2026-11-09 (PR #10) passed every step and test but took 21 min 36 s, over the 15 min target. About 10 min went to finding how to start PostgreSQL and which port and password go into `DATABASE_URL`, which the README does not explain. An earlier clean-clone attempt on `a32fbe4` found two setup failures, fixed in PR #10 (C-06). | S2: add a PostgreSQL subsection to the README, then repeat the run on a clean clone and record it; re-verify in S3 as planned. |
 | G-07 | NFR-09 | Empty/loading states are implemented on all Sprint 1 screens but only error/validation states are covered by E2E tests. | UI review checklist recorded per sprint from S2. |
-| G-08 | Sprint 1 scope | SRS Q-05 is open: the Sprint 1 slice is not yet confirmed against the theme's Sprint 1 example in `group_work_specs.docx`. | Team confirms before the release to `main`; resolution recorded in SRS §9. |
+| G-08 | Sprint 1 scope | SRS Q-05 closed on 2026-11-10 (SRS v0.2, PR #14) **without** comparing against the theme's Sprint 1 example: the full `group_work_specs.docx` was not available. The registration sheet confirms theme 6 (CPMS) and the Sprint 1 roles Student / Supervisor (Supervisor = Instructor). The slice was checked against the required Sprint 1 outcome in `project_deliverable_1_v1.pdf` §2 instead. | Disclosed as a known limitation in Part F. If the document is obtained, compare the slice with its Sprint 1 example and record any difference in SRS §9 and here. |
 
 ## 5. Approved changes
 
