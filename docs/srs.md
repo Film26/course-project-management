@@ -7,13 +7,14 @@
 | Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
 | Repository | https://github.com/Film26/course-project-management |
 | Document owner | 67070507202 · reviewed by 67070507216 |
-| Master specification | `group_work_specs.docx` (theme assignment and Sprint 1 example) |
+| Master specification | `group_work_specs.docx` (theme assignment and Sprint 1 example). The team could not obtain a copy; the Sprint 1 scope is checked against `project_deliverable_1_v1.pdf` §2 instead (see Q-05). |
 
 ### Version history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft of the full-product baseline: actors, scope, FR/BR/NFR, decisions |
+| 0.2 | 2026-11-10 | 67070507202 | Q-05 closed: `group_work_specs.docx` not available to the team, Sprint 1 scope checked against the Deliverable 1 required outcome instead |
 
 ---
 
@@ -157,4 +158,4 @@ IDs are stable. *Planned* = feature and sprint allocation (details in `docs/feat
 | Q-02 | Can a team resubmit after rejection? | Yes — by creating a **new** proposal; the rejected one is kept (D-05, BR-01). | 2026-11-07 |
 | Q-03 | Are late milestone submissions allowed? | Yes, but marked `LATE` (BR-11). | 2026-11-07 |
 | Q-04 | Should unknown e-mail and wrong password give different errors? | No — identical 401 to avoid account enumeration (F-01 rule R1). | 2026-11-07 |
-| Q-05 | Does the Sprint 1 slice match the theme's Sprint 1 example in `group_work_specs.docx`? | **Open** — team to confirm against the master specification before release. | — |
+| Q-05 | Does the Sprint 1 slice match the theme's Sprint 1 example in `group_work_specs.docx`? | **Closed, not confirmed against the theme example.** The team could not obtain `group_work_specs.docx`, so the theme's own Sprint 1 example was not compared. Instead the slice was checked against the required Sprint 1 outcome in `project_deliverable_1_v1.pdf` §2: (1) complete journey UI → API → database: proposal create → submit → approve/reject, read back (TEST-02-20); (2) real login, logout, current user and two roles Instructor/Student (F-01, TEST-01-13); (3) a state transition `DRAFT → SUBMITTED → APPROVED/REJECTED` with business rules BR-01 to BR-05 (F-02); (4) automated tests for rules, persistence and access: 62 unit and API/DB tests and 4 E2E tests; (5) Issues, feature branches, reviewed PRs, `sprint-1` staging and a release on `main`. The reasons for the scope are in `plan.md` §3. If the theme example differs, the difference is recorded here and in `traceability.md` G-08. Disclosed as a known limitation in the Deliverable 1 PDF. | 2026-11-10 |
