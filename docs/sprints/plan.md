@@ -12,7 +12,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial plan for Sprints 1–3 |
-| 0.2 | 2026-11-09 | 67070507202 | §3: NFR-07 is verified by the README run recorded in the release PR; work items list the actual PR numbers |
+| 0.2 | 2026-11-09 | 67070507202 | §3: records the NFR-07 README run (21 min 36 s, not met, fix in S2) and adds NFR-08 to the Sprint 1 requirements; work items list the actual PR numbers (PR #12 review) |
 
 ---
 
@@ -46,7 +46,7 @@ All features depend on F-01, because every endpoint uses its session, role and o
 |---|---|
 | **Goal** | Deliver one complete domain journey (UI → API → database) with real login, two roles, a meaningful state transition, business-rule validation and automated tests. |
 | **Features** | F-01 Authentication & role-based access (owner 67070507202); F-02 Project proposal workflow (owner 67070507216) |
-| **Requirements** | FR-01 to FR-09 · BR-01 to BR-05 · NFR-01 to NFR-06 and NFR-09 established; NFR-07 verified when the teammate follows the README on a clean clone and the time is recorded in the release PR (traceability G-06) |
+| **Requirements** | FR-01 to FR-09 · BR-01 to BR-05 · NFR-01 to NFR-06 and NFR-09 established; NFR-08 established in design (configuration through env vars, no secrets in Git; Docker in Lab 5); NFR-07 run on 2026-11-09 by the teammate (PR #10, `bb734b0`): every step and test passed in 21 min 36 s, so the ≤ 15 min target is **not met**; fix planned in S2 (traceability G-06) |
 | **Dependencies** | Baseline scaffold (pair work): stack, Prisma schema + migration, seed, test setup. F-02 depends on F-01. |
 | **Work items** | Issue #1 → PR #3 (F-01), Issue #2 → PR #6 (F-02), PR #4 + #11 (SRS + SDS), PR #8 + #9 (Part B/D docs), PR #10 (clean-clone setup fix), release PR `sprint-1 → main` (PR #5 was merged early without review; the reviewed release PR replaces it) |
 | **Completion outcome** | Release tag `v1.0-sprint1` on `main`. An Instructor and Students log in. A Student submits the team proposal, and the Instructor approves it or rejects it with a reason; the result is saved and can be read back. Rule violations (second active proposal, after deadline, invalid transition) return 409. Other roles and teams get 401/403. All unit, API/DB and E2E tests pass. |
@@ -64,6 +64,7 @@ All features depend on F-01, because every endpoint uses its session, role and o
 | BR-08 membership lock after approval | S2 with F-03 | Needs team join/leave (F-03) |
 | Database constraint for BR-01 | S3 hardening (if feasible) | A partial unique index is not expressible in the Prisma schema; the rule is enforced by a transaction with a team row lock (F-02 contract §4) |
 | Docker image, CI/CD, GCP deployment | Lab 5 / S2 | Explicitly due in Lab 5 |
+| NFR-07 README setup ≤ 15 min | S2 | The README does not explain how to start PostgreSQL or which port and password go into `DATABASE_URL`; this cost about 10 min in the Sprint 1 run. S2 adds a PostgreSQL subsection to the README and repeats the run. |
 
 ## 4. Sprint 2: Core course workflow (planned)
 
