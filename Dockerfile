@@ -3,9 +3,8 @@
 # No secret is baked in: every setting comes from the environment at run time (R-02).
 
 # ---- build: install all workspace deps, generate Prisma client, build the React UI ----
-FROM node:22-bookworm-slim AS build
-RUN apt-get update && apt-get install -y --no-install-recommends openssl \
-  && rm -rf /var/lib/apt/lists/*
+# Alpine already ships libssl 3, which the Prisma engine needs (no apt/apk step).
+FROM node:22-alpine AS build
 WORKDIR /app
 
 # Manifests + Prisma schema first, so `npm ci` is cached until dependencies change.
@@ -22,9 +21,7 @@ RUN npm run build -w client
 COPY server server
 
 # ---- runtime ----
-FROM node:22-bookworm-slim AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends openssl \
-  && rm -rf /var/lib/apt/lists/*
+FROM node:22-alpine AS runtime
 
 # Which commit this image was built from (R-08). Public Git SHA, not a secret.
 ARG APP_COMMIT=unknown
