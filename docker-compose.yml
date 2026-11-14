@@ -46,6 +46,8 @@ services:
   # UI + API in one container, like Cloud Run.
   app:
     image: cpms:local
+    # Built by the `migrate` service above; never try to pull `cpms:local` from Docker Hub.
+    pull_policy: never
     environment:
       DATABASE_URL: postgresql://cpms:${POSTGRES_PASSWORD}@db:5432/cpms?schema=public
       PORT: 8080
