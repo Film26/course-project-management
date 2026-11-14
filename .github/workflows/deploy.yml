@@ -1,0 +1,99 @@
+# Lab 5 Ep.7 (R-07, R-08): every merge into main is a release.
+#   test (reuses ci-docker.yml) -> sign in to GCP with Workload Identity Federation (no key)
+#   -> build + push image tagged with the full commit SHA -> migration job -> Cloud Run by digest
+#   -> smoke test of the public URL -> summary with commit, digest, revision.
+# Rollback / roll forward (Ep.8): Actions -> Deploy demo -> Run workflow on main with image_tag =
+# the full SHA of an earlier release; test and build are skipped and that exact image is redeployed.
+# Names must match deploy/config.sh, the GitHub environment `demo` and the WIF attribute condition.
+name: Deploy demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Full 40-character commit SHA of an earlier release to redeploy (empty = test, build and deploy current main)"
+        required: false
+        default: ""
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.event_name == 'push' || inputs.image_tag == ''
+    uses: ./.github/workflows/ci-docker.yml
+
+  deploy:
+    needs: test
+    # Runs after a green test, or with test skipped only for a rollback to an existing image.
+    if: >-
+      always() &&
+      (needs.test.result == 'success' ||
+       (needs.test.result == 'skipped' && github.event_name == 'workflow_dispatch' && inputs.image_tag != ''))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: demo
+    permissions:
+      contents: read
+      id-token: write   # OIDC token for Workload Identity Federation
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      TAG: ${{ inputs.image_tag || github.sha }}
+    steps:
+      - name: Validate deployment settings
+        run: |
+          [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "Branch is not allowed to deploy: $GITHUB_REF"; exit 1; }
+          for v in PROJECT_ID REGION; do [ -n "${!v}" ] || { echo "Environment demo is missing variable for $v"; exit 1; }; done
+          [ -n "${{ vars.GCP_WIF_PROVIDER }}" ] && [ -n "${{ vars.GCP_DEPLOY_SA }}" ] || { echo "GCP_WIF_PROVIDER / GCP_DEPLOY_SA missing in environment demo"; exit 1; }
+          [[ "$TAG" =~ ^[0-9a-f]{40}$ ]] || { echo "Image tag must be a full 40-character commit SHA: $TAG"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation, no key)
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Build and push image (tag = commit SHA)
+        if: inputs.image_tag == ''
+        run: |
+          source deploy/config.sh
+          IMAGE="$(image_base):${TAG}"
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build --build-arg APP_COMMIT="$TAG" -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Verify image, migrate and deploy
+        id: release
+        run: bash deploy/release.sh "$TAG"
+
+      - name: Smoke test public URL
+        env:
+          SMOKE_EMAIL: ${{ vars.SMOKE_EMAIL }}
+          SMOKE_PASSWORD: ${{ secrets.SMOKE_PASSWORD }}
+        run: bash deploy/smoke_test.sh "${{ steps.release.outputs.url }}" "$TAG"
+
+      - name: Record the release
+        if: always() && steps.release.outputs.url != ''
+        run: |
+          {
+            echo "### CPMS demo deployment"
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Commit image tag | \`${TAG}\` |"
+            echo "| Image digest | \`${{ steps.release.outputs.digest }}\` |"
+            echo "| Cloud Run revision | \`${{ steps.release.outputs.revision }}\` |"
+            echo "| URL | ${{ steps.release.outputs.url }} |"
+            echo "| Running commit | ${{ steps.release.outputs.url }}/api/version |"
+            echo "| Mode | ${{ inputs.image_tag != '' && 'rollback/roll-forward (test + build skipped)' || 'release from main' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
