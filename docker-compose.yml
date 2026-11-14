@@ -1,0 +1,63 @@
+# Run CPMS locally with its database (Lab 5, R-01 / C-03):
+#   cp .env.example .env   # then set POSTGRES_PASSWORD and SEED_PASSWORD
+#   docker compose up --build -d
+#   open http://localhost:8080
+# Data lives in the named volume `pgdata`, so it survives `docker compose down` / `up`.
+# `docker compose down -v` deletes the volume (clean database).
+name: cpms
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cpms
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (copy .env.example)}
+      POSTGRES_DB: cpms
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cpms -d cpms"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    # No host port by default: only the app talks to the database. To open it with a DB tool,
+    # uncomment and pick a free host port (5432 is often taken by a local PostgreSQL).
+    # ports:
+    #   - "5435:5432"
+
+  # One-shot job: apply migrations + idempotent seed, then exit 0. Same image as `app`
+  # (this is what the Cloud Run migration job runs too).
+  migrate:
+    build:
+      context: .
+      args:
+        APP_COMMIT: ${APP_COMMIT:-local}
+    image: cpms:local
+    command: ["migrate"]
+    environment:
+      DATABASE_URL: postgresql://cpms:${POSTGRES_PASSWORD}@db:5432/cpms?schema=public
+      SEED_PASSWORD: ${SEED_PASSWORD:?set SEED_PASSWORD in .env (copy .env.example)}
+      SEED_ON_MIGRATE: ${SEED_ON_MIGRATE:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  # UI + API in one container, like Cloud Run.
+  app:
+    image: cpms:local
+    environment:
+      DATABASE_URL: postgresql://cpms:${POSTGRES_PASSWORD}@db:5432/cpms?schema=public
+      PORT: 8080
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-8}
+      # Plain http on localhost; Cloud Run (https) sets COOKIE_SECURE=true.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  pgdata:

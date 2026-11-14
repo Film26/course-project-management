@@ -1,0 +1,25 @@
+# Keep the build context small and secret-free (R-02): only what the image needs.
+.git
+.github
+**/node_modules
+**/dist
+**/coverage
+
+# Never send env files with real values into the image
+**/.env
+**/.env.*
+!**/.env.example
+
+# Not needed at run time
+docs
+evidence
+e2e
+test-results
+playwright-report
+playwright.config.js
+*.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+.vscode
+.idea
