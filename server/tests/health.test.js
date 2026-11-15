@@ -14,6 +14,13 @@ describe('baseline', () => {
     expect(res.body).toEqual({ status: 'ok' });
   });
 
+  // TEMPORARY (Lab 5 C-02 / R-06): deliberately wrong expectation to prove a failed
+  // required check blocks the merge. This branch is never merged.
+  it('C-02 demo: deliberately failing test', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.status).toBe(500);
+  });
+
   it('unknown API route returns the standard error shape', async () => {
     const res = await request(app).get('/api/does-not-exist');
     expect(res.status).toBe(404);
