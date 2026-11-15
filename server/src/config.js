@@ -17,4 +17,8 @@ export const config = {
   databaseUrl: required('DATABASE_URL'),
   sessionTtlHours: Number(process.env.SESSION_TTL_HOURS ?? 8),
   cookieSecure: process.env.COOKIE_SECURE === 'true',
+  // Lab 5: the container serves the built UI from this folder (unset in local dev, where Vite serves it).
+  clientDistDir: process.env.CLIENT_DIST_DIR || null,
+  // Lab 5 (R-08): the commit this build came from, set by the Docker build / Cloud Run deploy.
+  appCommit: process.env.APP_COMMIT || 'unknown',
 };
