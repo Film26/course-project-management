@@ -1,0 +1,99 @@
+# Lab 5 Ep.4 (R-05): build + tests on every Pull Request into staging and main.
+# The job name `test-and-docker` is the required status check in the main ruleset (R-06, Ep.6).
+# deploy.yml reuses this workflow (workflow_call) so every release is tested again.
+name: CI & Docker Build
+
+on:
+  pull_request:
+    branches: [main, staging]
+  workflow_call:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Throwaway database for this run only. The password is a CI-only placeholder, not a secret.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci-only
+          POSTGRES_DB: cpms_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d cpms_ci"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+
+    env:
+      DB_BASE: postgresql://ci:ci-only@localhost:5432
+      SEED_PASSWORD: ci-seed-only
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check deploy scripts (offline, never touches Google Cloud)
+        run: |
+          for f in deploy/*.sh server/docker-entrypoint.sh; do bash -n "$f"; done
+          shellcheck -S warning deploy/*.sh server/docker-entrypoint.sh
+          DRY_RUN=1 PROJECT_ID=ci-dry-run REGION=asia-southeast1 bash deploy/deploy.sh > dry-run.log
+          grep -q "gcloud run deploy cpms" dry-run.log
+          grep -q "gcloud sql instances create cpms-pg" dry-run.log
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Write env files for the CI database (placeholders only)
+        working-directory: server
+        run: |
+          printf 'DATABASE_URL="%s/cpms_dev?schema=public"\nSEED_PASSWORD="%s"\n' "$DB_BASE" "$SEED_PASSWORD" > .env
+          printf 'DATABASE_URL="%s/cpms_test?schema=public"\nSEED_PASSWORD="%s"\n' "$DB_BASE" "$SEED_PASSWORD" > .env.test
+
+      - name: Migrate and seed a fresh database
+        run: |
+          npm run db:migrate
+          npm run db:seed
+          npm run db:seed   # the seed must be safe to run twice (it runs on every deploy)
+
+      - name: Backend tests (unit + API/DB integration)
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test.log
+          {
+            echo "### Backend tests (commit \`${GITHUB_SHA}\`)"
+            echo '```'
+            grep -E "Test Files|Tests " test.log | sed 's/\x1b\[[0-9;]*m//g'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build the UI
+        run: npm run build
+
+      - name: Docker build (not pushed)
+        run: docker build --build-arg APP_COMMIT="${GITHUB_SHA}" -t cpms:ci .
+
+      - name: Run the container against the CI database and smoke-test it
+        run: |
+          URL="${DB_BASE}/cpms_container?schema=public"
+          docker run --rm --network host -e DATABASE_URL="$URL" -e SEED_PASSWORD cpms:ci migrate
+          docker run -d --name cpms-ci --network host -e DATABASE_URL="$URL" -e PORT=8080 cpms:ci
+          bash deploy/smoke_test.sh http://localhost:8080 "${GITHUB_SHA}"
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs cpms-ci || true

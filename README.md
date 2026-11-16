@@ -32,6 +32,27 @@ See [`docs/`](docs/) — SRS, features, traceability, system SDS, sprint plan an
 | Auth | bcrypt password hashes, server-side sessions in an httpOnly cookie |
 | Tests | Vitest + Supertest (unit, API/DB integration), Playwright (E2E) |
 
+## Run with Docker (Lab 5)
+
+Prerequisites: Docker Desktop (or Docker Engine + Compose v2). No Node.js or PostgreSQL install needed.
+
+```bash
+cp .env.example .env              # set POSTGRES_PASSWORD and SEED_PASSWORD (your own values)
+docker compose up --build -d      # db -> migrate (migrations + seed, exits 0) -> app
+docker compose ps -a              # app and db running, migrate "Exited (0)"
+curl http://localhost:8080/api/ready     # {"status":"ready","db":"connected"}
+curl http://localhost:8080/api/version   # commit the image was built from
+# open http://localhost:8080 and log in with a seeded account (password = SEED_PASSWORD)
+
+docker compose down               # stop; data stays in the pgdata volume
+docker compose up -d              # start again; your data is still there
+docker compose down -v            # stop AND delete the database volume
+```
+
+The same image runs on Cloud Run: `serve` (default) starts the API and serves the built UI on one
+origin; `migrate` applies Prisma migrations and the idempotent seed. Port 8080 already in use?
+Set `APP_PORT=8081` in `.env`. On Windows PowerShell type `curl.exe` instead of `curl`.
+
 ## Local setup
 
 Prerequisites: Node.js 20+, PostgreSQL running locally.
