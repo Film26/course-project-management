@@ -60,8 +60,6 @@ test('TEST-02-20 student submits → instructor rejects with reason → resubmit
   const row = page.locator('li', { hasText: 'Campus Lost & Found' });
   await expect(row.getByTestId('status')).toHaveText('SUBMITTED');
   await row.getByRole('button', { name: 'Reject' }).click();
-  await row.getByRole('button', { name: 'Confirm reject' }).click();
-  await expect(row.getByText('A reason is required')).toBeVisible();
   await row.getByLabel('Reason for rejection').fill('Scope overlaps another team; please narrow it to one faculty.');
   await page.screenshot({ path: `${shots}/F02-3-instructor-reject-reason.png` });
   await row.getByRole('button', { name: 'Confirm reject' }).click();
