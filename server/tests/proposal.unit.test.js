@@ -99,8 +99,7 @@ describe('TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04)', () => {
   });
 
   it('Issue #36 (UAT-06c): an empty or blank reject reason is refused with "Reason is required" (AC-02-09, BR-04)', () => {
-    for (const body of [{}, { reason: '' }, { reason: '   ' }, { reason: '
-	' }, null]) {
+    for (const body of [{}, { reason: '' }, { reason: '   ' }, { reason: ' \n\t ' }, null]) {
       expect(validateRejectReason(body)).toEqual({ ok: false, details: { reason: 'Reason is required' } });
     }
   });
