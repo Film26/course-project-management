@@ -62,8 +62,9 @@ export function validateProposalInput(body, { partial = false } = {}) {
 
 // BR-04: a rejection needs a non-empty reason of at most 500 characters.
 export function validateRejectReason(body) {
-  const r = checkText(body?.reason, 'Reason', LIMITS.reason);
-  return r.error ? { ok: false, details: { reason: r.error } } : { ok: true, value: r.value };
+  const reason = typeof body?.reason === 'string' ? body.reason.trim() : '';
+  if (reason.length > LIMITS.reason) return { ok: false, details: { reason: `Reason must be at most ${LIMITS.reason} characters` } };
+  return { ok: true, value: reason };
 }
 
 export function parseStatusFilter(status) {

@@ -12,7 +12,6 @@ function ReviewRow({ proposal, onDecide, busy }) {
   const [error, setError] = useState('');
 
   function confirmReject() {
-    if (!reason.trim()) return setError('A reason is required');
     if (reason.trim().length > REASON_MAX) return setError(`At most ${REASON_MAX} characters`);
     onDecide(proposal, 'reject', reason);
   }
