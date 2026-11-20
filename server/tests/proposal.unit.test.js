@@ -90,9 +90,19 @@ describe('TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04)', () => {
   });
 
   it('reject reason: required, trimmed, at most 500 characters', () => {
+    expect(validateRejectReason({}).ok).toBe(false);
+    expect(validateRejectReason({ reason: '' }).ok).toBe(false);
+    expect(validateRejectReason({ reason: '   ' }).ok).toBe(false);
     expect(validateRejectReason({ reason: 'r'.repeat(501) }).details.reason).toBeDefined();
     expect(validateRejectReason({ reason: 'r'.repeat(500) }).ok).toBe(true);
     expect(validateRejectReason({ reason: '  Scope too large  ' })).toEqual({ ok: true, value: 'Scope too large' });
+  });
+
+  it('Issue #36 (UAT-06c): an empty or blank reject reason is refused with "Reason is required" (AC-02-09, BR-04)', () => {
+    for (const body of [{}, { reason: '' }, { reason: '   ' }, { reason: '
+	' }, null]) {
+      expect(validateRejectReason(body)).toEqual({ ok: false, details: { reason: 'Reason is required' } });
+    }
   });
 
   it('status filter: optional, must be a known status', () => {
