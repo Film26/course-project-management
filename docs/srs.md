@@ -4,9 +4,9 @@
 | Item | Value |
 |---|---|
 | Course | CPE 334 — Semester 1/2026 |
-| Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
+| Team | 67070507202 (Film26) · 67070507207 (Nontok9164). Until 2026-11-24 the second member was 67070507216 (jaruwan18); the history rows below keep that author |
 | Repository | https://github.com/Film26/course-project-management |
-| Document owner | 67070507202 · reviewed by 67070507216 |
+| Document owner | 67070507202 · reviewed by 67070507207 |
 | Master specification | `group_work_specs.docx` (Group Work Specification). Theme assignment confirmed in the course registration sheet: team TH-034, theme 6 Course Project Management System, Sprint 1 roles Student / Supervisor. The full document with the Sprint 1 example was not available to the team (see Q-05). |
 
 ### Version history
@@ -15,6 +15,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft of the full-product baseline: actors, scope, FR/BR/NFR, decisions |
 | 0.2 | 2026-11-10 | 67070507202 | Q-05 closed: theme and Sprint 1 roles confirmed from the registration sheet (Supervisor = Instructor); the Sprint 1 example itself was not available, so the scope is checked against the Deliverable 1 required outcome |
+| 0.3 | 2026-11-24 | 67070507202 | Team change: 67070507207 (Nontok9164) replaces 67070507216 (jaruwan18). Only the current team and owner fields changed; history keeps the original authors |
 
 ---
 

@@ -3,8 +3,8 @@
 
 | Item | Value |
 |---|---|
-| Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
-| Document owner | 67070507202 · reviewed by 67070507216 |
+| Team | 67070507202 (Film26) · 67070507207 (Nontok9164). Until 2026-11-24 the second member was 67070507216 (jaruwan18); the history rows below keep that author |
+| Document owner | 67070507202 · reviewed by 67070507207 |
 | Related | `docs/srs.md` (requirements), `docs/features.md`, `docs/sprints/sprint-1/*` (feature contracts) |
 
 ### Version history
@@ -13,6 +13,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft: architecture, data model, UI/API conventions, access matrix, auth, configuration, deployment plan |
 | 0.2 | 2026-11-07 | 67070507202 | §5 F-02 rows now list the real endpoints from PR #6; §2.2 records how BR-01 is enforced |
+| 0.3 | 2026-11-24 | 67070507202 | Team change: 67070507207 (Nontok9164) replaces 67070507216 (jaruwan18). Only the current team and owner fields changed; history keeps the original authors |
 
 ---
 

@@ -3,8 +3,8 @@
 
 | Item | Value |
 |---|---|
-| Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
-| Document owner | 67070507202 · reviewed by 67070507216 |
+| Team | 67070507202 (Film26) · 67070507207 (Nontok9164). Until 2026-11-24 the second member was 67070507216 (jaruwan18); the history rows below keep that author |
+| Document owner | 67070507202 · reviewed by 67070507207 |
 | Source of IDs | FR / BR / NFR from `docs/srs.md` |
 | Related | `docs/traceability.md` (requirement → feature → sprint → AC/TEST), `docs/sprints/plan.md` |
 
@@ -14,6 +14,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial inventory F-01 to F-09 and system responsibilities SR-01 to SR-04 |
 | 0.2 | 2026-11-09 | 67070507202 | SR-03: records the NFR-07 README run (21 min 36 s, not met, fix in S2), aligned with `traceability.md` (PR #9 and PR #12 reviews) |
+| 0.3 | 2026-11-24 | 67070507202 | Team change: 67070507207 (Nontok9164) replaces 67070507216 (jaruwan18). Only the current team and owner fields changed; history keeps the original authors |
 
 ---
 

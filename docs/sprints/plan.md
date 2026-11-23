@@ -3,8 +3,8 @@
 
 | Item | Value |
 |---|---|
-| Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
-| Document owner | 67070507202 · reviewed by 67070507216 |
+| Team | 67070507202 (Film26) · 67070507207 (Nontok9164). Until 2026-11-24 the second member was 67070507216 (jaruwan18); the history rows below keep that author |
+| Document owner | 67070507202 · reviewed by 67070507207 |
 | Related | `docs/srs.md`, `docs/features.md`, `docs/traceability.md` |
 
 ### Version history
@@ -13,6 +13,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial plan for Sprints 1–3 |
 | 0.2 | 2026-11-09 | 67070507202 | §3: records the NFR-07 README run (21 min 36 s, not met, fix in S2) and adds NFR-08 to the Sprint 1 requirements; work items list the actual PR numbers (PR #12 review) |
+| 0.3 | 2026-11-24 | 67070507202 | Team change: 67070507207 (Nontok9164) replaces 67070507216 (jaruwan18). Sprint 2 and Sprint 3 allocations move to 67070507207; Sprint 1 owners stay as they were |
 
 ---
 
@@ -74,7 +75,7 @@ All features depend on F-01, because every endpoint uses its session, role and o
 | **Features** | F-03 Team formation, F-04 Course milestones, F-05 Deliverable submission, F-06 Grading & feedback |
 | **Requirements** | FR-10 to FR-18 · BR-06 to BR-12 · NFR-05 (forced 500 test), NFR-08 (Docker + Cloud Run), NFR-11 (coverage ≥ 80 % for rule modules) |
 | **Dependencies** | F-03 needs F-02 (BR-07 changes F-02 submit, BR-08 reads proposal status). F-05 needs F-02 + F-04. F-06 needs F-05. Lab 5 (Dockerfile, Cloud SQL, Cloud Run, CI) runs alongside. |
-| **Proposed allocation** | 67070507202: F-04, F-06 · 67070507216: F-03, F-05 · pair: Lab 5 deployment |
+| **Proposed allocation** | 67070507202: F-04, F-06 · 67070507207: F-03, F-05 · pair: Lab 5 deployment |
 | **Completion outcome** | Deliverable 2 release. Students form teams and submit milestone URLs. Late submissions are flagged. The Instructor grades, and students see released grades only. The app runs on Cloud Run with Cloud SQL. Every new endpoint has 401/403 API tests. |
 | **Risks** | Lab 5 deployment work competes for time with the feature work; mitigated by keeping submissions as URLs (D-06). |
 
@@ -87,7 +88,7 @@ All features depend on F-01, because every endpoint uses its session, role and o
 | **Requirements** | FR-19 to FR-22 · BR-13 · NFR-10 (p95 < 500 ms with 50 teams), NFR-07 rechecked, NFR-11 rechecked |
 | **Hardening** | Login rate limiting, cleanup of expired sessions, a DB-level guard for BR-01 if feasible, a full regression E2E across all roles, and accessibility checks on forms. |
 | **Dependencies** | F-07 needs F-03 + F-04. F-08 needs F-02, F-05 and F-06. F-09 hooks into F-02, F-03 and F-06. |
-| **Proposed allocation** | 67070507202: F-08, performance test · 67070507216: F-07, F-09 · pair: regression and final demo video |
+| **Proposed allocation** | 67070507202: F-08, performance test · 67070507207: F-07, F-09 · pair: regression and final demo video |
 | **Completion outcome** | Final release by 13 Dec: all FR/BR implemented and traced to passing tests, performance target measured and the final demonstration video recorded. |
 
 ## 6. Definition of Done for every sprint

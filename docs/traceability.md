@@ -3,8 +3,8 @@
 
 | Item | Value |
 |---|---|
-| Team | 67070507202 (Film26) · 67070507216 (jaruwan18) |
-| Document owner | 67070507216 (jaruwan18) · reviewed by 67070507202 (Film26) |
+| Team | 67070507202 (Film26) · 67070507207 (Nontok9164). Until 2026-11-24 the second member was 67070507216 (jaruwan18); the history rows below keep that author |
+| Document owner | 67070507207 (Nontok9164) · reviewed by 67070507202 (Film26). Versions 0.1–0.4 by 67070507216 (jaruwan18) |
 | Related | `docs/srs.md` (FR/BR/NFR text), `docs/features.md` (feature inventory), `docs/sprints/plan.md` (sprint goals), `docs/sprints/sprint-1/F-01-auth.md`, `docs/sprints/sprint-1/F-02-proposal.md` (AC and STS) |
 
 ### Version history
@@ -15,6 +15,7 @@
 | 0.2 | 2026-11-07 | 67070507216 | Aligned with `features.md` v0.1 (PR #8): NFR rows name system responsibilities SR-01–SR-04; G-01 plan moved to S3 hardening as in `plan.md` |
 | 0.3 | 2026-11-07 | 67070507216 | PR #9 review by Film26: FR-06 status split into the Sprint 1 scope (verified) and the BR-07 minimum-team-size check (planned S2); NFR-07 status states that the README run has not been done yet |
 | 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4`; G-08 records how Q-05 was closed (PR #14) |
+| 0.5 | 2026-11-24 | 67070507202 | Team change: 67070507207 (Nontok9164) replaces 67070507216 (jaruwan18) and takes over as document owner. Rows 0.1–0.4, NFR-07 and C-01/C-05 keep the original names |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
