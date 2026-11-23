@@ -229,7 +229,7 @@ describe('decide — POST /api/proposals/:id/approve | reject', () => {
     const p = await makeProposal(alpha, { status: 'SUBMITTED', submittedAt: new Date() });
     const c = await as(instructorA);
 
-    for (const body of [{ reason: 'r'.repeat(501) }]) {
+    for (const body of [{}, { reason: '   ' }, { reason: 'r'.repeat(501) }]) {
       const res = await request(app).post(`/api/proposals/${p.id}/reject`).set('Cookie', c).send(body);
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
@@ -245,6 +245,20 @@ describe('decide — POST /api/proposals/:id/approve | reject', () => {
     const row = await reload(p);
     expect(row).toMatchObject({ status: 'REJECTED', rejectReason: 'Scope is too large for one semester', decidedById: instructorA.id });
     expect(row.decidedAt).not.toBeNull();
+  });
+
+  it('TEST-02-15b Issue #36 (UAT-06c): reject with an empty or blank reason → 400, proposal stays SUBMITTED (AC-02-09, BR-04)', async () => {
+    const p = await makeProposal(alpha, { status: 'SUBMITTED', submittedAt: new Date() });
+    const c = await as(instructorA);
+
+    for (const body of [{}, { reason: '' }, { reason: '   ' }]) {
+      const res = await request(app).post(`/api/proposals/${p.id}/reject`).set('Cookie', c).send(body);
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(res.body.error.details.reason).toBe('Reason is required');
+    }
+    const row = await reload(p);
+    expect(row).toMatchObject({ status: 'SUBMITTED', rejectReason: null, decidedAt: null, decidedById: null });
   });
 });
 
