@@ -57,6 +57,7 @@ model Course {
   instructor       User     @relation("CourseInstructor", fields: [instructorId], references: [id])
   proposalDeadline DateTime
   teams            Team[]
+  milestones       Milestone[]
 }
 
 model Team {
@@ -95,4 +96,22 @@ model Proposal {
   updatedAt    DateTime       @updatedAt
 
   @@index([teamId])
+}
+
+// F-04 (FR-13, BR-09): course milestones. weight is an integer percentage; the course total ≤ 100 is
+// enforced in the application inside a transaction with a course row lock (a sum over rows is not a
+// column constraint). The migration adds CHECK constraints for the per-row ranges.
+model Milestone {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  dueAt       DateTime
+  weight      Int
+  maxScore    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
 }

@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-24 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-01/F-02 code |
+| 1.1 | 2026-11-24 | Film26 | TEST-04-09 split: the `NO_TEAM` case becomes TEST-04-09b and runs after F-03 is merged; migration name is `20261124164659_f04_milestones` | Writing the RED tests showed that a student "in the course without a team" cannot exist before F-03 adds `Enrollment`. Until then a student belongs to a course through a team (as in F-01). No AC changed |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -85,7 +86,7 @@ All endpoints require a session (`401 UNAUTHENTICATED`). Order of checks: authen
 
 ## 4. Data
 
-Migration `20261124010000_f04_milestones`:
+Migration `20261124164659_f04_milestones` *(v1.1)*:
 - New `Milestone { id, courseId (FK Course, cascade), title, description @default(""), dueAt DateTime, weight Int, maxScore Int, createdAt, updatedAt }`, `@@index([courseId])`.
 - SQL `CHECK ("weight" BETWEEN 1 AND 100)` and `CHECK ("maxScore" BETWEEN 1 AND 1000)`. Prisma does not model CHECK constraints and does not report them as drift.
 - BR-09 (a sum over rows) is enforced by the M1 transaction, not by a constraint. Recorded as a known limitation.
@@ -124,14 +125,15 @@ Migration `20261124010000_f04_milestones`:
 | TEST-04-06 | AC-04-03 | API+DB | course with total 50 | 2 concurrent POST weight 30 | one 201, one 409; DB total 80 |
 | TEST-04-07 | AC-04-04 | API+DB | M1 weight 20, total 90 | PATCH M1 `{ weight: 30 }`; PATCH M1 `{ title: "M1 SRS" }` | 200 (total 100, not 120); 200 with only the title changed |
 | TEST-04-08 | AC-04-05 | API+DB | total 90 | DELETE M3; POST weight 50 | 204, row gone; 201 |
-| TEST-04-09 | AC-04-06 | API+DB | seed; student5 enrolled without team | instructor1 GET; student1 GET; student5 GET; GET unknown course; PATCH unknown milestone | sorted M1, M2, M3, `totalWeight` 90; `teamStatus` `NOT_SUBMITTED` ×3; `NO_TEAM` ×3; 404; 404 |
+| TEST-04-09 | AC-04-06 | API+DB | seed milestones (total 90) | instructor1 GET; student1 GET; GET unknown course; PATCH / DELETE unknown milestone; GET course `abc` | sorted M1, M2, M3, `totalWeight` 90; `team` Alpha and `teamStatus` `NOT_SUBMITTED` ×3; 404; 404; 400 |
+| TEST-04-09b *(v1.1)* | AC-04-06 | API+DB | after F-03: student5 enrolled, no team | student5 GET | `team: null`, `teamStatus` `NO_TEAM` ×3 (`it.todo` until F-03 is merged) |
 | TEST-04-10 | AC-04-07 | API+DB | instructor2 owns another course; student7 not enrolled | student1 POST/PATCH/DELETE; instructor2 GET/POST/PATCH/DELETE; student7 GET | all 403 `FORBIDDEN`, no `milestone(s)` in body; DB unchanged |
 | TEST-04-11 | AC-04-08 | API | no cookie | each F-04 endpoint | 401 |
 | TEST-04-12 | AC-04-09 | E2E (Playwright) | `cpms_e2e` seeded | journey of AC-04-09 | each step visible; screenshots `evidence/screenshots/F04-*.png` |
 
 ## 8. Definition of Done (F-04 instance of the Product DoD)
 - [ ] AC-04-01 … AC-04-09 implemented.
-- [ ] TEST-04-01 … TEST-04-11 automated and passing in `npm test`; TEST-04-12 passing in `npm run test:e2e`.
+- [ ] TEST-04-01 … TEST-04-11 automated and passing in `npm test`; TEST-04-09b passing once F-03 is merged; TEST-04-12 passing in `npm run test:e2e`.
 - [ ] Red → green evidence in `docs/sprints/sprint-2/evidence/F-04-tdd-red.txt` and `F-04-tdd-green.txt`.
 - [ ] F-01, F-02 (and F-03 if merged first) tests still pass.
 - [ ] Migration applies on a copy of the deployed database; no secrets in Git; README updated with the milestone journey.
