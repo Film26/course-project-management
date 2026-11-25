@@ -38,10 +38,10 @@ beforeEach(async () => {
     data: { code: 'CPE999', name: 'Other Course', instructorId: instructor2.id, proposalDeadline: new Date(Date.now() + 30 * DAY) },
   });
   alpha = await prisma.team.create({
-    data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id }] } },
+    data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id, courseId: course.id }] } },
   });
   await prisma.team.create({
-    data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id }] } },
+    data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id, courseId: course.id }] } },
   });
 
   // Same three milestones as the seed: total weight 90 %. Created out of order to prove the sort.
