@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { StatusBadge, formatTime } from '../proposalUi.jsx';
+import { NoTeam, TeamInfo } from '../teamUi.jsx';
 
 const LIMITS = { title: 120, description: 5000 };
 
@@ -49,16 +50,18 @@ function ProposalForm({ initial, busy, submitLabel, onSave, extraAction }) {
 }
 
 export default function TeamProposalPage({ courseId, onBack, onUnauthenticated }) {
-  const [state, setState] = useState({ loading: true, data: null, error: '' });
+  const [state, setState] = useState({ loading: true, data: null, error: '', status: 0 });
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
 
   const load = useCallback(() => {
     api(`/courses/${courseId}/my-team`)
-      .then((data) => setState({ loading: false, data, error: '' }))
+      .then((data) => setState({ loading: false, data, error: '', status: 200 }))
       .catch((err) => {
         if (err.status === 401) return onUnauthenticated();
-        setState({ loading: false, data: null, error: err.message });
+        // F-03: 404 = enrolled without a team (show create/join), 403 = not enrolled.
+        const msg = err.status === 403 ? 'You are not enrolled in this course.' : err.message;
+        setState({ loading: false, data: null, error: msg, status: err.status });
       });
   }, [courseId, onUnauthenticated]);
 
@@ -85,6 +88,23 @@ export default function TeamProposalPage({ courseId, onBack, onUnauthenticated }
       ← Back
     </button>
   );
+  if (state.status === 404)
+    return (
+      <section>
+        {back}
+        <h2>My team</h2>
+        {actionError && (
+          <p className="error" role="alert">
+            {actionError}
+          </p>
+        )}
+        <NoTeam
+          busy={busy}
+          onCreate={(name) => run(() => api(`/courses/${courseId}/teams`, { method: 'POST', body: { name } }))}
+          onJoin={(joinCode) => run(() => api(`/courses/${courseId}/teams/join`, { method: 'POST', body: { joinCode } }))}
+        />
+      </section>
+    );
   if (state.error)
     return (
       <section>
@@ -106,9 +126,13 @@ export default function TeamProposalPage({ courseId, onBack, onUnauthenticated }
       <h2>
         {course.code} — {team.name}
       </h2>
-      <p className="muted">
-        Members: {team.members.map((m) => m.displayName).join(', ')} · Proposal deadline: {formatTime(course.proposalDeadline)}
-      </p>
+      <p className="muted">Proposal deadline: {formatTime(course.proposalDeadline)}</p>
+      <TeamInfo course={course} team={team} busy={busy} onLeave={() => run(() => api(`/teams/${team.id}/leave`, { method: 'POST' }))} />
+      {team.members.length < course.minTeamSize && (
+        <p className="muted" data-testid="size-warning">
+          Your team needs at least {course.minTeamSize} members before a proposal can be submitted.
+        </p>
+      )}
 
       {actionError && (
         <p className="error" role="alert">

@@ -1,0 +1,63 @@
+# F-05 TDD RED run
+# branch: feature/F-05-submissions (stacked on feature/F-03-teams; F-04 merged in sprint-2 via #48)  commit: (this commit: tests + schema/migration + rules stub, before implementation; parent = contract v1.0)
+# date: 2026-11-25T21:29:30+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/submission.unit.test.js tests/submission.api.test.js
+# note: TEST-05-13 passes already: F-04 maps the new ON DELETE RESTRICT error to 409 MILESTONE_HAS_SUBMISSIONS (F-04 M4).
+
+ × tests/submission.api.test.js > submit — POST /api/milestones/:id/submissions (FR-15) > TEST-05-05 a member of an approved team submits version 1 on time for their own team; body fields are ignored (AC-05-01) 226ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/submission.api.test.js > submit — POST /api/milestones/:id/submissions (FR-15) > TEST-05-06 invalid input → 400 naming the field; nothing stored (AC-05-02) 101ms
+ × tests/submission.api.test.js > submit — POST /api/milestones/:id/submissions (FR-15) > TEST-05-07 a team without an APPROVED proposal cannot submit (AC-05-03, BR-10) 113ms
+ × tests/submission.api.test.js > versions and lateness (FR-16, BR-11) > TEST-05-08 resubmitting before the due date adds a version and keeps the old ones; concurrent submissions get distinct versions (AC-05-04) 120ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/submission.api.test.js > versions and lateness (FR-16, BR-11) > TEST-05-09 after the due date a first submission is accepted and marked LATE (AC-05-05) 115ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/submission.api.test.js > versions and lateness (FR-16, BR-11) > TEST-05-10 after the due date: refused once an on-time version exists, accepted while all versions are late (AC-05-06) 118ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/submission.api.test.js > views (FR-14, FR-16) > TEST-05-11 status per milestone; students see only their team's versions; the instructor sees every team (AC-05-07) 133ms
+   → expected [ [ 1, 'NOT_SUBMITTED' ], …(1) ] to deeply equal [ [ 1, 'SUBMITTED' ], [ 2, 'LATE' ] ]
+ × tests/submission.api.test.js > access control (NFR-02, NFR-03) > TEST-05-12 instructors cannot submit; outsiders are refused; no team → 409; teams never see each other's versions (AC-05-08) 147ms
+   → expected 404 to be 403 // Object.is equality
+ ✓ tests/submission.api.test.js > access control (NFR-02, NFR-03) > TEST-05-13 a milestone with submissions cannot be deleted (AC-05-09, F-04 M4) 159ms
+ × tests/submission.api.test.js > access control (NFR-02, NFR-03) > TEST-05-14 every F-05 endpoint rejects requests without a session (AC-05-10) 101ms
+   → expected 404 to be 401 // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > trims the URL and note, defaults the note to "" and ignores other fields 9ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, value: { …(2) } }
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = undefined and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "   " and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "github.com/x" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "javascript:alert(1)" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "ftp://files.example.com/a" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "https://" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects url = 42 and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects note = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > rejects note = 7 and names the field 0ms
+   → expected true to be false // Object.is equality
+ ✓ tests/submission.unit.test.js > TEST-05-01 validateSubmissionInput (AC-05-02) > accepts a 2000-character URL and a 1000-character note (boundaries) 1ms
+ × tests/submission.unit.test.js > TEST-05-02 isLate (AC-05-04, AC-05-05, BR-11) > exactly at the due date is on time; one millisecond later is late 0ms
+   → expected false to be true // Object.is equality
+ ✓ tests/submission.unit.test.js > TEST-05-03 canSubmit (AC-05-06, BR-11) > before the due date a team may always (re)submit 0ms
+ × tests/submission.unit.test.js > TEST-05-03 canSubmit (AC-05-06, BR-11) > after the due date: allowed without versions or with only late ones, refused once an on-time version exists 1ms
+   → expected { ok: true } to deeply equal { ok: false, …(1) }
+ × tests/submission.unit.test.js > TEST-05-04 currentVersion and teamStatus (AC-05-07, FR-14) > the current version is the highest one 1ms
+   → expected null to deeply equal { version: 3 }
+ × tests/submission.unit.test.js > TEST-05-04 currentVersion and teamStatus (AC-05-07, FR-14) > status comes from the current version 1ms
+   → expected 'NOT_SUBMITTED' to be 'SUBMITTED' // Object.is equality
+ Test Files  2 failed (2)
+      Tests  25 failed | 3 passed (28)
+
+# regression on the same commit (all other test files)
+ Test Files  10 passed (10)
+      Tests  152 passed (152)
