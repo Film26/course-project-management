@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
-export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTeamProposal, onUnauthenticated }) {
+export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTeamProposal, onOpenAudit, onUnauthenticated }) {
   const [state, setState] = useState({ loading: true, courses: [], error: '' });
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTe
                 <span className="actions">
                   <button onClick={() => onOpenRoster(c)}>View roster</button>
                   <button onClick={() => onOpenProposals(c)}>Review proposals</button>
+                  <button onClick={() => onOpenAudit(c)}>Audit log</button>
                 </span>
               )}
               {user.role === 'STUDENT' && <button onClick={() => onOpenTeamProposal(c)}>My team proposal</button>}

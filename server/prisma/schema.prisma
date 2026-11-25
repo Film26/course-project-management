@@ -33,6 +33,7 @@ model User {
   memberships      TeamMember[]
   coursesTaught    Course[]     @relation("CourseInstructor")
   decidedProposals Proposal[]   @relation("ProposalDecider")
+  auditEntries     AuditEntry[]
 }
 
 // Server-side session: the cookie holds a random token, only its SHA-256 hash is stored.
@@ -57,6 +58,7 @@ model Course {
   instructor       User     @relation("CourseInstructor", fields: [instructorId], references: [id])
   proposalDeadline DateTime
   teams            Team[]
+  auditEntries     AuditEntry[]
 }
 
 model Team {
@@ -95,4 +97,31 @@ model Proposal {
   updatedAt    DateTime       @updatedAt
 
   @@index([teamId])
+}
+
+// F-09 (FR-22): append-only audit log. Each entry is written in the same transaction as the change it
+// records (L1). A trigger in the migration rejects UPDATE (L2). teamId has no FK on purpose: an entry keeps
+// the id of a team that is deleted later (F-03 T6); the team name is kept in details.
+enum AuditAction {
+  PROPOSAL_APPROVED
+  PROPOSAL_REJECTED
+  TEAM_CREATED
+  MEMBER_JOINED
+  MEMBER_LEFT
+  GRADE_RELEASED
+}
+
+model AuditEntry {
+  id        Int         @id @default(autoincrement())
+  courseId  Int
+  course    Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  actorId   Int
+  actor     User        @relation(fields: [actorId], references: [id])
+  teamId    Int?
+  action    AuditAction
+  entityId  Int
+  details   Json
+  createdAt DateTime    @default(now())
+
+  @@index([courseId, createdAt])
 }

@@ -18,6 +18,7 @@
 | 1.0 | 2026-11-07 | jaruwan18 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation |
 | 1.1 | 2026-11-07 | jaruwan18 | Order of checks: role (403) is checked by `requireRole` **before** input validation (400); review list opens on the "Submitted" filter | Reuses the F-01 `requireRole` middleware as planned in the F-01 contract; no AC or test changed (every AC-02 test uses a valid body for forbidden-role calls). Instructors mostly need the submitted queue |
 | 1.2 | 2026-11-07 | jaruwan18 | E2E tests use their own database `cpms_e2e` (`server/.env.e2e`), own API port 3100 and UI port 5174; they refuse to run unless the database name contains `e2e`. TEST-02-20 precondition updated | PR #6 review by Film26: the E2E cleanup (`deleteMany`) ran against `cpms_dev` and could delete development data |
+| 1.4 | 2026-11-25 | Film26 | Approve/reject (P3, P5) run the conditional update and the F-09 audit entry in one transaction; no AC, API or status code changed | F-09 step A1 (FR-22, L1): a decision must never be stored without its audit entry. v1.3 is the F-03 change (BR-07 submit check), recorded in the F-03 PR |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 

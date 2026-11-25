@@ -104,4 +104,11 @@ Rules enforced by the API: one active proposal per team, no submission after the
 only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
 the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
 
+### Sprint 3 journey: audit log (F-09, step A1)
+
+Log in as `instructor1@cpms.test` → approve or reject a submitted proposal → **Audit log**: every decision is
+listed newest first with the instructor, the team and the reject reason; filter by action, **Load more** for older
+entries. A decision and its audit entry are saved together or not at all, and entries cannot be edited
+(see `docs/sprints/sprint-3/F-09-audit.md`).
+
 Never commit `server/.env` / `server/.env.test` or any real password.
