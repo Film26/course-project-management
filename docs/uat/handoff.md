@@ -7,8 +7,10 @@ without a verbal briefing. If something here is unclear or wrong, report it as a
 
 | Role | Team | Students (name / ID) |
 |---|---|---|
-| Product Team | CPMS (Film26 / jaruwan18) | น.ส.ทรรศน์วรรณ นามกา 67070507202 · 67070507216 (jaruwan18) |
-| UAT Team | E-Commerce Product Team / TokTickIt | Jiraphat Jarernpipattada (GitHub jiraphat-j) · Thanaporn Bun |
+| Product Team | CPMS (Film26 / jaruwan18) | น.ส.ทรรศน์วรรณ นามกา 67070507202 · 67070507216 (jaruwan18; full name _pending_) |
+| UAT Team | E-Commerce Product Team / TokTickIt | Jiraphat Jarernpipattada (GitHub jiraphat-j) · Thanaporn Bun (name as written in the UAT Team's report on #36) |
+
+**Other accounts in the record.** `Nontok9164` is not one of the two Product Team students and not a member of the UAT Team. It approved release PR #38 and posted re-test notes on #33 and #36; these are therefore **not** the UAT Team's independent actions, and the UAT Team's own confirmation of the corrected release is pending (`findings-and-acceptance.md` §3).
 
 ## 2. Release under test
 
@@ -48,7 +50,7 @@ above. Report such ideas as *enhancements*, not defects.
 | `STUDENT-A2` | STUDENT | Student Two | Team Alpha |
 | `STUDENT-B1` | STUDENT | Student Three | Team Beta |
 
-The emails and the shared password are sent through the private course handoff channel (_name the channel_),
+The emails and the shared password are sent through the private course handoff channel (_channel name pending_),
 **not** in this file or the PDF. All accounts and data are synthetic.
 
 ## 5. Data setup, reset and cleanup
@@ -88,10 +90,11 @@ manual UAT:
 - a different instructor (AC-01-08, part of AC-02-11): only one instructor account exists;
 - an expired session (AC-01-05) and hash storage (AC-01-09).
 
-## 8. Schedule (fill in)
+## 8. Schedule (dates taken from GitHub)
 
 | Session | Date / time | Who |
 |---|---|---|
-| Initial UAT | | |
-| Defect correction deadline | | |
-| Re-test and acceptance decision | | |
+| Initial UAT (round 1, `c83a17a`) | 20 Nov 2026 (decision posted 07:23 UTC on #33) | UAT Team (jiraphat-j) |
+| Round 2 on the exercise build `8e89112`, defect #36 reported | 20 Nov 2026, 16:22 (UTC+7) | UAT Team |
+| Defect correction (#37 → release #38, `463411f`) | 20–23 Nov 2026 | Product Team (Film26, review jaruwan18) |
+| Re-test and acceptance decision of `463411f` | _pending: UAT Team_ | UAT Team |

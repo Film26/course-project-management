@@ -81,7 +81,7 @@ gcloud run jobs execute cpms-migrate --region asia-southeast1 --wait
 
 ## 5. Quality gate
 
-- `.github/workflows/ci-docker.yml`, job **`test-and-docker`**, runs on every PR into `staging` and `main`:
+- `.github/workflows/ci-docker.yml`, job **`test-and-docker`**, runs on every PR into `staging`, `main` and, since PR #48 (25 Nov 2026), the sprint branches `sprint-*`:
   deploy-script dry run → migrate + seed twice on a throwaway PostgreSQL → `npm test` → UI build →
   `docker build` → run the container and smoke-test it.
 - Ruleset **lab5-merge-gate** on `main` and `staging`: PR required, 1 approval (the author cannot approve),

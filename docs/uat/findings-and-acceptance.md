@@ -18,7 +18,7 @@ minor defect is fixed, or the UAT Team explicitly accepts it as a known limitati
 
 | Our Issue ID (in their repo) | Case / AC | Reporter | Severity | Their classification | Outcome |
 |---|---|---|---|---|---|
-| | | | | | |
+| _pending_ | | | | | Our reports on the partner's product are recorded in their repository; links to be added |
 
 ## 3. Defect correction chain (one row per accepted defect)
 
@@ -49,11 +49,12 @@ minor defect is fixed, or the UAT Team explicitly accepts it as a known limitati
 | Field | Value |
 |---|---|
 | Product | CPMS — Sprint 1 scope (F-01, F-02) |
-| Exact release tested | commit: ____ / revision: ____ / URL: https://cpms-t4xsm3f7aa-as.a.run.app |
-| Cases executed | UAT-01 … UAT-07 (PASS __ / FAIL __ / BLOCKED __) |
-| Open critical / major defects | |
-| Decision | ☐ Accepted ☐ Accepted with documented minor limitations ☐ Not Accepted |
-| Reasons / conditions | |
-| UAT testers (name / team) | |
-| Date | |
-| Recorded where | (e.g. comment link on Issue #__ from the UAT Team's GitHub account) |
+| Exact release tested | Round 1: commit `c83a17a` / revision `cpms-00003-h49` / URL: https://cpms-t4xsm3f7aa-as.a.run.app |
+| Cases executed | UAT-01 … UAT-07 (PASS 7 / FAIL 0 / BLOCKED 0) |
+| Open critical / major defects | None at round 1 |
+| Decision | ☑ Accepted (round 1) |
+| Reasons / conditions | All seven agreed cases passed on `c83a17a`; F-01 and F-02 contracts verified (UAT Team's text on #33) |
+| UAT testers (name / team) | Jiraphat Jarernpipattada & Thanaporn Bun (E-Commerce Product Team / TokTickIt) |
+| Date | 20 Nov 2026 |
+| Recorded where | [#33 comment](https://github.com/Film26/course-project-management/issues/33#issuecomment-7033210710) and [revision correction](https://github.com/Film26/course-project-management/issues/33#issuecomment-7033406930), both from jiraphat-j |
+| Corrected release `463411f` | _pending_: the UAT Team's own decision on #33 (the notes from `Nontok9164` on 23 Nov are not the UAT Team's) |
