@@ -24,8 +24,9 @@ beforeEach(async () => {
   await prisma.course.create({
     data: { code: 'CPE999', name: 'Other Course', instructorId: instructor2.id, proposalDeadline: new Date(Date.now() + 30 * DAY) },
   });
-  alpha = await prisma.team.create({ data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id }] } } });
-  beta = await prisma.team.create({ data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id }] } } });
+  // Sync with sprint-2 (F-03): a membership records its course (BR-06 unique per course).
+  alpha = await prisma.team.create({ data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id, courseId: course.id }] } } });
+  beta = await prisma.team.create({ data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id, courseId: course.id }] } } });
 });
 
 afterAll(() => prisma.$disconnect());

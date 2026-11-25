@@ -1,0 +1,79 @@
+# F-03 TDD RED run
+# branch: feature/F-03-teams (stacked on feature/F-04-milestones, PR #48)  commit: (this commit: tests + schema/migration + rules stub + fixture updates, before implementation; parent = contract v1.0)
+# date: 2026-11-25T16:34:17+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/team.unit.test.js tests/team.api.test.js
+# note: TEST-03-02 passes already: it checks the join-code default of the new schema (database function), not application code
+
+ ✓ tests/team.api.test.js > join codes (T7) > TEST-03-02 every team gets a unique 8-character code from the allowed alphabet (AC-03-01) 168ms
+ × tests/team.api.test.js > create team — POST /api/courses/:courseId/teams (FR-10) > TEST-03-05 an enrolled student without a team creates one and is its only member; userId in the body is ignored (AC-03-01) 137ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/team.api.test.js > create team — POST /api/courses/:courseId/teams (FR-10) > TEST-03-06 an invalid or duplicate team name is rejected and nothing is stored (AC-03-02) 89ms
+ × tests/team.api.test.js > join team — POST /api/courses/:courseId/teams/join (FR-11, BR-06, BR-07) > TEST-03-07 an enrolled student joins with a valid code; lower case and spaces are accepted (AC-03-03) 91ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/team.api.test.js > join team — POST /api/courses/:courseId/teams/join (FR-11, BR-06, BR-07) > TEST-03-08 a student already in a team cannot create or join another; concurrent joins store one membership (AC-03-04, BR-06) 90ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/team.api.test.js > join team — POST /api/courses/:courseId/teams/join (FR-11, BR-06, BR-07) > TEST-03-09 the max-th member is accepted, a full team is rejected, and two joins for the last place store one (AC-03-05, BR-07) 92ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/team.api.test.js > join team — POST /api/courses/:courseId/teams/join (FR-11, BR-06, BR-07) > TEST-03-10 a malformed code → 400; a code of no team in this course (also another course's team) → 404 (AC-03-06) 87ms
+   → expected 404 to be 400 // Object.is equality
+ × tests/team.api.test.js > leave team — POST /api/teams/:teamId/leave (FR-12, BR-08) > TEST-03-11 a member leaves; the last member leaving deletes a team without proposals and keeps one with proposals (AC-03-07) 88ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/team.api.test.js > leave team — POST /api/teams/:teamId/leave (FR-12, BR-08) > TEST-03-12 an APPROVED proposal locks join and leave; a team with only a REJECTED proposal is not locked (AC-03-08, BR-08) 90ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/team.api.test.js > BR-07 on proposal submit — POST /api/proposals/:id/submit (F-02 v1.3) > TEST-03-13 a team below the minimum size cannot submit; with exactly the minimum it can (AC-03-09) 103ms
+   → expected 200 to be 409 // Object.is equality
+ × tests/team.api.test.js > access control (NFR-02, NFR-03) > TEST-03-14 instructors, students outside the course and non-members are refused (AC-03-10) 111ms
+   → expected 404 to be 403 // Object.is equality
+ × tests/team.api.test.js > access control (NFR-02, NFR-03) > TEST-03-15 every F-03 endpoint rejects requests without a session (AC-03-11) 77ms
+   → expected 404 to be 401 // Object.is equality
+ × tests/team.api.test.js > views (FR-10, FR-04) > TEST-03-16 members see their code and size; the instructor sees codes and unassigned students; other teams never see a code (AC-03-12) 100ms
+   → expected { id: 1, name: 'Team Alpha', …(1) } to match object { id: 1, joinCode: 'ALPHA234', …(1) }
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > trims the team name and ignores other fields 11ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, …(1) }
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the name undefined and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the name "" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the name "   " and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the name 42 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the name "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 0ms
+   → expected true to be false // Object.is equality
+ ✓ tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > accepts a 60-character name (boundary) 0ms
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > normalises a join code to upper case without spaces 1ms
+   → expected { ok: true, value: '' } to deeply equal { ok: true, value: 'ALPHA234' }
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code undefined and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "ALPHA23" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "ALPHA2345" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "ALPHA2O4" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "ALPHI234" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code "ALPHA210" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-01 validateTeamName and normalizeJoinCode (AC-03-02, AC-03-06) > rejects the malformed code 12345678 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-03 team size (AC-03-05, AC-03-09, BR-07) > a team can be joined while it is below the maximum; the max-th member is the last one 0ms
+   → expected true to be false // Object.is equality
+ × tests/team.unit.test.js > TEST-03-03 team size (AC-03-05, AC-03-09, BR-07) > a proposal can be submitted only with at least the minimum size (boundary = minimum) 0ms
+   → expected true to be false // Object.is equality
+ ✓ tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses [] → locked false 0ms
+ ✓ tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses ["REJECTED"] → locked false 0ms
+ ✓ tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses ["REJECTED","SUBMITTED"] → locked false 0ms
+ ✓ tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses ["DRAFT"] → locked false 0ms
+ × tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses ["APPROVED"] → locked true 0ms
+   → expected false to be true // Object.is equality
+ × tests/team.unit.test.js > TEST-03-04 isMembershipLocked (AC-03-08, BR-08) > statuses ["REJECTED","APPROVED"] → locked true 0ms
+   → expected false to be true // Object.is equality
+ Test Files  2 failed (2)
+      Tests  31 failed | 6 passed (37)
+
+# regression on the same commit (all other test files: F-01, F-02, F-04, health, deploy)
+ Test Files  8 passed (8)
+      Tests  114 passed | 1 todo (115)
