@@ -13,6 +13,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial plan for Sprints 1–3 |
 | 0.2 | 2026-11-09 | 67070507202 | §3: records the NFR-07 README run (21 min 36 s, not met, fix in S2) and adds NFR-08 to the Sprint 1 requirements; work items list the actual PR numbers (PR #12 review) |
+| 0.3 | 2026-11-25 | 67070507202 | §5: F-09 Audit log moves from 67070507216 to 67070507202 (Issue #46 reassigned); 67070507216 keeps F-07 and reviews F-08 and F-09 | 67070507216 owns F-03 and F-05 in Sprint 2, which F-05/F-06 and F-07 depend on. F-09 step A1 (proposal decisions) only needs F-02, so 67070507202 can start it now and Sprint 3 progress is ready for Deliverable 2 Part C. Approved by 67070507216 in the review of this change |
 
 ---
 
@@ -87,7 +88,7 @@ All features depend on F-01, because every endpoint uses its session, role and o
 | **Requirements** | FR-19 to FR-22 · BR-13 · NFR-10 (p95 < 500 ms with 50 teams), NFR-07 rechecked, NFR-11 rechecked |
 | **Hardening** | Login rate limiting, cleanup of expired sessions, a DB-level guard for BR-01 if feasible, a full regression E2E across all roles, and accessibility checks on forms. |
 | **Dependencies** | F-07 needs F-03 + F-04. F-08 needs F-02, F-05 and F-06. F-09 hooks into F-02, F-03 and F-06. |
-| **Proposed allocation** | 67070507202: F-08, performance test · 67070507216: F-07, F-09 · pair: regression and final demo video |
+| **Proposed allocation** | 67070507202: F-08, F-09, performance test · 67070507216: F-07 · pair: regression and final demo video *(v0.3: F-09 moved to 67070507202)* |
 | **Completion outcome** | Final release by 13 Dec: all FR/BR implemented and traced to passing tests, performance target measured and the final demonstration video recorded. |
 
 ## 6. Definition of Done for every sprint
