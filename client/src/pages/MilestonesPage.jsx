@@ -106,7 +106,7 @@ function errorText(err) {
   return err.message;
 }
 
-export default function MilestonesPage({ user, courseId, onBack, onUnauthenticated }) {
+export default function MilestonesPage({ user, courseId, onBack, onOpenSubmissions, onUnauthenticated }) {
   const isInstructor = user.role === 'INSTRUCTOR';
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   const [reloadKey, setReloadKey] = useState(0);
@@ -213,6 +213,14 @@ export default function MilestonesPage({ user, courseId, onBack, onUnauthenticat
                 <p className="muted">
                   Due {formatTime(m.dueAt)} · Weight {m.weight} % · Max score {m.maxScore}
                 </p>
+                {/* F-05: open the milestone's submissions (students submit there; the instructor sees every team). */}
+                {(isInstructor || m.teamStatus !== 'NO_TEAM') && (
+                  <div className="actions">
+                    <button className="secondary" onClick={() => onOpenSubmissions(m)}>
+                      {isInstructor ? 'Submissions' : m.teamStatus === 'NOT_SUBMITTED' ? 'Submit' : 'Resubmit / history'}
+                    </button>
+                  </div>
+                )}
                 {isInstructor && (
                   <div className="actions">
                     <button disabled={busy} onClick={() => setEditing(m.id)}>

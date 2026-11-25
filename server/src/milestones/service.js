@@ -3,6 +3,8 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { LIMITS, checkWeightTotal } from './rules.js';
+import { teamStatus } from '../submissions/rules.js';
+import { currentByMilestone } from '../submissions/service.js';
 
 const milestoneSelect = {
   id: true,
@@ -132,11 +134,12 @@ export async function listMilestones(courseId, user) {
   const publicCourse = { id: course.id, code: course.code, name: course.name };
 
   if (user.role === 'INSTRUCTOR') return { course: publicCourse, milestones, totalWeight };
-  // M6: F-05 replaces NOT_SUBMITTED with SUBMITTED / LATE from the team's current submission.
+  // M6 / F-05 S7: SUBMITTED / LATE / NOT_SUBMITTED from the team's current version; NO_TEAM without a team.
+  const current = team ? await currentByMilestone(team.id, milestones.map((m) => m.id)) : new Map();
   return {
     course: publicCourse,
     team,
     totalWeight,
-    milestones: milestones.map((m) => ({ ...m, teamStatus: team ? 'NOT_SUBMITTED' : 'NO_TEAM' })),
+    milestones: milestones.map((m) => ({ ...m, teamStatus: team ? teamStatus(current.get(m.id) ?? null) : 'NO_TEAM' })),
   };
 }

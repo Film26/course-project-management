@@ -119,6 +119,17 @@ Rules enforced by the API: one team per student per course, 2–3 members per te
 a proposal can be submitted only with at least 2 members, and membership is locked once the proposal is approved
 (see `docs/sprints/sprint-2/F-03-teams.md`).
 
+### Sprint 2 journey: deliverables (F-05)
+
+1. As `instructor1@cpms.test`, approve Team Alpha's proposal (F-02).
+2. Log in as `student1@cpms.test` → **Milestones** → **Submit** on a milestone → enter a link (http/https) and a note.
+   `student2@cpms.test` can **Resubmit**: the newest version is current, older ones stay in the history.
+3. As `instructor1@cpms.test` → **Milestones** → **Submissions**: the current version of every team.
+
+Rules enforced by the API: only a team with an approved proposal can submit; after the due date a version is
+marked LATE, and once an on-time version exists no new version is accepted after the due date
+(see `docs/sprints/sprint-2/F-05-submissions.md`).
+
 ### Sprint 2 journey: milestones (F-04)
 
 The seed adds three milestones to CPE334 (M1 20 %, M2 30 %, M3 40 %, total 90 %).

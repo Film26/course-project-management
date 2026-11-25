@@ -17,6 +17,7 @@ test.beforeAll(async () => {
   const prisma = new PrismaClient({ datasourceUrl: DATABASE_URL });
   try {
     const course = await prisma.course.findUniqueOrThrow({ where: { code: 'CPE334' } });
+    await prisma.submission.deleteMany({ where: { milestone: { courseId: course.id } } }); // F-05: RESTRICT on milestone
     await prisma.milestone.deleteMany({ where: { courseId: course.id } });
     await prisma.milestone.createMany({ data: SEED_MILESTONES.map((m) => ({ ...m, dueAt: new Date(m.dueAt), courseId: course.id })) });
   } finally {

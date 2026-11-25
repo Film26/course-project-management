@@ -17,6 +17,7 @@
 |---|---|---|---|---|
 | 1.0 | 2026-11-24 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md`, F-02 and the F-03/F-04 contracts |
 | 1.1 | 2026-11-25 | Film26 | Migration name `20261125120000_f05_submissions`; TEST-05-13 already passes at RED because F-04 maps the FK error to 409 `MILESTONE_HAS_SUBMISSIONS` (M4) | Recorded while writing the RED tests. No AC changed |
+| 1.2 | 2026-11-25 | Film26 | Owner changes to Film26 (plan v0.4); S5 note: checked after S1 and before S3 inside the team-row lock (F-06 G8); a student without a team can still open the page (`team: null`, no form) | PR #47 review (F-06 G8) and the owner change |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
