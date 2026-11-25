@@ -1,5 +1,5 @@
 # F-09 (step A1) TDD GREEN run
-# branch: feature/F-09-audit  RED commit: 97069d9 (tests unchanged since RED)  GREEN: this commit (implementation)
+# branch: feature/F-09-audit  RED commit: 97069d9 (tests unchanged since RED)  GREEN: 3bca213 (implementation); CI: RED run 45560963405 failed, GREEN run 45561424547 passed
 # date: 2026-11-25T13:32:34+07:00
 # command: cd server && npx vitest run --reporter=verbose   (whole backend suite: F-09 + F-01/F-02 regression)
 # note: the 'INTERNAL_ERROR' log line during TEST-09-06 is the injected audit failure the test expects

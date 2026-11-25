@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-25 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD; delivery in three steps (A1–A3) | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-02/F-03/F-06 contracts |
+| 1.1 | 2026-11-25 | Film26 | L5: order and `before` cursor use the entry `id` only; new L6 names the exact call F-03 (A2) and F-06 (A3) make | PR #52 review by jaruwan18: `createdAt` is the transaction start time and can disagree with `id` order, so paging by `id` while sorting by `createdAt` could skip or repeat entries. PR #51 review: F-03 needs the exact hook |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -47,7 +48,12 @@
 - **L2 Append-only.** There is no endpoint to edit or delete entries. A DB trigger rejects `UPDATE` on `AuditEntry`. Entries are removed only when their course is deleted (cascade; not possible through the API).
 - **L3 Content.** Each entry stores `action`, `actorId` (session user), `courseId`, `teamId` (when the action concerns a team), `entityId` (proposal / submission / team id) and `details` (JSON): proposal title and reject reason; team name; milestone title, score and max score. No passwords, tokens or e-mail addresses.
 - **L4 Visibility.** Only the course instructor can read the course log. Students have no audit endpoint.
-- **L5 Order and paging.** Newest first (`createdAt` desc, `id` desc). `limit` 1–100 (default 50); `before` = an entry id for the next page. Optional `action` filter.
+- **L5 Order and paging.** Newest first by `id` desc *(v1.1: id only, it follows insert order; `createdAt` is shown but not used for order)*. `limit` 1–100 (default 50); `before` = an entry id for the next page. Optional `action` filter.
+
+- **L6 Hooks for A2 / A3 *(v1.1)*.** The feature that makes the change calls, **inside its own transaction**, `record(tx, { courseId, actorId: user.id, teamId, action, entityId, data })` from `src/audit/service.js`:
+  - F-03 create team: `action: 'TEAM_CREATED'`, `entityId: team.id`, `data: { teamName }`; join: `'MEMBER_JOINED'`, `entityId: team.id`, `data: { teamName }`; leave: `'MEMBER_LEFT'`, `entityId: team.id`, `data: { teamName }`, recorded **before** an empty team is deleted (F-03 T6), so the name is kept.
+  - F-06 release: `'GRADE_RELEASED'`, `entityId: submission.id`, `teamId`, `data: { milestoneTitle, score, maxScore }`.
+  - `buildDetails` drops any other field (L3); a failed `record` rolls the change back (L1).
 
 ### Validation
 | Field | Rule | Error |

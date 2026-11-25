@@ -14,6 +14,8 @@ export function record(tx, { courseId, actorId, teamId = null, action, entityId,
 }
 
 // FR-22 / L4 / L5: the course instructor reads the log, newest first, with an optional action filter.
+// Order and cursor both use the id only (insert order). createdAt is the transaction start time, so two
+// overlapping transactions can store createdAt and id in different orders (PR #52 review).
 export async function listCourseAudit(courseId, user, { limit, before, action }) {
   const course = await prisma.course.findUnique({ where: { id: courseId }, select: { id: true, code: true, name: true, instructorId: true } });
   if (!course) throw new ApiError(404, 'NOT_FOUND', 'Course not found');
@@ -22,7 +24,7 @@ export async function listCourseAudit(courseId, user, { limit, before, action })
   // One extra row tells whether an older page exists.
   const rows = await prisma.auditEntry.findMany({
     where: { courseId, ...(action ? { action } : {}), ...(before ? { id: { lt: before } } : {}) },
-    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    orderBy: { id: 'desc' },
     take: limit + 1,
     select: { id: true, action: true, createdAt: true, teamId: true, entityId: true, details: true, actor: { select: { id: true, displayName: true } } },
   });

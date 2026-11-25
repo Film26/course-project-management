@@ -1,5 +1,5 @@
 # F-09 (step A1) TDD RED run
-# branch: feature/F-09-audit  commit: (this commit: tests + schema/migration + rules stub, before implementation; parent 47c1179 = contract v1.0)
+# branch: feature/F-09-audit  commit: 97069d9 (tests + schema/migration + rules stub, before implementation; parent 47c1179 = contract v1.0)
 # date: 2026-11-25T13:27:10+07:00
 # command: cd server && npx vitest run --reporter=verbose tests/audit.unit.test.js tests/audit.api.test.js
 # note: TEST-09-05 passes trivially before implementation (nothing writes entries yet; it guards against wrong entries after GREEN).
