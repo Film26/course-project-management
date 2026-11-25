@@ -2,6 +2,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { canGrade, canRelease, checkScoreRange } from './rules.js';
+import { record } from '../audit/service.js';
 
 const MESSAGES = {
   GRADE_RELEASED: 'This grade has been released and can no longer be changed',
@@ -31,7 +32,7 @@ async function loadForInstructor(submissionId, user) {
       teamId: true,
       version: true,
       milestoneId: true,
-      milestone: { select: { maxScore: true, dueAt: true, course: { select: { instructorId: true } } } },
+      milestone: { select: { title: true, courseId: true, maxScore: true, dueAt: true, course: { select: { instructorId: true } } } },
     },
   });
   if (!s) throw new ApiError(404, 'NOT_FOUND', 'Submission not found');
@@ -84,7 +85,17 @@ export async function releaseGrade(submissionId, user, now = new Date()) {
     if (!check.ok) throw conflict(check.code);
     const { count } = await tx.grade.updateMany({ where: { submissionId, releasedAt: null }, data: { releasedAt: now } });
     if (count === 0) throw conflict('GRADE_RELEASED');
-    return toGrade(await tx.grade.findUnique({ where: { submissionId }, select: gradeSelect }), s.milestone.maxScore);
+    const released = await tx.grade.findUnique({ where: { submissionId }, select: gradeSelect });
+    // F-09 A3 (L6): same transaction as the release; feedback is not stored in the log (L3 whitelist).
+    await record(tx, {
+      courseId: s.milestone.courseId,
+      actorId: user.id,
+      teamId: s.teamId,
+      action: 'GRADE_RELEASED',
+      entityId: submissionId,
+      data: { milestoneTitle: s.milestone.title, score: released.score, maxScore: s.milestone.maxScore },
+    });
+    return toGrade(released, s.milestone.maxScore);
   });
 }
 

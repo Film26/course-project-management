@@ -76,6 +76,7 @@ To keep the Deliverable 2 schedule, the owner merged these PRs into `sprint-2` /
 | #61 | Sync of `sprint-2` into `sprint-3` | passed; local 229/229, E2E 9/9 | none |
 | #58 | `plan.md` v0.4 (C-17) | — | none |
 | #53 | Deliverable 2 Parts A, D, E (this document) | — | changes requested on the first version (`d72d6f2`); all nine points addressed in `6b9b9a0` but not re-reviewed |
+| this PR (F-09 A2/A3) | audit entries for team changes and grade release | see PR | merged to keep the D2 candidate (#60) unchanged once its review starts |
 
 ## 4. What to update before submission
 - [ ] Every "pending" above → approval / merge date.

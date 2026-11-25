@@ -152,7 +152,11 @@ describe('student view — GET /api/courses/:courseId/my-grades (FR-18, BR-12)',
     expect(mine.body.grades).toHaveLength(1);
     expect(mine.body.grades[0]).toMatchObject({ milestone: { id: m1.id, title: 'M1 Requirements', maxScore: 100 }, version: 1, score: 85, feedback: 'Feedback' });
     expect(JSON.stringify(mine.body)).not.toContain('M2 Design');
-    expect(JSON.stringify(mine.body)).not.toContain('70');
+    // The unreleased M2 grade (70) must not appear in any form. Checked on the data, not on the JSON text:
+    // timestamps such as "…:12.170Z" made a text search for "70" fail at random (fixed 26 Nov 2026).
+    expect(mine.body.grades.map((g) => g.score)).toEqual([85]);
+    expect(mine.body.grades.some((g) => g.milestone.id === m2.id)).toBe(false);
+    expect(Object.values(mine.body.grades[0])).not.toContain(70);
 
     const other = await request(app).get(`/api/courses/${course.id}/my-grades`).set('Cookie', await as(s3));
     expect(other.status).toBe(200);

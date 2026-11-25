@@ -70,8 +70,8 @@ Final examination period 1–11 Dec: no main workflow is left for the last two d
 | Feature / item | Current status | Remaining action | Owner | Target |
 |---|---|---|---|---|
 | F-03, F-05, F-06 | Implemented, PRs #56 / #57 / #47 | Review, merge, release `v2.0-sprint2` | 67070507202 (review 67070507216) | 27 Nov |
-| F-09 A2 (membership entries) | A1 done (PR #52) | `record(tx, …)` in F-03 create/join/leave + TEST-09-10 | 67070507202 | 30 Nov |
-| F-09 A3 (grade release entry) | — | `record` in F-06 release + TEST-09-11 | 67070507202 | 30 Nov |
+| F-09 A2 (membership entries) | **Done 26 Nov** (TEST-09-10, 09-10b) | — | 67070507202 | done |
+| F-09 A3 (grade release entry) | **Done 26 Nov** (TEST-09-11) | — | 67070507202 | done |
 | F-08 Course dashboard | Contract v1.1 (PR #50) | RED → GREEN, TEST-08-01 … 05, 07; perf seed + `cpms-perf` measurement (TEST-08-06, NFR-10) | 67070507202 | 4 Dec |
 | F-07 Peer evaluation | Contract (PR #54) | RED → GREEN, TEST-07-01 … 10 | 67070507202 | 6 Dec |
 | NFR-07 README rerun (G-06) | Open | Clean-machine run ≤ 15 min, recorded | 67070507216 | 8 Dec |

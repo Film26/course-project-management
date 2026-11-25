@@ -53,7 +53,7 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 | FR-19 | Student rates each teammate once per milestone | F-07 Peer evaluation | S3 | AC-07-01, AC-07-02, AC-07-09 | TEST-07-01, TEST-07-03, TEST-07-04, TEST-07-10 | Contract only (PR #54, owner 67070507202 since plan v0.4) |
 | FR-20 | Instructor views average peer ratings | F-07 | S3 | AC-07-07 | TEST-07-02, TEST-07-08 | Contract only (PR #54) |
 | FR-21 | Instructor course dashboard | F-08 Dashboard | S3 | AC-08-01 … AC-08-05, AC-08-07 | TEST-08-01 … TEST-08-05, TEST-08-07 | Contract only (merged PR #50, v1.1) |
-| FR-22 | Audit entries for decisions, grade releases, membership changes | F-09 Audit log | S3 | AC-09-01 … AC-09-10 | TEST-09-01, TEST-09-02 (L-U); TEST-09-03 … TEST-09-09 (L-API); TEST-09-12 (E2E) | Partial: proposal decisions (step A1) implemented, tests pass on PR #52 (CI run 45561424547 on `3bca213`; review fix `fe304e6` 92/92 locally); membership (A2) and grade release (A3) planned |
+| FR-22 | Audit entries for decisions, grade releases, membership changes | F-09 Audit log | S3 | AC-09-01 … AC-09-10 | TEST-09-01, TEST-09-02 (L-U); TEST-09-03 … TEST-09-09 (L-API); TEST-09-12 (E2E) | Implemented: A1 (PR #52, CI run 45561424547), A2 + A3 (F-09 v1.2: TEST-09-10, 09-10b, 09-11; 232/232 locally) |
 
 ## 2. Business rules
 
@@ -185,8 +185,8 @@ One row per AC of the current contract on its branch. *Verification* says whethe
 | AC-09-05 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-01, TEST-09-07 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
 | AC-09-06 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-08 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
 | AC-09-07 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-09 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
-| AC-09-08 *(A2)* | No (step A2) | TEST-09-10 | Not run: planned after F-03 / F-06 merge |
-| AC-09-09 *(A3)* | No (step A3) | TEST-09-11 | Not run: planned after F-03 / F-06 merge |
+| AC-09-08 *(A2)* | Yes, steps A2 (F-09 v1.2) | TEST-09-10, TEST-09-10b | Ran and passed: 232/232 locally |
+| AC-09-09 *(A3)* | Yes, step A3 (F-09 v1.2) | TEST-09-11 | Ran and passed: 232/232 locally |
 | AC-09-10 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-12 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
 
 ## 4. Coverage gaps
