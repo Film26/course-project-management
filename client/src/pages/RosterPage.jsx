@@ -35,7 +35,9 @@ export default function RosterPage({ courseId, onBack, onUnauthenticated }) {
           ) : (
             state.data.teams.map((t) => (
               <div key={t.id} className="card">
-                <h3>{t.name}</h3>
+                <h3>
+                  {t.name} <span className="muted">· code {t.joinCode}</span>
+                </h3>
                 <ul>
                   {t.members.map((m) => (
                     <li key={m.id}>
@@ -45,6 +47,18 @@ export default function RosterPage({ courseId, onBack, onUnauthenticated }) {
                 </ul>
               </div>
             ))
+          )}
+          <h3>Unassigned students</h3>
+          {state.data.unassigned.length === 0 ? (
+            <p className="muted">Every enrolled student is in a team.</p>
+          ) : (
+            <ul data-testid="unassigned">
+              {state.data.unassigned.map((u) => (
+                <li key={u.id}>
+                  {u.displayName} <span className="muted">({u.email})</span>
+                </li>
+              ))}
+            </ul>
           )}
         </>
       )}
