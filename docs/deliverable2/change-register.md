@@ -11,6 +11,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-25 | 67070507202 | First version. Drafted with an AI assistant (Claude Code); every commit, PR, run and revision was read from GitHub |
+| 0.4 | 2026-11-26 | 67070507202 | §3.1: PRs merged into sprint branches without an approval (#50, #56, #57, #58, #61, #53) |
 | 0.3 | 2026-11-25 | 67070507202 | #47/#56/#57 merge order and missing reviews on #56/#57 recorded; release PRs #59/#60 and sync PR #61 |
 | 0.2 | 2026-11-25 | 67070507202 | PR #53 review by 67070507216: no reference to work that is not in the repository; F-03 / F-05 / F-07 now point to their PRs (#56, #57, #54); D-08 v1.1 approved; F-04 v1.2 review fixes (C-16); F-09 CI runs; allocation changes C-14 / C-17 with their timeline; #50 merge recorded as it happened |
 
@@ -62,7 +63,19 @@ Status values: **Resolved** = fixed, released and re-tested · **Resolved, re-te
 | C-15 | 2026-11-25 | CI workflow | CI also runs on PRs into `sprint-*` | Sprint integration checks | jaruwan18, PR #48 (merged) |
 | C-19 | 2026-11-25 | F-08 v1.1 | Separate perf service/DB, fixed measurement conditions, NFR-10 for three endpoints, one grade shape | PR #50 review | PR #50 **merged after the v1.1 fixes; the reviewer's final approval of v1.1 is not recorded** (last review: changes requested on v1.0) |
 | C-14 | 2026-11-25 | `plan.md` v0.3 | F-09 moves to 67070507202 | 67070507216 owned F-03/F-05 | jaruwan18, PR #51 (merged 25 Nov). **Timeline:** PR #52 (F-09 A1) was opened before this approval, on the same day |
-| C-17 | 2026-11-25 | `plan.md` v0.4 | F-03, F-05 (S2) and F-07 (S3) move to 67070507202; 67070507216 reviews every PR | Four days left; F-03 → F-05 → F-06 built in sequence by one person | PR #58, review pending. **Timeline:** the F-03/F-05 code (PRs #56/#57) was committed before this approval, on the same day |
+| C-17 | 2026-11-25 | `plan.md` v0.4 | F-03, F-05 (S2) and F-07 (S3) move to 67070507202; 67070507216 reviews every PR | Four days left; F-03 → F-05 → F-06 built in sequence by one person | PR #58 **merged on 26 Nov by the owner without a review on the PR** (team decision to keep the schedule). **Timeline:** the F-03/F-05 code (PRs #56/#57) was committed before this approval, on the same day |
+
+### 3.1 PRs merged into sprint branches without a reviewer approval (team decision, 26 Nov 2026)
+
+To keep the Deliverable 2 schedule, the owner merged these PRs into `sprint-2` / `sprint-3`, which have no merge ruleset. `staging` and `main` still require an approval and the `test-and-docker` check for every release PR.
+
+| PR | Content | CI | Review state at merge |
+|---|---|---|---|
+| #50 | F-08 contract v1.1 | — | changes requested on v1.0; v1.1 fixes not re-reviewed |
+| #56, #57 | F-03, F-05 (code also entered through #47, approved) | passed (45653168539, 45653196163) | none on the PR |
+| #61 | Sync of `sprint-2` into `sprint-3` | passed; local 229/229, E2E 9/9 | none |
+| #58 | `plan.md` v0.4 (C-17) | — | none |
+| #53 | Deliverable 2 Parts A, D, E (this document) | — | changes requested on the first version (`d72d6f2`); all nine points addressed in `6b9b9a0` but not re-reviewed |
 
 ## 4. What to update before submission
 - [ ] Every "pending" above → approval / merge date.
