@@ -181,3 +181,65 @@ describe('reading the log — GET /api/courses/:courseId/audit (FR-22)', () => {
     expect((await prisma.auditEntry.findUnique({ where: { id: entry.id } })).details).toEqual({ title: 'X' });
   });
 });
+
+// Steps A2 / A3 (contract v1.1 L6): the feature that makes the change writes the entry in its own transaction.
+describe('recording membership changes and grade release (A2, A3)', () => {
+  it('TEST-09-10 create, join and leave each store one entry with the student as actor and the team name (AC-09-08)', async () => {
+    const s5 = await createUser({ email: 'student5@cpms.test', displayName: 'Student Five' });
+    const s6 = await createUser({ email: 'student6@cpms.test', displayName: 'Student Six' });
+    await prisma.enrollment.createMany({ data: [s5, s6].map((s) => ({ courseId: course.id, userId: s.id })) });
+
+    const created = await request(app).post(`/api/courses/${course.id}/teams`).set('Cookie', await as(s5)).send({ name: 'Team Gamma' });
+    expect(created.status).toBe(201);
+    const { id: teamId, joinCode } = created.body.team;
+    expect((await request(app).post(`/api/courses/${course.id}/teams/join`).set('Cookie', await as(s6)).send({ joinCode })).status).toBe(200);
+    expect((await request(app).post(`/api/teams/${teamId}/leave`).set('Cookie', await as(s6))).status).toBe(200);
+
+    const rows = await entries();
+    expect(rows.map((r) => [r.action, r.actorId, r.teamId, r.entityId, r.details])).toEqual([
+      ['TEAM_CREATED', s5.id, teamId, teamId, { teamName: 'Team Gamma' }],
+      ['MEMBER_JOINED', s6.id, teamId, teamId, { teamName: 'Team Gamma' }],
+      ['MEMBER_LEFT', s6.id, teamId, teamId, { teamName: 'Team Gamma' }],
+    ]);
+    expect(rows.every((r) => r.courseId === course.id)).toBe(true);
+  });
+
+  it('TEST-09-10b the last member leaving an empty team is recorded before the team is deleted; refused requests store nothing (AC-09-08, F-03 T6)', async () => {
+    const s5 = await createUser({ email: 'student5@cpms.test', displayName: 'Student Five' });
+    await prisma.enrollment.create({ data: { courseId: course.id, userId: s5.id } });
+    const c5 = await as(s5);
+    const { team } = (await request(app).post(`/api/courses/${course.id}/teams`).set('Cookie', c5).send({ name: 'Team Solo' })).body;
+
+    expect((await request(app).post(`/api/courses/${course.id}/teams`).set('Cookie', c5).send({ name: 'Second' })).status).toBe(409); // BR-06
+    const left = await request(app).post(`/api/teams/${team.id}/leave`).set('Cookie', c5);
+    expect(left.body).toEqual({ left: true, teamDeleted: true });
+
+    const rows = await entries();
+    expect(rows.map((r) => r.action)).toEqual(['TEAM_CREATED', 'MEMBER_LEFT']);
+    expect(rows[1]).toMatchObject({ teamId: team.id, details: { teamName: 'Team Solo' } });
+    expect(await prisma.team.findUnique({ where: { id: team.id } })).toBeNull();
+  });
+
+  it('TEST-09-11 releasing a grade stores one GRADE_RELEASED entry with milestone, score and max score; saving a grade stores none (AC-09-09)', async () => {
+    const milestone = await prisma.milestone.create({
+      data: { courseId: course.id, title: 'M1 Requirements', dueAt: new Date(Date.now() - 60 * 1000), weight: 20, maxScore: 100 },
+    });
+    const sub = await prisma.submission.create({ data: { milestoneId: milestone.id, teamId: alpha.id, version: 1, url: 'https://example.com/v1', isLate: false, submittedById: student1.id } });
+    const c = await as(instructor1);
+
+    expect((await request(app).put(`/api/submissions/${sub.id}/grade`).set('Cookie', c).send({ score: 85, feedback: 'Private feedback' })).status).toBe(200);
+    expect(await entries()).toEqual([]);
+    expect((await request(app).post(`/api/submissions/${sub.id}/grade/release`).set('Cookie', c)).status).toBe(200);
+
+    const rows = await entries();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      action: 'GRADE_RELEASED',
+      actorId: instructor1.id,
+      teamId: alpha.id,
+      entityId: sub.id,
+      details: { milestoneTitle: 'M1 Requirements', score: 85, maxScore: 100 },
+    });
+    expect(JSON.stringify(rows[0].details)).not.toContain('Private feedback'); // L3 whitelist
+  });
+});

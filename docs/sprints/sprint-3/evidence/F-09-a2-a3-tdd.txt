@@ -1,0 +1,20 @@
+# F-09 steps A2 + A3 — TDD RED run
+# branch: feature/F-09-audit-a2-a3 (from sprint-3 1cc3fd7, which now contains F-03 and F-06)  commit: RED = this commit (tests only)
+# date: 2026-11-26T04:41:33+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/audit.api.test.js
+
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-03 approving stores one PROPOSAL_APPROVED entry with actor, team, proposal id and title (AC-09-01) 313ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-04 rejecting stores one PROPOSAL_REJECTED entry that contains the reason (AC-09-02) 104ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-05 a decision request that is refused stores no entry (AC-09-03) 118ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-06 if the audit entry cannot be written, the decision is rolled back (AC-09-04, L1) 129ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05) 179ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-08 only the course instructor reads the log (AC-09-06) 134ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-09 an entry cannot be changed in the database (AC-09-07, L2) 88ms
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10 create, join and leave each store one entry with the student as actor and the team name (AC-09-08) 133ms
+   → expected [] to deeply equal [ …(3) ]
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10b the last member leaving an empty team is recorded before the team is deleted; refused requests store nothing (AC-09-08, F-03 T6) 113ms
+   → expected [] to deeply equal [ 'TEAM_CREATED', 'MEMBER_LEFT' ]
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-11 releasing a grade stores one GRADE_RELEASED entry with milestone, score and max score; saving a grade stores none (AC-09-09) 112ms
+   → expected [] to have a length of 1 but got +0
+ Test Files  1 failed (1)
+      Tests  3 failed | 7 passed (10)
