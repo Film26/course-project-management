@@ -86,7 +86,7 @@ Migration `f07_peer_ratings`: `PeerRating { id, milestoneId (FK Milestone, casca
 | TEST-07-02 | AC-07-07 | Unit | `averageOf([])`, `[4]`, `[4, 5, 5]` | null, 4, 4.67 |
 | TEST-07-03 | AC-07-01 | API+DB | Alpha (s1, s2), M1 | s1 rates s2 with `raterId: s2` in body | 201; DB row rater s1, ratee s2 |
 | TEST-07-04 | AC-07-02 | API+DB | — | bodies from TEST-07-01 | 400 each; 0 rows |
-| TEST-07-05 | AC-07-03, 04 | API+DB | s3 in Beta; user 999999; s2 removed from Alpha | s1 rates s1, s3, 999999, s2 | 409 `SELF_RATING`, then `NOT_A_TEAMMATE` ×3; 0 rows |
+| TEST-07-05 | AC-07-03, AC-07-04 | API+DB | s3 in Beta; user 999999; s2 removed from Alpha | s1 rates s1, s3, 999999, s2 | 409 `SELF_RATING`, then `NOT_A_TEAMMATE` ×3; 0 rows |
 | TEST-07-06 | AC-07-05 | API+DB | s1 rated s2 on M1 | rate again on M1; rate on M2; 2 concurrent first ratings by s2 of s1 | 409, row unchanged; 201; one 201 + one 409 |
 | TEST-07-07 | AC-07-06 | API+DB | s1→s2 (4), s3→… none, s2→s1 (2) | s1 GET mine | teammates [s2 rated 4]; body never contains score 2 or s2's comment |
 | TEST-07-08 | AC-07-07 | API+DB | s2 received 4 and 5 on M1, M2 | instructor1 GET; `?milestoneId=M1` | s2 average 4.5 count 2; M1 only: 4 count 1; s5 null/0 |
