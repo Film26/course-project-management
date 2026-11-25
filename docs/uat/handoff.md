@@ -7,8 +7,8 @@ without a verbal briefing. If something here is unclear or wrong, report it as a
 
 | Role | Team | Students (name / ID) |
 |---|---|---|
-| Product Team | CPMS (Film26 / jaruwan18) | _fill in_ |
-| UAT Team | _partner team name_ | _fill in_ |
+| Product Team | CPMS (Film26 / jaruwan18) | น.ส.ทรรศน์วรรณ นามกา 67070507202 · 67070507216 (jaruwan18) |
+| UAT Team | E-Commerce Product Team / TokTickIt | Jiraphat Jarernpipattada (GitHub jiraphat-j) · Thanaporn Bun |
 
 ## 2. Release under test
 
@@ -17,7 +17,7 @@ without a verbal briefing. If something here is unclear or wrong, report it as a
 | Repository | https://github.com/Film26/course-project-management |
 | Sprint 1 baseline release | tag `v1.0-sprint1` → commit `18a3cd9` (12 Nov 2026) |
 | Deployed commit (tested version) | `main` @ `c83a17a631664c47df646782d23fa51bce8c8bd6`. Check it yourself: `<URL>/api/version` |
-| Cloud Run revision | _fill in on handoff day_ (`gcloud run services describe cpms --region asia-southeast1 --format='value(status.latestReadyRevisionName)'`) |
+| Cloud Run revision | `cpms-00003-h49` (Deploy demo run 43922898309; confirmed by the UAT Team in #33). Command: `gcloud run services describe cpms --region asia-southeast1 --format='value(status.latestReadyRevisionName)'` |
 | Deployed URL `<URL>` | https://cpms-t4xsm3f7aa-as.a.run.app |
 | Health check | `<URL>/api/ready` must return `{"status":"ready","db":"connected"}` before you start |
 

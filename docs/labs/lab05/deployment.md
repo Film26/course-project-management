@@ -143,3 +143,13 @@ auto-increase off · nothing else billable. Keep the service running until gradi
 | C-04 | Public URL: sign in, proposal created/submitted/approved, reject without reason refused, student gets 403 on roster |
 | C-05 | Proposal “Lab 5 Persistence Check” present after restart (revision `cpms-00002-s67`) and after redeploy (`cpms-00003-h49`) — Issue #25 |
 | C-06 | PR #28 → staging, release PR #30 → main (merge `c83a17a`), Deploy demo run [43922898309](https://github.com/Film26/course-project-management/actions/runs/43922898309): digest `sha256:5b5384fc…`, revision `cpms-00003-h49`, `/api/version` = `c83a17a…` |
+
+## 9. Later releases through the same pipeline (Lab 6)
+
+Every release below went `staging` → `main` through a reviewed PR and was deployed by the Deploy demo workflow (§6). Revisions are read from the deploy run log.
+
+| Release PR → main | Commit | Deploy demo run | Revision | Content |
+|---|---|---|---|---|
+| #30 | `c83a17a` | [43922898309](https://github.com/Film26/course-project-management/actions/runs/43922898309) | `cpms-00003-h49` | Lab 5 deploy pipeline (C-06); Sprint 1 UAT round 1 tested this release |
+| #35 | `8e89112` | [44699936362](https://github.com/Film26/course-project-management/actions/runs/44699936362) | `cpms-00004-m7f` | Lab 6 controlled defect exercise build (PR #34); UAT round 2 found #36 here |
+| #38 | `463411f` | [45229209859](https://github.com/Film26/course-project-management/actions/runs/45229209859) | `cpms-00005-zns` | Fix for #36 (PR #37); current deployed release |
