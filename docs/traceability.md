@@ -16,6 +16,7 @@
 | 0.3 | 2026-11-07 | 67070507216 | PR #9 review by Film26: FR-06 status split into the Sprint 1 scope (verified) and the BR-07 minimum-team-size check (planned S2); NFR-07 status states that the README run has not been done yet |
 | 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4`; G-08 records how Q-05 was closed (PR #14) |
 | 0.5 | 2026-11-25 | 67070507202 | Sprint 2/3 rows filled from the F-03 … F-09 contracts with real AC and TEST IDs and honest status (implemented on PR / RED / contract only); new §3.2 per-AC status table; status legend extended. Baseline revisions C-07 … C-15 and D-08 are listed in `docs/deliverable2/change-register.md` §3. Drafted with an AI assistant (Claude Code) |
+| 0.6 | 2026-11-25 | 67070507202 | PR #53 review by 67070507216: statuses refreshed to the real PRs and CI runs (F-03 #56, F-05 #57, F-06 #47, F-07 #54, F-09 #52, F-04 and F-08 merged); §3.2 regenerated from the current contract versions (69 ACs, incl. AC-06-10; AC-07-04 and AC-08-03 now show their tests) |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
@@ -40,19 +41,19 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 | FR-07 | Instructor lists course proposals by status | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
 | FR-08 | Instructor approves / rejects with reason; decider + time recorded | F-02 | S1 | AC-02-08, AC-02-09, AC-02-14 | TEST-02-14, TEST-02-15 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
 | FR-09 | Team members view proposal, status, decision/reason | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
-| FR-10 | Student creates a team, gets a join code | F-03 Team formation | S2 | AC-03-01, AC-03-02, AC-03-12, AC-03-13 | TEST-03-01 (T-U); TEST-03-02, TEST-03-05, TEST-03-06, TEST-03-16 (T-API); TEST-03-17 (E2E) | In progress: tests written (RED), not implemented |
-| FR-11 | Student joins a team by join code | F-03 | S2 | AC-03-03, AC-03-06 | TEST-03-01 (T-U); TEST-03-07, TEST-03-10 (T-API) | In progress: tests written (RED), not implemented |
-| FR-12 | Student leaves team while no approved proposal | F-03 | S2 | AC-03-07 | TEST-03-11 (T-API); TEST-03-17 (E2E) | In progress: tests written (RED), not implemented |
+| FR-10 | Student creates a team, gets a join code | F-03 Team formation | S2 | AC-03-01, AC-03-02, AC-03-12, AC-03-13 | TEST-03-01 (T-U); TEST-03-02, TEST-03-05, TEST-03-06, TEST-03-16 (T-API); TEST-03-17 (E2E) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
+| FR-11 | Student joins a team by join code | F-03 | S2 | AC-03-03, AC-03-06 | TEST-03-01 (T-U); TEST-03-07, TEST-03-10 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
+| FR-12 | Student leaves team while no approved proposal | F-03 | S2 | AC-03-07 | TEST-03-11 (T-API); TEST-03-17 (E2E) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
 | FR-13 | Instructor manages milestones (incl. max score, C-08) | F-04 Milestones | S2 | AC-04-01, AC-04-02, AC-04-04, AC-04-05, AC-04-09 | TEST-04-01 (M-U); TEST-04-03, TEST-04-04, TEST-04-07, TEST-04-08 (M-API); TEST-04-12 (E2E) | Implemented, passing on PR #48 (`278de51`, CI run 45555374710); not yet integrated |
-| FR-14 | Students view milestones + own submission status | F-04 (list), F-05 (status) | S2 | AC-04-06, AC-05-07 | TEST-04-09, TEST-04-09b after F-03 (M-API); TEST-05-04 (S-U), TEST-05-11 (S-API) | Partial: list with `NOT_SUBMITTED` passing on PR #48; `SUBMITTED` / `LATE` in F-05 (RED) |
-| FR-15 | Team member submits deliverable URL + note | F-05 Submissions | S2 | AC-05-01, AC-05-02, AC-05-11 | TEST-05-01 (S-U); TEST-05-05, TEST-05-06 (S-API); TEST-05-15 (E2E) | In progress: tests written (RED), not implemented |
-| FR-16 | Resubmit before due date; history kept | F-05 | S2 | AC-05-04, AC-05-07 | TEST-05-02, TEST-05-04 (S-U); TEST-05-08, TEST-05-11 (S-API) | In progress: tests written (RED), not implemented |
-| FR-17 | Instructor grades and releases | F-06 Grading | S2 | AC-06-01, AC-06-03, AC-06-04 | TEST-06-02 (G-U); TEST-06-04, TEST-06-06, TEST-06-07 (G-API) | Contract only (PR #47) |
-| FR-18 | Team views released grades of own team only | F-06 | S2 | AC-06-05, AC-06-07 | TEST-06-03 (G-U); TEST-06-08, TEST-06-10 (G-API); TEST-06-12 (E2E) | Contract only (PR #47) |
-| FR-19 | Student rates each teammate once per milestone | F-07 Peer evaluation | S3 | AC-07-01, AC-07-02, AC-07-09 | TEST-07-01, TEST-07-03, TEST-07-04, TEST-07-10 | Contract only (draft, owner 67070507216) |
-| FR-20 | Instructor views average peer ratings | F-07 | S3 | AC-07-07 | TEST-07-02, TEST-07-08 | Contract only |
-| FR-21 | Instructor course dashboard | F-08 Dashboard | S3 | AC-08-01 … AC-08-05, AC-08-07 | TEST-08-01 … TEST-08-05, TEST-08-07 | Contract only (PR #50) |
-| FR-22 | Audit entries for decisions, grade releases, membership changes | F-09 Audit log | S3 | AC-09-01 … AC-09-10 | TEST-09-01, TEST-09-02 (L-U); TEST-09-03 … TEST-09-09 (L-API); TEST-09-12 (E2E) | Partial: proposal decisions (step A1) implemented, passing locally on PR #52 (`3bca213`); membership (A2) and grade release (A3) planned |
+| FR-14 | Students view milestones + own submission status | F-04 (list), F-05 (status) | S2 | AC-04-06, AC-05-07 | TEST-04-09, TEST-04-09b after F-03 (M-API); TEST-05-04 (S-U), TEST-05-11 (S-API) | List verified (PR #48, merged); `SUBMITTED` / `LATE` implemented on PR #57, tests pass |
+| FR-15 | Team member submits deliverable URL + note | F-05 Submissions | S2 | AC-05-01, AC-05-02, AC-05-11 | TEST-05-01 (S-U); TEST-05-05, TEST-05-06 (S-API); TEST-05-15 (E2E) | Implemented, tests pass on PR #57 (CI run 45653196163); merge pending |
+| FR-16 | Resubmit before due date; history kept | F-05 | S2 | AC-05-04, AC-05-07 | TEST-05-02, TEST-05-04 (S-U); TEST-05-08, TEST-05-11 (S-API) | Implemented, tests pass on PR #57 (CI run 45653196163); merge pending |
+| FR-17 | Instructor grades and releases | F-06 Grading | S2 | AC-06-01, AC-06-03, AC-06-04 | TEST-06-02 (G-U); TEST-06-04, TEST-06-06, TEST-06-07 (G-API) | Implemented, tests pass on PR #47 (CI run 45638396394); merge pending |
+| FR-18 | Team views released grades of own team only | F-06 | S2 | AC-06-05, AC-06-07 | TEST-06-03 (G-U); TEST-06-08, TEST-06-10 (G-API); TEST-06-12 (E2E) | Implemented, tests pass on PR #47 (CI run 45638396394); merge pending |
+| FR-19 | Student rates each teammate once per milestone | F-07 Peer evaluation | S3 | AC-07-01, AC-07-02, AC-07-09 | TEST-07-01, TEST-07-03, TEST-07-04, TEST-07-10 | Contract only (PR #54, owner 67070507202 since plan v0.4) |
+| FR-20 | Instructor views average peer ratings | F-07 | S3 | AC-07-07 | TEST-07-02, TEST-07-08 | Contract only (PR #54) |
+| FR-21 | Instructor course dashboard | F-08 Dashboard | S3 | AC-08-01 … AC-08-05, AC-08-07 | TEST-08-01 … TEST-08-05, TEST-08-07 | Contract only (merged PR #50, v1.1) |
+| FR-22 | Audit entries for decisions, grade releases, membership changes | F-09 Audit log | S3 | AC-09-01 … AC-09-10 | TEST-09-01, TEST-09-02 (L-U); TEST-09-03 … TEST-09-09 (L-API); TEST-09-12 (E2E) | Partial: proposal decisions (step A1) implemented, tests pass on PR #52 (CI run 45561424547 on `3bca213`; review fix `fe304e6` 92/92 locally); membership (A2) and grade release (A3) planned |
 
 ## 2. Business rules
 
@@ -63,14 +64,14 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 | BR-03 | Only `DRAFT→SUBMITTED`, `SUBMITTED→APPROVED/REJECTED`; final states | F-02 | S1 | AC-02-04, AC-02-07 | TEST-02-01 all 16 pairs (P-U); TEST-02-10, TEST-02-13 (P-API) | Verified (auto) |
 | BR-04 | Reject reason required, ≤ 500 chars | F-02 | S1 | AC-02-09 | TEST-02-04 500/501 boundary (P-U); TEST-02-15 (P-API) | Verified (auto) |
 | BR-05 | Only team members act on / read own proposal; only course instructor decides | F-02 | S1 | AC-02-10, AC-02-11 | TEST-02-16, TEST-02-17 (P-API); TEST-02-20 other-team 403 (P-E2E) | Verified (auto) |
-| BR-06 | One team per student per course | F-03 | S2 | AC-03-04 | TEST-03-08 incl. concurrency (T-API); DB unique `TeamMember(courseId, userId)` | In progress: tests written (RED) |
-| BR-07 | Team size min/max; submit only with ≥ `minTeamSize` members | F-03 (+ change to F-02 submit) | S2 | AC-03-05, AC-03-09 | TEST-03-03 boundaries (T-U); TEST-03-09 incl. concurrency, TEST-03-13 (T-API) | In progress: tests written (RED) (see C-02, C-11) |
-| BR-08 | Membership locked after proposal `APPROVED` | F-03 | S2 | AC-03-08 | TEST-03-04 (T-U); TEST-03-12 (T-API) | In progress: tests written (RED) |
-| BR-09 | Milestone weights ≤ 100 % | F-04 | S2 | AC-04-03 | TEST-04-02 boundary 100/101 (M-U); TEST-04-05, TEST-04-06 concurrency (M-API) | Implemented, passing on PR #48; not yet integrated |
-| BR-10 | Only teams with `APPROVED` proposal submit deliverables | F-05 (depends on F-02) | S2 | AC-05-03 | TEST-05-07 (S-API) | In progress: tests written (RED) |
-| BR-11 | Late submissions marked `LATE`; resubmission rule | F-05 | S2 | AC-05-04, AC-05-05, AC-05-06 | TEST-05-02 boundary, TEST-05-03 (S-U); TEST-05-09, TEST-05-10 (S-API) | In progress: tests written (RED); G-05 resolved in the F-05 contract (C-12) |
-| BR-12 | Score within 0..max score; visible only after release | F-06 | S2 | AC-06-02, AC-06-05, AC-06-06 | TEST-06-01 boundaries, TEST-06-03 (G-U); TEST-06-05, TEST-06-08, TEST-06-09 (G-API) | Contract only (PR #47); max score from F-04 (G-04 closed by C-08) |
-| BR-13 | No self-rating; once per teammate per milestone; individual ratings hidden | F-07 | S3 | AC-07-03 … AC-07-06 | TEST-07-05, TEST-07-06, TEST-07-07 | Contract only |
+| BR-06 | One team per student per course | F-03 | S2 | AC-03-04 | TEST-03-08 incl. concurrency (T-API); DB unique `TeamMember(courseId, userId)` | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
+| BR-07 | Team size min/max; submit only with ≥ `minTeamSize` members | F-03 (+ change to F-02 submit) | S2 | AC-03-05, AC-03-09 | TEST-03-03 boundaries (T-U); TEST-03-09 incl. concurrency, TEST-03-13 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending (see C-02, C-11) |
+| BR-08 | Membership locked after proposal `APPROVED` | F-03 | S2 | AC-03-08 | TEST-03-04 (T-U); TEST-03-12 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
+| BR-09 | Milestone weights ≤ 100 % | F-04 | S2 | AC-04-03 | TEST-04-02 boundary 100/101 (M-U); TEST-04-05, TEST-04-06 concurrency (M-API) | Verified (auto): merged into `sprint-2` (PR #48) |
+| BR-10 | Only teams with `APPROVED` proposal submit deliverables | F-05 (depends on F-02) | S2 | AC-05-03 | TEST-05-07 (S-API) | Implemented, tests pass on PR #57 (CI run 45653196163); merge pending |
+| BR-11 | Late submissions marked `LATE`; resubmission rule | F-05 | S2 | AC-05-04, AC-05-05, AC-05-06 | TEST-05-02 boundary, TEST-05-03 (S-U); TEST-05-09, TEST-05-10 (S-API) | Implemented, tests pass on PR #57 (CI run 45653196163); merge pending; G-05 resolved in the F-05 contract (C-12) |
+| BR-12 | Score within 0..max score; visible only after release | F-06 | S2 | AC-06-02, AC-06-05, AC-06-06 | TEST-06-01 boundaries, TEST-06-03 (G-U); TEST-06-05, TEST-06-08, TEST-06-09 (G-API) | Implemented, tests pass on PR #47 (CI run 45638396394); max score from F-04 (G-04 closed by C-08) |
+| BR-13 | No self-rating; once per teammate per milestone; individual ratings hidden | F-07 | S3 | AC-07-03 … AC-07-06 | TEST-07-05, TEST-07-06, TEST-07-07 | Contract only (PR #54) |
 
 F-01 has no business rule of its own. Its internal rules R1–R6 (identical login error, session-only identity, etc.) are recorded in `F-01-auth.md` and trace to FR-01–04 and NFR-01–04 above and below.
 
@@ -112,86 +113,87 @@ Every Sprint 1 acceptance criterion maps to at least one test:
 | | | AC-02-13 | TEST-02-19 |
 | | | AC-02-14 | TEST-02-20 |
 
-### 3.2 Sprint 2 and Sprint 3 acceptance criteria: implementation and verification status (2026-11-25)
+### 3.2 Sprint 2 and Sprint 3 acceptance criteria: implementation and verification status (2026-11-25, v0.6)
 
-One row per AC from the Sprint 2/3 contracts. *Verification* says whether the test has **run** and what it showed; a test that has not run is never counted as passing. Update this table on the candidate commit.
+One row per AC of the current contract on its branch. *Verification* says whether the tests **ran** and what they showed; a test that has not run is never shown as passing. Refresh on the candidate commit.
 
 | AC | Implemented | Tests (contract STS) | Verification status |
 |---|---|---|---|
-| AC-03-01 | No | TEST-03-02, TEST-03-05 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-02 | No | TEST-03-01, TEST-03-06 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-03 | No | TEST-03-07 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-04 | No | TEST-03-08 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-05 | No | TEST-03-03, TEST-03-09 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-06 | No | TEST-03-01, TEST-03-10 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-07 | No | TEST-03-11 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-08 | No | TEST-03-04, TEST-03-12 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-09 | No | TEST-03-03, TEST-03-13 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-10 | No | TEST-03-14 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-11 | No | TEST-03-15 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-12 | No | TEST-03-16 | Tests written (RED, F-03 patch): fail as expected |
-| AC-03-13 | No | TEST-03-17 | Tests written (RED, F-03 patch): fail as expected |
-| AC-04-01 | Yes (PR #48, `278de51`) | TEST-04-03 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-02 | Yes (PR #48, `278de51`) | TEST-04-01, TEST-04-04 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-03 | Yes (PR #48, `278de51`) | TEST-04-02, TEST-04-05, TEST-04-06 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-04 | Yes (PR #48, `278de51`) | TEST-04-07 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-05 | Yes (PR #48, `278de51`) | TEST-04-08 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-06 | Yes (PR #48, `278de51`) | TEST-04-09 | Ran and passed locally and in CI run 45555374710 (not yet merged); TEST-04-09b (NO_TEAM) waits for F-03 (`it.todo`) |
-| AC-04-07 | Yes (PR #48, `278de51`) | TEST-04-10 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-08 | Yes (PR #48, `278de51`) | TEST-04-11 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-04-09 | Yes (PR #48, `278de51`) | TEST-04-12 | Ran and passed locally and in CI run 45555374710 (not yet merged) |
-| AC-05-01 | No | TEST-05-05 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-02 | No | TEST-05-01, TEST-05-06 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-03 | No | TEST-05-07 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-04 | No | TEST-05-02, TEST-05-08 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-05 | No | TEST-05-02, TEST-05-09 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-06 | No | TEST-05-03, TEST-05-10 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-07 | No | TEST-05-04, TEST-05-11 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-08 | No | TEST-05-12 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-09 | No | TEST-05-13 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-10 | No | TEST-05-14 | Tests written (RED, F-05 patch): fail as expected |
-| AC-05-11 | No | TEST-05-15 | Tests written (RED, F-05 patch): fail as expected |
-| AC-06-01 | No | TEST-06-04 | Planned in contract (PR #47) |
-| AC-06-02 | No | TEST-06-01, TEST-06-05 | Planned in contract (PR #47) |
-| AC-06-03 | No | TEST-06-02, TEST-06-06 | Planned in contract (PR #47) |
-| AC-06-04 | No | TEST-06-02, TEST-06-07 | Planned in contract (PR #47) |
-| AC-06-05 | No | TEST-06-03, TEST-06-08 | Planned in contract (PR #47) |
-| AC-06-06 | No | TEST-06-09 | Planned in contract (PR #47) |
-| AC-06-07 | No | TEST-06-10 | Planned in contract (PR #47) |
-| AC-06-08 | No | TEST-06-11 | Planned in contract (PR #47) |
-| AC-06-09 | No | TEST-06-12 | Planned in contract (PR #47) |
-| AC-07-01 | No | TEST-07-03 | Planned in contract |
-| AC-07-02 | No | TEST-07-01, TEST-07-04 | Planned in contract |
-| AC-07-03 | No | TEST-07-05 | Planned in contract |
-| AC-07-04 | No | — | Planned in contract |
-| AC-07-05 | No | TEST-07-06 | Planned in contract |
-| AC-07-06 | No | TEST-07-07 | Planned in contract |
-| AC-07-07 | No | TEST-07-02, TEST-07-08 | Planned in contract |
-| AC-07-08 | No | TEST-07-09 | Planned in contract |
-| AC-07-09 | No | TEST-07-10 | Planned in contract |
-| AC-08-01 | No | TEST-08-01, TEST-08-03 | Planned in contract (PR #50) |
-| AC-08-02 | No | TEST-08-02 | Planned in contract (PR #50) |
-| AC-08-03 | No | — | Planned in contract (PR #50) |
-| AC-08-04 | No | TEST-08-04 | Planned in contract (PR #50) |
-| AC-08-05 | No | TEST-08-05 | Planned in contract (PR #50) |
-| AC-08-06 | No | TEST-08-06 | Planned in contract (PR #50) |
-| AC-08-07 | No | TEST-08-07 | Planned in contract (PR #50) |
-| AC-09-01 | A1: Yes (PR #52, `3bca213`) | TEST-09-02, TEST-09-03 | A1: ran and passed locally (CI after merge) |
-| AC-09-02 | A1: Yes (PR #52, `3bca213`) | TEST-09-02, TEST-09-04 | A1: ran and passed locally (CI after merge) |
-| AC-09-03 | A1: Yes (PR #52, `3bca213`) | TEST-09-05 | A1: ran and passed locally (CI after merge) |
-| AC-09-04 | A1: Yes (PR #52, `3bca213`) | TEST-09-06 | A1: ran and passed locally (CI after merge) |
-| AC-09-05 | A1: Yes (PR #52, `3bca213`) | TEST-09-01, TEST-09-07 | A1: ran and passed locally (CI after merge) |
-| AC-09-06 | A1: Yes (PR #52, `3bca213`) | TEST-09-08 | A1: ran and passed locally (CI after merge) |
-| AC-09-07 | A1: Yes (PR #52, `3bca213`) | TEST-09-09 | A1: ran and passed locally (CI after merge) |
-| AC-09-08 *(A2)* | No (step A2) | TEST-09-10 | Planned |
-| AC-09-09 *(A3)* | No (step A3) | TEST-09-11 | Planned |
-| AC-09-10 | A1: Yes (PR #52, `3bca213`) | TEST-09-12 | A1: ran and passed locally (CI after merge) |
+| AC-03-01 | Yes, PR #56 (`10ce17a`) | TEST-03-02, TEST-03-05 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-02 | Yes, PR #56 (`10ce17a`) | TEST-03-01, TEST-03-06 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-03 | Yes, PR #56 (`10ce17a`) | TEST-03-07 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-04 | Yes, PR #56 (`10ce17a`) | TEST-03-08 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-05 | Yes, PR #56 (`10ce17a`) | TEST-03-03, TEST-03-09 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-06 | Yes, PR #56 (`10ce17a`) | TEST-03-01, TEST-03-10 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-07 | Yes, PR #56 (`10ce17a`) | TEST-03-11 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-08 | Yes, PR #56 (`10ce17a`) | TEST-03-04, TEST-03-12 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-09 | Yes, PR #56 (`10ce17a`) | TEST-03-03, TEST-03-13 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-10 | Yes, PR #56 (`10ce17a`) | TEST-03-14 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-11 | Yes, PR #56 (`10ce17a`) | TEST-03-15 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-12 | Yes, PR #56 (`10ce17a`) | TEST-03-16 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-03-13 | Yes, PR #56 (`10ce17a`) | TEST-03-17 | Ran and passed: 152/152 locally, CI run 45653168539; merge into `sprint-2` pending |
+| AC-04-01 | Yes, merged (PR #48, `135d4a3`) | TEST-04-03 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-02 | Yes, merged (PR #48, `135d4a3`) | TEST-04-01, TEST-04-04 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-03 | Yes, merged (PR #48, `135d4a3`) | TEST-04-02, TEST-04-05, TEST-04-06, TEST-04-13 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-04 | Yes, merged (PR #48, `135d4a3`) | TEST-04-07, TEST-04-14b | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-05 | Yes, merged (PR #48, `135d4a3`) | TEST-04-08, TEST-04-14 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-06 | Yes, merged (PR #48, `135d4a3`) | TEST-04-09, TEST-04-09b | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-07 | Yes, merged (PR #48, `135d4a3`) | TEST-04-10 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-08 | Yes, merged (PR #48, `135d4a3`) | TEST-04-11 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-04-09 | Yes, merged (PR #48, `135d4a3`) | TEST-04-12 | Ran and passed: 114/114, CI run 45577625107 (Verified, auto) |
+| AC-05-01 | Yes, PR #57 (`fef1a22`) | TEST-05-05 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-02 | Yes, PR #57 (`fef1a22`) | TEST-05-01, TEST-05-06 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-03 | Yes, PR #57 (`fef1a22`) | TEST-05-07 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-04 | Yes, PR #57 (`fef1a22`) | TEST-05-02, TEST-05-08 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-05 | Yes, PR #57 (`fef1a22`) | TEST-05-02, TEST-05-09 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-06 | Yes, PR #57 (`fef1a22`) | TEST-05-03, TEST-05-10 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-07 | Yes, PR #57 (`fef1a22`) | TEST-05-04, TEST-05-11 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-08 | Yes, PR #57 (`fef1a22`) | TEST-05-12 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-09 | Yes, PR #57 (`fef1a22`) | TEST-05-13 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-10 | Yes, PR #57 (`fef1a22`) | TEST-05-14 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-05-11 | Yes, PR #57 (`fef1a22`) | TEST-05-15 | Ran and passed: 180/180 locally, CI run 45653196163; merge pending |
+| AC-06-01 | Yes, PR #47 (`34ad6c6`) | TEST-06-04 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-02 | Yes, PR #47 (`34ad6c6`) | TEST-06-01, TEST-06-05 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-03 | Yes, PR #47 (`34ad6c6`) | TEST-06-02, TEST-06-06 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-04 | Yes, PR #47 (`34ad6c6`) | TEST-06-02, TEST-06-07, TEST-06-07b | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-05 | Yes, PR #47 (`34ad6c6`) | TEST-06-03, TEST-06-08 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-06 | Yes, PR #47 (`34ad6c6`) | TEST-06-09 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-07 | Yes, PR #47 (`34ad6c6`) | TEST-06-10 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-08 | Yes, PR #47 (`34ad6c6`) | TEST-06-11 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-09 | Yes, PR #47 (`34ad6c6`) | TEST-06-12 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-06-10 *(v1.1)* | Yes, PR #47 (`34ad6c6`) | TEST-06-13 | Ran and passed: 206/206 ×3 locally, CI run 45638396394; merge pending |
+| AC-07-01 | No | TEST-07-03 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-02 | No | TEST-07-01, TEST-07-04 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-03 | No | TEST-07-05 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-04 | No | TEST-07-05 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-05 | No | TEST-07-06 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-06 | No | TEST-07-07 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-07 | No | TEST-07-02, TEST-07-08 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-08 | No | TEST-07-09 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-07-09 | No | TEST-07-10 | Not run: contract only (PR #54); implementation planned (Part C plan) |
+| AC-08-01 | No | TEST-08-01, TEST-08-03 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-02 | No | TEST-08-02 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-03 | No | TEST-08-02 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-04 | No | TEST-08-04 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-05 | No | TEST-08-05 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-06 | No | TEST-08-06 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-08-07 | No | TEST-08-07 | Not run: contract only (merged PR #50, v1.1); implementation planned |
+| AC-09-01 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-02, TEST-09-03 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-02 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-02, TEST-09-04 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-03 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-05 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-04 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-06 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-05 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-01, TEST-09-07 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-06 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-08 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-07 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-09 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
+| AC-09-08 *(A2)* | No (step A2) | TEST-09-10 | Not run: planned after F-03 / F-06 merge |
+| AC-09-09 *(A3)* | No (step A3) | TEST-09-11 | Not run: planned after F-03 / F-06 merge |
+| AC-09-10 | Step A1: yes, PR #52 (`fe304e6`) | TEST-09-12 | Ran and passed: CI run 45561424547 on `3bca213`, 92/92 locally on `fe304e6` |
 
 ## 4. Coverage gaps
 
 Requirements, or parts of them, that are not fully verified at the end of Sprint 1. Each one has an owner sprint.
 
-*Status on 2026-11-25 (v0.5):* G-02 is covered by TEST-09-06 (forced 500, PR #52, not merged yet); G-03 is covered for proposal decisions by F-09 step A1 (PR #52); G-04 is closed by the F-04 max score (C-08); G-05 is resolved in the F-05 contract (C-12); G-06 is still open. Details: `docs/deliverable2/change-register.md` §2.
+*Status on 2026-11-25 (v0.6):* G-02 is covered by TEST-09-06 (forced 500, PR #52, CI run 45561424547); G-03 is covered for proposal decisions by F-09 step A1 (PR #52); G-04 is closed by the F-04 max score (C-08); G-05 is resolved in the F-05 contract (C-12); G-06 is still open. Details: `docs/deliverable2/change-register.md` §2.
 
 | ID | Requirement | Gap | Plan |
 |---|---|---|---|
