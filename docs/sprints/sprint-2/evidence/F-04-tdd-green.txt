@@ -1,0 +1,121 @@
+# F-04 TDD GREEN run
+# branch: feature/F-04-milestones  RED commit: d78ed25 (tests unchanged since RED)  GREEN: this commit (implementation)
+# date: 2026-11-25T12:41:26+07:00
+# command: cd server && npx vitest run --reporter=verbose   (whole backend suite: F-04 + F-01/F-02 regression)
+
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-05 a team member creates a DRAFT for their own team; client-supplied status/teamId are ignored (AC-02-01) 185ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-06 a second active proposal is rejected while DRAFT, SUBMITTED or APPROVED exists (AC-02-02, BR-01) 102ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-07 after a rejection the team may create a new proposal and the rejected one is kept (AC-02-02, D-05) 80ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-08 concurrent creates for the same team store exactly one proposal (AC-02-02, NFR-06) 170ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-09 invalid input → 400 VALIDATION_ERROR naming the fields, nothing stored or changed (AC-02-03) 102ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-10 a DRAFT can be edited; a SUBMITTED proposal cannot (AC-02-04) 87ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-11 a member submits a DRAFT before the deadline → SUBMITTED with submittedAt (AC-02-05) 79ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-12 submit after the course deadline → 409 DEADLINE_PASSED, still DRAFT (AC-02-06, BR-02) 87ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-13 transitions outside the state machine → 409 INVALID_TRANSITION, status unchanged (AC-02-07, BR-03) 105ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-14 the course instructor approves a SUBMITTED proposal; decider and time are stored (AC-02-08) 85ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-15 reject needs a reason of 1–500 chars; invalid reasons change nothing (AC-02-09, BR-04) 97ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-15b Issue #36 (UAT-06c): reject with an empty or blank reason → 400, proposal stays SUBMITTED (AC-02-09, BR-04) 81ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-16 a non-member student and an instructor cannot create, read, edit or submit a team proposal (AC-02-10) 140ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-17 students cannot list or decide; an instructor of another course cannot read, list or decide (AC-02-11) 107ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-18 every F-02 endpoint rejects requests without a session (AC-02-12) 78ms
+ ✓ tests/proposal.api.test.js > view proposals (FR-07, FR-09) > TEST-02-19 members see their team and decisions; the instructor lists and filters the course (AC-02-13) 136ms
+ ✓ tests/milestone.api.test.js > create milestone — POST /api/courses/:courseId/milestones > TEST-04-03 the course instructor creates a milestone; dueAt is stored in UTC and courseId in the body is ignored (AC-04-01) 174ms
+ ✓ tests/milestone.api.test.js > create milestone — POST /api/courses/:courseId/milestones > TEST-04-04 invalid input → 400 VALIDATION_ERROR naming the field; nothing stored or changed (AC-04-02) 90ms
+ ✓ tests/milestone.api.test.js > weight total — BR-09 > TEST-04-05 a total above 100 % is rejected with the current total; exactly 100 % is accepted (AC-04-03) 92ms
+ ✓ tests/milestone.api.test.js > weight total — BR-09 > TEST-04-06 two concurrent creates that together exceed 100 % store exactly one (AC-04-03, NFR-06) 120ms
+ ✓ tests/milestone.api.test.js > edit and delete — PATCH | DELETE /api/milestones/:id > TEST-04-07 editing changes only the sent fields; a milestone's own old weight is not counted twice (AC-04-04) 87ms
+ ✓ tests/milestone.api.test.js > edit and delete — PATCH | DELETE /api/milestones/:id > TEST-04-08 deleting a milestone removes it and frees its weight (AC-04-05) 84ms
+ ✓ tests/milestone.api.test.js > list milestones — GET /api/courses/:courseId/milestones (FR-13, FR-14) > TEST-04-09 the instructor sees milestones sorted by due date with the total; a team member sees the team status; unknown ids → 404 (AC-04-06) 104ms
+ ↓ tests/milestone.api.test.js > list milestones — GET /api/courses/:courseId/milestones (FR-13, FR-14) > TEST-04-09b an enrolled student without a team sees teamStatus NO_TEAM (AC-04-06, after F-03)
+ ✓ tests/milestone.api.test.js > access control (NFR-02, NFR-03) > TEST-04-10 a student cannot write; an instructor of another course cannot read or write; a student outside the course cannot read (AC-04-07) 167ms
+ ✓ tests/milestone.api.test.js > access control (NFR-02, NFR-03) > TEST-04-11 every F-04 endpoint rejects requests without a session (AC-04-08) 79ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-04 valid credentials → 200, user only, HttpOnly cookie, hashed session token (AC-01-01, AC-01-09) 145ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-05 wrong password and unknown email → identical 401, no cookie, no session (AC-01-02) 69ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-06 missing / empty fields → 400 VALIDATION_ERROR naming the fields (AC-01-03) 56ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-07 identity comes from the session, client-supplied id/role are ignored (AC-01-04) 61ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-08 no cookie or an unknown token → 401 without private data (AC-01-05) 70ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-09 an expired session → 401 (AC-01-05, NFR-04) 65ms
+ ✓ tests/auth.api.test.js > POST /api/auth/logout > TEST-01-10 logout revokes the session; the old cookie no longer works (AC-01-06) 67ms
+ ✓ tests/auth.api.test.js > GET /api/courses — list scoped to the current user > TEST-01-14 instructor sees courses they teach; student sees courses of their team; other instructor sees none (AC-01-11) 91ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-11 a STUDENT is forbidden (AC-01-07) 67ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-12 owning instructor 200; other instructor 403; unknown course 404 (AC-01-08) 90ms
+ ✓ tests/deploy.test.js > readiness and version (smoke test endpoints) > GET /api/ready reports the database as connected 61ms
+ ✓ tests/deploy.test.js > readiness and version (smoke test endpoints) > GET /api/version returns the commit the build came from 6ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > serves index.html at / and for any non-API path (single-page app) 14ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > unknown /api routes still return the JSON 404, never the UI 4ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > without CLIENT_DIST_DIR (local dev) the API does not serve the UI 3ms
+ ✓ tests/health.test.js > baseline > GET /api/health returns ok 25ms
+ ✓ tests/health.test.js > baseline > unknown API route returns the standard error shape 5ms
+ ✓ tests/health.test.js > baseline > test database is migrated and writable 79ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is active when not revoked and expiresAt is in the future 1ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is expired exactly at expiresAt (boundary) 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive once revoked, even before expiry 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive for a missing session 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-02 password hashing (AC-01-09) > stores a bcrypt hash, not the plaintext, and verifies correctly 8ms
+ ✓ tests/auth.unit.test.js > TEST-01-03 session token hashing (AC-01-09, rule R3) > produces a random token and a deterministic SHA-256 hex hash 1ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts a valid create body, trims text and converts dueAt to a Date in UTC 2ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > description is optional on create and defaults to an empty string 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > an empty body names every required field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "   " and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects description = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-12-01" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-12-01T23:59:00" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "tomorrow" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-13-40T25:00:00Z" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 0 and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 101 and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 12.5 and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = "20" and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = 0 and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = 1001 and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = null and names the field 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary title = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary description = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary weight = 1 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary weight = 100 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary maxScore = 1 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary maxScore = 1000 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > partial (PATCH): validates only the sent fields and needs at least one 0ms
+ ✓ tests/milestone.unit.test.js > parseDueAt (AC-04-02, M3) > needs a date-time with Z or an offset; returns the UTC instant 0ms
+ ✓ tests/milestone.unit.test.js > parseDueAt (AC-04-02, M3) > accepts a due date in the past (M3) 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-02 checkWeightTotal (AC-04-03, BR-09) > a total of exactly 100 % is accepted (boundary) 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-02 checkWeightTotal (AC-04-03, BR-09) > a total above 100 % is rejected and reports the current total 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → DRAFT is rejected 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → SUBMITTED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → APPROVED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → REJECTED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > rejects unknown statuses 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > allows submission 1 ms before the deadline 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > allows submission exactly at the deadline (boundary) 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > rejects submission 1 ms after the deadline 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-03 isActiveStatus (AC-02-02, BR-01) > treats DRAFT, SUBMITTED and APPROVED as active and REJECTED as inactive 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > requires title and description on create 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > rejects blank strings and non-strings 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > enforces the 120-char title and 5000-char description limits 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > returns trimmed values and ignores unknown fields 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > partial (edit) mode accepts one field but requires at least one 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > reject reason: required, trimmed, at most 500 characters 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > Issue #36 (UAT-06c): an empty or blank reject reason is refused with "Reason is required" (AC-02-09, BR-04) 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > status filter: optional, must be a known status 0ms
+ Test Files  8 passed (8)
+      Tests  107 passed | 1 todo (108)
+   Duration  10.92s (transform 140ms, setup 86ms, collect 1.83s, tests 3.74s, environment 1ms, prepare 870ms)
+
+# E2E: npx playwright test (run from the repo root)
+  ok TEST-01-13, TEST-01-13b, TEST-02-20, TEST-02-20b (regression)
+  ok TEST-04-12 instructor adds a milestone up to 100 %, is stopped at 101 %, edits it; student sees the list
+  5 passed — screenshots: docs/sprints/sprint-2/evidence/screenshots/F04-*.png

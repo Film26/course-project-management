@@ -29,11 +29,13 @@ beforeEach(async () => {
     data: { code: 'CPE999', name: 'Other Course', instructorId: instructorB.id, proposalDeadline: new Date(Date.now() + 30 * DAY) },
   });
   alpha = await prisma.team.create({
-    data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id }, { userId: student2.id }] } },
+    data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id, courseId: course.id }, { userId: student2.id, courseId: course.id }] } },
   });
   beta = await prisma.team.create({
-    data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id }] } },
+    data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id, courseId: course.id }] } },
   });
+  // F-03: every student of CPE334 is enrolled; student4 is enrolled but has no team (my-team → 404, as in F-02).
+  await prisma.enrollment.createMany({ data: [student1, student2, student3, student4].map((s) => ({ courseId: course.id, userId: s.id })) });
 });
 
 afterAll(() => prisma.$disconnect());

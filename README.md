@@ -93,6 +93,11 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 | student1@cpms.test | STUDENT | Team Alpha |
 | student2@cpms.test | STUDENT | Team Alpha |
 | student3@cpms.test | STUDENT | Team Beta |
+| student4@cpms.test | STUDENT | Team Beta |
+| student5@cpms.test | STUDENT | none (enrolled) |
+| student6@cpms.test | STUDENT | none (enrolled) |
+
+Team Alpha's join code is `ALPHA234`, Team Beta's is `BETA2345`. All six students are enrolled in CPE334.
 
 ### Sprint 1 journey (F-01 + F-02)
 
@@ -103,6 +108,48 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 Rules enforced by the API: one active proposal per team, no submission after the course deadline,
 only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
 the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
+
+### Sprint 2 journey: teams (F-03)
+
+1. Log in as `student5@cpms.test` → **My team proposal** → **Create team** → the page shows the join code.
+2. Log in as `student6@cpms.test` → **My team proposal** → **Join team** with that code; **Leave team** works while the team has no approved proposal.
+3. Log in as `instructor1@cpms.test` → **View roster**: join codes and the unassigned students.
+
+Rules enforced by the API: one team per student per course, 2–3 members per team, joining a full team is refused,
+a proposal can be submitted only with at least 2 members, and membership is locked once the proposal is approved
+(see `docs/sprints/sprint-2/F-03-teams.md`).
+
+### Sprint 2 journey: deliverables (F-05)
+
+1. As `instructor1@cpms.test`, approve Team Alpha's proposal (F-02).
+2. Log in as `student1@cpms.test` → **Milestones** → **Submit** on a milestone → enter a link (http/https) and a note.
+   `student2@cpms.test` can **Resubmit**: the newest version is current, older ones stay in the history.
+3. As `instructor1@cpms.test` → **Milestones** → **Submissions**: the current version of every team.
+
+Rules enforced by the API: only a team with an approved proposal can submit; after the due date a version is
+marked LATE, and once an on-time version exists no new version is accepted after the due date
+(see `docs/sprints/sprint-2/F-05-submissions.md`).
+
+### Sprint 2 journey: grading (F-06)
+
+1. As `instructor1@cpms.test` → **Milestones** → **Submissions** → enter a score (0 to the milestone's max score)
+   and feedback → **Save grade**. After the milestone due date → **Release**.
+2. The team's students see the grade under **My grades** only after it is released; other teams never see it.
+
+Rules enforced by the API (D-08): only the team's current version is graded or released, release only after the
+due date, a released grade cannot change and the team cannot submit that milestone again
+(see `docs/sprints/sprint-2/F-06-grading.md`).
+
+### Sprint 2 journey: milestones (F-04)
+
+The seed adds three milestones to CPE334 (M1 20 %, M2 30 %, M3 40 %, total 90 %).
+
+1. Log in as `instructor1@cpms.test` → **Milestones** → **Add milestone** (title, due date in Bangkok time, weight %, max score). **Edit** and **Delete** are on each milestone.
+2. Log in as a student of a team in CPE334 → **Milestones** → the course milestones in due-date order with the team's status.
+
+Rules enforced by the API: the weights of a course add up to at most 100 % (exactly 100 % is allowed), weight
+1–100 and max score 1–1000 as whole numbers, and only the course instructor can change milestones
+(see `docs/sprints/sprint-2/F-04-milestones.md`).
 
 ### Sprint 3 journey: audit log (F-09, step A1)
 

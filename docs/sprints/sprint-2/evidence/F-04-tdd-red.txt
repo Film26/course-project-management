@@ -1,0 +1,77 @@
+# F-04 TDD RED run
+# branch: feature/F-04-milestones  commit: (this commit: tests + schema/migration + rules stub, before implementation; parent 06076da = contract v1.0)
+# date: 2026-11-24T23:48:24+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/milestone.unit.test.js tests/milestone.api.test.js
+
+ × tests/milestone.api.test.js > create milestone — POST /api/courses/:courseId/milestones > TEST-04-03 the course instructor creates a milestone; dueAt is stored in UTC and courseId in the body is ignored (AC-04-01) 589ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/milestone.api.test.js > create milestone — POST /api/courses/:courseId/milestones > TEST-04-04 invalid input → 400 VALIDATION_ERROR naming the field; nothing stored or changed (AC-04-02) 80ms
+   → expected 404 to be 400 // Object.is equality
+ × tests/milestone.api.test.js > weight total — BR-09 > TEST-04-05 a total above 100 % is rejected with the current total; exactly 100 % is accepted (AC-04-03) 73ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/milestone.api.test.js > weight total — BR-09 > TEST-04-06 two concurrent creates that together exceed 100 % store exactly one (AC-04-03, NFR-06) 76ms
+   → expected [ 404, 404 ] to deeply equal [ 201, 409 ]
+ × tests/milestone.api.test.js > edit and delete — PATCH | DELETE /api/milestones/:id > TEST-04-07 editing changes only the sent fields; a milestone's own old weight is not counted twice (AC-04-04) 71ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/milestone.api.test.js > edit and delete — PATCH | DELETE /api/milestones/:id > TEST-04-08 deleting a milestone removes it and frees its weight (AC-04-05) 270ms
+   → expected 404 to be 204 // Object.is equality
+ × tests/milestone.api.test.js > list milestones — GET /api/courses/:courseId/milestones (FR-13, FR-14) > TEST-04-09 the instructor sees milestones sorted by due date with the total; a team member sees the team status; unknown ids → 404 (AC-04-06) 69ms
+   → expected 404 to be 200 // Object.is equality
+ ↓ tests/milestone.api.test.js > list milestones — GET /api/courses/:courseId/milestones (FR-13, FR-14) > TEST-04-09b an enrolled student without a team sees teamStatus NO_TEAM (AC-04-06, after F-03)
+ × tests/milestone.api.test.js > access control (NFR-02, NFR-03) > TEST-04-10 a student cannot write; an instructor of another course cannot read or write; a student outside the course cannot read (AC-04-07) 88ms
+   → expected 404 to be 403 // Object.is equality
+ × tests/milestone.api.test.js > access control (NFR-02, NFR-03) > TEST-04-11 every F-04 endpoint rejects requests without a session (AC-04-08) 77ms
+   → expected 404 to be 401 // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts a valid create body, trims text and converts dueAt to a Date in UTC 13ms
+   → expected {} to deeply equal { title: 'M1 Requirements', …(4) }
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > description is optional on create and defaults to an empty string 1ms
+   → expected undefined to be '' // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > an empty body names every required field 1ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "   " and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects title = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects description = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-12-01" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-12-01T23:59:00" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "tomorrow" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-13-40T25:00:00Z" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 0 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 101 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = 12.5 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects weight = "20" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = 0 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = 1001 and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects maxScore = null and names the field 0ms
+   → expected true to be false // Object.is equality
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary title = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary description = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary weight = 1 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary weight = 100 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary maxScore = 1 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > accepts the boundary maxScore = 1000 0ms
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > partial (PATCH): validates only the sent fields and needs at least one 1ms
+   → expected { ok: true, value: {} } to deeply equal { Object (ok, value) }
+ × tests/milestone.unit.test.js > parseDueAt (AC-04-02, M3) > needs a date-time with Z or an offset; returns the UTC instant 0ms
+   → expected { ok: true, value: null } to deeply equal { ok: true, …(1) }
+ ✓ tests/milestone.unit.test.js > parseDueAt (AC-04-02, M3) > accepts a due date in the past (M3) 0ms
+ ✓ tests/milestone.unit.test.js > TEST-04-02 checkWeightTotal (AC-04-03, BR-09) > a total of exactly 100 % is accepted (boundary) 0ms
+ × tests/milestone.unit.test.js > TEST-04-02 checkWeightTotal (AC-04-03, BR-09) > a total above 100 % is rejected and reports the current total 0ms
+   → expected { ok: true, currentTotal: 90 } to deeply equal { ok: false, currentTotal: 90 }
+ Test Files  2 failed (2)
+      Tests  30 failed | 8 passed | 1 todo (39)
+   Duration  5.47s (transform 105ms, setup 31ms, collect 479ms, tests 1.42s, environment 0ms, prepare 250ms)
