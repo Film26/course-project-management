@@ -1,0 +1,16 @@
+# F-04 PR #48 review fixes (contract v1.2) — RED run
+# branch: feature/F-04-milestones  commit: (this commit: new tests + seed logic moved to prisma/seedMilestones.js without behaviour change; before the fix)
+# date: 2026-11-25T15:33:16+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/milestone.unit.test.js tests/milestone.api.test.js
+# note: TEST-04-14 / 14b (concurrent delete, edit vs delete) already pass here: two parallel HTTP requests did not hit the race window locally in 3 runs, so they do not prove the 500. They stay as regression tests; the fix is a row lock inside the transaction plus P2025 → 404.
+
+ × tests/milestone.api.test.js > contract v1.2 — PR #48 review > TEST-04-13 the seed adds milestones only to a course that has none, so a re-run never breaks BR-09 (AC-04-03) 81ms
+   → expected 1 to be +0 // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-02-30T10:00:00Z" and names the field 10ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-04-31T23:59:00+07:00" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/milestone.unit.test.js > TEST-04-01 validateMilestoneInput (AC-04-02) > rejects dueAt = "2026-02-29T00:00:00Z" and names the field 1ms
+   → expected true to be false // Object.is equality
+ Test Files  2 failed (2)
+      Tests  4 failed | 41 passed | 1 todo (46)

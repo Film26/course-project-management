@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { envFileFor } from '../src/envFile.js';
+import { seedMilestones } from './seedMilestones.js';
 dotenv.config({ path: envFileFor(process.env.NODE_ENV), override: true, quiet: true });
 
 const prisma = new PrismaClient();
@@ -62,19 +63,10 @@ async function main() {
     }
   }
 
-  // F-04: three milestones, total weight 90 % (a 10 % milestone still fits, 11 % does not — BR-09).
-  // Matched by title so the seed stays safe to run on every deploy; an instructor's later edits are kept.
-  const milestones = [
-    { title: 'M1 Requirements', description: 'SRS, feature inventory and Sprint 1 contracts', dueAt: '2026-12-01T16:59:00Z', weight: 20, maxScore: 100 },
-    { title: 'M2 Design', description: 'System-level SDS and Sprint 2 contracts', dueAt: '2026-12-06T16:59:00Z', weight: 30, maxScore: 100 },
-    { title: 'M3 Final release', description: 'Deployed final release and demonstration video', dueAt: '2026-12-13T16:59:00Z', weight: 40, maxScore: 100 },
-  ];
-  for (const m of milestones) {
-    const exists = await prisma.milestone.findFirst({ where: { courseId: course.id, title: m.title }, select: { id: true } });
-    if (!exists) await prisma.milestone.create({ data: { ...m, dueAt: new Date(m.dueAt), courseId: course.id } });
-  }
+  // F-04: seed milestones (rule for re-runs in seedMilestones.js, TEST-04-13).
+  const createdMilestones = await seedMilestones(prisma, course.id);
 
-  console.log(`Seeded ${users.length} users, course ${course.code}, ${teams.length} teams, ${milestones.length} milestones.`);
+  console.log(`Seeded ${users.length} users, course ${course.code}, ${teams.length} teams, ${createdMilestones} new milestones.`);
 }
 
 main()

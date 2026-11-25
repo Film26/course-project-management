@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
 import { prisma, resetDb, createUser } from './helpers/db.js';
+import { seedMilestones } from '../prisma/seedMilestones.js';
 
 const app = createApp();
 const PASSWORD = 'Test-Pass-123';
@@ -253,5 +254,48 @@ describe('access control (NFR-02, NFR-03)', () => {
       expect(res.body.milestones).toBeUndefined();
     }
     expect(await snapshot()).toEqual(before);
+  });
+});
+
+describe('contract v1.2 — PR #48 review', () => {
+  it('TEST-04-13 the seed adds milestones only to a course that has none, so a re-run never breaks BR-09 (AC-04-03)', async () => {
+    // A course without milestones gets the three seed milestones (90 %).
+    await prisma.milestone.deleteMany({ where: { courseId: course.id } });
+    expect(await seedMilestones(prisma, course.id)).toBe(3);
+    expect(await totalWeight()).toBe(90);
+
+    // The instructor renames M1 and adds a 10 % milestone (total 100 %). The next deploy runs the seed again.
+    const first = await prisma.milestone.findFirst({ where: { courseId: course.id, title: 'M1 Requirements' } });
+    await prisma.milestone.update({ where: { id: first.id }, data: { title: 'M1 SRS' } });
+    await makeMilestone({ title: 'M4 Demo', dueAt: new Date('2026-12-12T11:00:00Z'), weight: 10 });
+    expect(await seedMilestones(prisma, course.id)).toBe(0);
+    expect(await totalWeight()).toBe(100);
+    expect(await prisma.milestone.count({ where: { courseId: course.id } })).toBe(4);
+
+    // Same when the instructor deleted a seed milestone.
+    await prisma.milestone.deleteMany({ where: { courseId: course.id, title: 'M2 Design' } });
+    expect(await seedMilestones(prisma, course.id)).toBe(0);
+    expect(await totalWeight()).toBe(70);
+  });
+
+  it('TEST-04-14 two deletes of the same milestone at the same time give 204 and 404, never 500 (AC-04-05, NFR-05)', async () => {
+    const c = await as(instructor1);
+    const results = await Promise.all([
+      request(app).delete(`/api/milestones/${m1.id}`).set('Cookie', c),
+      request(app).delete(`/api/milestones/${m1.id}`).set('Cookie', c),
+    ]);
+    expect(results.map((r) => r.status).sort()).toEqual([204, 404]);
+    expect(await prisma.milestone.findUnique({ where: { id: m1.id } })).toBeNull();
+  });
+
+  it('TEST-04-14b an edit that meets a concurrent delete gives 404, never 500 (AC-04-04, NFR-05)', async () => {
+    const c = await as(instructor1);
+    const [edit, del] = await Promise.all([
+      request(app).patch(`/api/milestones/${m2.id}`).set('Cookie', c).send({ title: 'M2 SDS' }),
+      request(app).delete(`/api/milestones/${m2.id}`).set('Cookie', c),
+    ]);
+    expect(del.status).toBe(204);
+    expect([200, 404]).toContain(edit.status);
+    expect(await prisma.milestone.findUnique({ where: { id: m2.id } })).toBeNull();
   });
 });

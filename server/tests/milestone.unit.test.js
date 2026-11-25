@@ -47,6 +47,10 @@ describe('TEST-04-01 validateMilestoneInput (AC-04-02)', () => {
     ['dueAt', '2026-12-01T23:59:00'],
     ['dueAt', 'tomorrow'],
     ['dueAt', '2026-13-40T25:00:00Z'],
+    // PR #48 review: dates that do not exist must not roll over to the next month
+    ['dueAt', '2026-02-30T10:00:00Z'],
+    ['dueAt', '2026-04-31T23:59:00+07:00'],
+    ['dueAt', '2026-02-29T00:00:00Z'],
     ['weight', 0],
     ['weight', 101],
     ['weight', 12.5],
@@ -86,6 +90,12 @@ describe('parseDueAt (AC-04-02, M3)', () => {
     expect(parseDueAt('2026-12-01').ok).toBe(false);
     expect(parseDueAt(1764608340000).ok).toBe(false);
     expect(parseDueAt(undefined).ok).toBe(false);
+  });
+
+  it('accepts real calendar edges: 28 Feb 2026, 29 Feb 2028 (leap year), 31 Dec', () => {
+    expect(parseDueAt('2026-02-28T23:59:00+07:00').ok).toBe(true);
+    expect(parseDueAt('2028-02-29T12:00:00Z').ok).toBe(true);
+    expect(parseDueAt('2026-12-31T23:59:00+07:00')).toEqual({ ok: true, value: new Date('2026-12-31T16:59:00Z') });
   });
 
   it('accepts a due date in the past (M3)', () => {
