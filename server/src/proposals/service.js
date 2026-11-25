@@ -3,6 +3,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { ACTIVE_STATUSES, canTransition, isBeforeDeadline } from './rules.js';
+import { record } from '../audit/service.js';
 
 const proposalSelect = {
   id: true,
@@ -31,7 +32,7 @@ async function isMember(db, teamId, userId) {
 async function loadProposal(id) {
   const p = await prisma.proposal.findUnique({
     where: { id },
-    select: { id: true, status: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true } } } } },
+    select: { id: true, status: true, title: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true } } } } },
   });
   if (!p) throw notFound('Proposal');
   return p;
@@ -97,14 +98,25 @@ export async function submitProposal(id, user, now = new Date()) {
 }
 
 // FR-08, BR-03, BR-04: SUBMITTED → APPROVED | REJECTED by the course instructor.
+// F-09 A1 (FR-22, L1): the decision and its audit entry are written in one transaction, both or neither.
 export async function decideProposal(id, user, to, reason = null, now = new Date()) {
   const p = await loadForCourseInstructor(id, user);
   if (!canTransition(p.status, to)) throw invalidTransition(p.status, to);
-  const { count } = await prisma.proposal.updateMany({
-    where: { id, status: 'SUBMITTED' },
-    data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+  await prisma.$transaction(async (tx) => {
+    const { count } = await tx.proposal.updateMany({
+      where: { id, status: 'SUBMITTED' },
+      data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+    });
+    if (count === 0) throw invalidTransition((await tx.proposal.findUnique({ where: { id }, select: { status: true } })).status, to);
+    await record(tx, {
+      courseId: p.team.course.id,
+      actorId: user.id,
+      teamId: p.team.id,
+      action: to === 'APPROVED' ? 'PROPOSAL_APPROVED' : 'PROPOSAL_REJECTED',
+      entityId: id,
+      data: { title: p.title, reason: to === 'REJECTED' ? reason : undefined },
+    });
   });
-  if (count === 0) throw invalidTransition((await loadProposal(id)).status, to);
   return findProposal(id);
 }
 
