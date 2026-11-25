@@ -1,0 +1,61 @@
+# F-09 (step A1) TDD RED run
+# branch: feature/F-09-audit  commit: (this commit: tests + schema/migration + rules stub, before implementation; parent 47c1179 = contract v1.0)
+# date: 2026-11-25T13:27:10+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/audit.unit.test.js tests/audit.api.test.js
+# note: TEST-09-05 passes trivially before implementation (nothing writes entries yet; it guards against wrong entries after GREEN).
+#       TEST-09-09 passes already: it checks the append-only trigger of the new migration, not application code.
+
+ × tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-03 approving stores one PROPOSAL_APPROVED entry with actor, team, proposal id and title (AC-09-01) 197ms
+   → expected [] to have a length of 1 but got +0
+ × tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-04 rejecting stores one PROPOSAL_REJECTED entry that contains the reason (AC-09-02) 75ms
+   → expected [] to have a length of 1 but got +0
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-05 a decision request that is refused stores no entry (AC-09-03) 97ms
+ × tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-06 if the audit entry cannot be written, the decision is rolled back (AC-09-04, L1) 75ms
+   → expected 200 to be 500 // Object.is equality
+ × tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05) 101ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-08 only the course instructor reads the log (AC-09-06) 78ms
+   → expected 404 to be 403 // Object.is equality
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-09 an entry cannot be changed in the database (AC-09-07, L2) 77ms
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > defaults to 50 entries, no cursor, no filter 10ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, value: { limit: 50 } }
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > accepts the limit boundaries 1 and 100, a cursor and a known action 1ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, value: { limit: 1 } }
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "0" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "101" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "x" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "2.5" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "-1" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "0" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "abc" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects action = "BOGUS" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects action = "proposal_rejected" and names the field 0ms
+   → expected true to be false // Object.is equality
+ × tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > proposal approved: title only 0ms
+   → expected {} to deeply equal { title: 'Smart Parking' }
+ × tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > proposal rejected: title and reason 1ms
+   → expected {} to deeply equal { title: 'Smart Parking', …(1) }
+ × tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > membership actions: team name only (A2) 0ms
+   → expected {} to deeply equal { teamName: 'Team Gamma' }
+ × tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > grade released: milestone title, score and max score (A3) 0ms
+   → expected {} to deeply equal { milestoneTitle: 'M1', …(2) }
+ × tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > an unknown action is a programming error 3ms
+   → expected [Function] to throw an error
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05)
+ Test Files  2 failed (2)
+      Tests  21 failed | 2 passed (23)
+   Duration  4.19s (transform 87ms, setup 23ms, collect 411ms, tests 724ms, environment 0ms, prepare 201ms)
+
+# regression on the same commit: npx vitest run (whole backend suite)
+ Test Files  2 failed | 6 passed (8)
+      Tests  21 failed | 71 passed (92)
+# (all failures above are in audit.unit/audit.api; F-01/F-02/health/deploy files pass)
