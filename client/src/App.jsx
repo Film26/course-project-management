@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage.jsx';
 import RosterPage from './pages/RosterPage.jsx';
 import TeamProposalPage from './pages/TeamProposalPage.jsx';
 import ProposalReviewPage from './pages/ProposalReviewPage.jsx';
+import MilestonesPage from './pages/MilestonesPage.jsx';
 
 // F-01: session restore via /auth/me, header with current user, logout.
 export default function App() {
@@ -50,6 +51,7 @@ export default function App() {
             onOpenRoster={(c) => setView({ name: 'roster', courseId: c.id })}
             onOpenProposals={(c) => setView({ name: 'proposals', courseId: c.id })}
             onOpenTeamProposal={(c) => setView({ name: 'team-proposal', courseId: c.id })}
+            onOpenMilestones={(c) => setView({ name: 'milestones', courseId: c.id })}
             onUnauthenticated={onUnauthenticated}
           />
         )}
@@ -58,6 +60,9 @@ export default function App() {
         )}
         {view.name === 'proposals' && (
           <ProposalReviewPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
+        )}
+        {view.name === 'milestones' && (
+          <MilestonesPage user={user} courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
         )}
         {view.name === 'team-proposal' && (
           <TeamProposalPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />

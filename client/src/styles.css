@@ -153,3 +153,26 @@ button.secondary {
 .card h3 {
   margin: 0;
 }
+
+/* F-04: milestone total weight bar and team status badges */
+.meter {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 0 1rem;
+}
+.meter span {
+  display: block;
+  height: 100%;
+  background: #2563eb;
+}
+.status-not_submitted,
+.status-no_team {
+  background: #e5e7eb;
+  color: #374151;
+}
+.status-late {
+  background: #fde68a;
+  color: #78350f;
+}

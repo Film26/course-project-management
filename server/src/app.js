@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './errors.js';
 import { authRouter } from './routes/auth.js';
 import { coursesRouter } from './routes/courses.js';
 import { proposalsRouter, teamsRouter } from './routes/proposals.js';
+import { courseMilestonesRouter, milestonesRouter } from './routes/milestones.js';
 
 export function createApp() {
   const app = express();
@@ -31,8 +32,10 @@ export function createApp() {
 
   app.use('/api/auth', authRouter); // F-01
   app.use('/api/courses', coursesRouter); // F-01 roster, F-02 course proposals / my team
+  app.use('/api/courses', courseMilestonesRouter); // F-04 list / create milestones of a course
   app.use('/api/teams', teamsRouter); // F-02 create proposal
   app.use('/api/proposals', proposalsRouter); // F-02 view / edit / submit / decide
+  app.use('/api/milestones', milestonesRouter); // F-04 edit / delete
 
   app.use('/api', notFoundHandler);
 
