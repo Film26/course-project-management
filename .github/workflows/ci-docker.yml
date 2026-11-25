@@ -1,11 +1,13 @@
 # Lab 5 Ep.4 (R-05): build + tests on every Pull Request into staging and main.
+# Sprint 2: also on Pull Requests into the sprint integration branches (sprint-2, sprint-3), so every
+# feature PR has a recorded CI run before it is integrated (Deliverable 2, Part B "sprint integration checks").
 # The job name `test-and-docker` is the required status check in the main ruleset (R-06, Ep.6).
 # deploy.yml reuses this workflow (workflow_call) so every release is tested again.
 name: CI & Docker Build
 
 on:
   pull_request:
-    branches: [main, staging]
+    branches: [main, staging, 'sprint-*']
   workflow_call:
   workflow_dispatch:
 
