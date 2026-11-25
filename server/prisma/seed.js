@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { envFileFor } from '../src/envFile.js';
+import { seedMilestones } from './seedMilestones.js';
 dotenv.config({ path: envFileFor(process.env.NODE_ENV), override: true, quiet: true });
 
 const prisma = new PrismaClient();
@@ -62,7 +63,10 @@ async function main() {
     }
   }
 
-  console.log(`Seeded ${users.length} users, course ${course.code}, ${teams.length} teams.`);
+  // F-04: seed milestones (rule for re-runs in seedMilestones.js, TEST-04-13).
+  const createdMilestones = await seedMilestones(prisma, course.id);
+
+  console.log(`Seeded ${users.length} users, course ${course.code}, ${teams.length} teams, ${createdMilestones} new milestones.`);
 }
 
 main()

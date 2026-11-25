@@ -104,4 +104,15 @@ Rules enforced by the API: one active proposal per team, no submission after the
 only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
 the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
 
+### Sprint 2 journey: milestones (F-04)
+
+The seed adds three milestones to CPE334 (M1 20 %, M2 30 %, M3 40 %, total 90 %).
+
+1. Log in as `instructor1@cpms.test` → **Milestones** → **Add milestone** (title, due date in Bangkok time, weight %, max score). **Edit** and **Delete** are on each milestone.
+2. Log in as a student of a team in CPE334 → **Milestones** → the course milestones in due-date order with the team's status.
+
+Rules enforced by the API: the weights of a course add up to at most 100 % (exactly 100 % is allowed), weight
+1–100 and max score 1–1000 as whole numbers, and only the course instructor can change milestones
+(see `docs/sprints/sprint-2/F-04-milestones.md`).
+
 Never commit `server/.env` / `server/.env.test` or any real password.
