@@ -17,6 +17,7 @@
 |---|---|---|---|---|
 | 1.0 | 2026-11-25 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD; delivery in three steps (A1–A3) | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-02/F-03/F-06 contracts |
 | 1.1 | 2026-11-25 | Film26 | L5: order and `before` cursor use the entry `id` only; new L6 names the exact call F-03 (A2) and F-06 (A3) make | PR #52 review by jaruwan18: `createdAt` is the transaction start time and can disagree with `id` order, so paging by `id` while sorting by `createdAt` could skip or repeat entries. PR #51 review: F-03 needs the exact hook |
+| 1.2 | 2026-11-26 | Film26 | Steps A2 and A3 implemented as specified in L6 (no rule changed); TEST-09-10b added for the last member leaving an empty team (entry written before the team is deleted) | F-03 and F-06 are now in `sprint-3` (sync PR #61) |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -40,8 +41,8 @@
 | Step | Actions recorded | Needs | Target |
 |---|---|---|---|
 | **A1** | `PROPOSAL_APPROVED`, `PROPOSAL_REJECTED` | F-02 (done) | Deliverable 2 candidate (29 Nov) |
-| A2 | `TEAM_CREATED`, `MEMBER_JOINED`, `MEMBER_LEFT` | F-03 merged | 6 Dec |
-| A3 | `GRADE_RELEASED` | F-06 merged | 6 Dec |
+| A2 | `TEAM_CREATED`, `MEMBER_JOINED`, `MEMBER_LEFT` | F-03 merged | done 26 Nov *(v1.2)* |
+| A3 | `GRADE_RELEASED` | F-06 merged | done 26 Nov *(v1.2)* |
 
 ### Business rules as implemented
 - **L1 Atomic.** Each recorded action writes its `AuditEntry` inside the same transaction as the change. If the audit insert fails, the change is rolled back (NFR-06). A request that is rejected (400/403/404/409) writes no entry.
