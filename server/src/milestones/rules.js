@@ -13,10 +13,13 @@ export function parseDueAt(value) {
     return { ok: false, error: 'Due date must be an ISO 8601 date-time with a time zone, e.g. 2026-12-05T23:59:00+07:00' };
   }
   const date = new Date(value);
-  // Reject calendar overflow such as month 13 or hour 25 (Date would otherwise roll it over or give NaN).
+  // Reject dates that do not exist, such as 30 Feb or 31 Apr, month 13 or hour 25. Date would roll them over to
+  // the next month, so rebuild the written calendar date and check that it comes back unchanged (PR #48 review).
   const [y, mo, d] = value.slice(0, 10).split('-').map(Number);
   const [h, mi] = value.slice(11, 16).split(':').map(Number);
-  if (Number.isNaN(date.getTime()) || mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59) {
+  const written = new Date(Date.UTC(y, mo - 1, d));
+  const isRealDate = written.getUTCFullYear() === y && written.getUTCMonth() === mo - 1 && written.getUTCDate() === d;
+  if (Number.isNaN(date.getTime()) || !isRealDate || h > 23 || mi > 59) {
     return { ok: false, error: 'Due date is not a valid date-time' };
   }
   return { ok: true, value: date };

@@ -14,3 +14,9 @@
    → expected true to be false // Object.is equality
  Test Files  2 failed (2)
       Tests  4 failed | 41 passed | 1 todo (46)
+
+# GREEN run after the fix (this commit), whole backend suite, 3 consecutive runs
+# command: cd server && npx vitest run
+ Test Files  8 passed (8)       Tests  114 passed | 1 todo (115) 
+ Test Files  8 passed (8)       Tests  114 passed | 1 todo (115) 
+ Test Files  8 passed (8)       Tests  114 passed | 1 todo (115) 

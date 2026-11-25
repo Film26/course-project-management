@@ -45,12 +45,23 @@ async function lockCourse(tx, courseId) {
   return rows[0];
 }
 
-/** Load a milestone with its course owner, or 404; then require the course instructor (403). */
-async function loadForInstructor(id, user) {
-  const m = await prisma.milestone.findUnique({ where: { id }, select: { id: true, courseId: true, course: { select: { instructorId: true } } } });
-  if (!m) throw notFound('Milestone');
-  if (m.course.instructorId !== user.id) throw forbidden('You do not teach this course');
-  return m;
+/**
+ * Inside a transaction: lock the milestone row, or 404; then require the course instructor (403). A concurrent
+ * edit/delete of the same milestone waits for the lock and then sees the result (404 if it was deleted), so the
+ * write after it can no longer fail with Prisma P2025 (PR #48 review).
+ */
+async function lockForInstructor(tx, id, user) {
+  const rows = await tx.$queryRaw`SELECT m.id, m."courseId", c."instructorId"
+    FROM "Milestone" m JOIN "Course" c ON c.id = m."courseId" WHERE m.id = ${id} FOR UPDATE OF m`;
+  if (rows.length === 0) throw notFound('Milestone');
+  if (rows[0].instructorId !== user.id) throw forbidden('You do not teach this course');
+  return rows[0];
+}
+
+/** Any remaining "record not found" from Prisma is a 404, never a 500 (NFR-05). */
+function mapNotFound(err) {
+  if (err?.code === 'P2025') return notFound('Milestone');
+  return err;
 }
 
 // FR-13: create, BR-09 checked under the course lock.
@@ -65,26 +76,32 @@ export async function createMilestone(courseId, user, input) {
 
 // FR-13: edit only the sent fields; a new weight is checked without counting the milestone's old weight.
 export async function updateMilestone(id, user, changes) {
-  const m = await loadForInstructor(id, user);
-  return prisma.$transaction(async (tx) => {
-    if (changes.weight !== undefined) {
-      await lockCourse(tx, m.courseId);
-      await checkWeightWithinLimit(tx, m.courseId, changes.weight, id);
-    }
-    return tx.milestone.update({ where: { id }, data: changes, select: milestoneSelect });
-  });
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const m = await lockForInstructor(tx, id, user);
+      if (changes.weight !== undefined) {
+        await lockCourse(tx, m.courseId);
+        await checkWeightWithinLimit(tx, m.courseId, changes.weight, id);
+      }
+      return tx.milestone.update({ where: { id }, data: changes, select: milestoneSelect });
+    });
+  } catch (err) {
+    throw mapNotFound(err);
+  }
 }
 
 // FR-13 / M4: delete. Once F-05 adds submissions, the FK (ON DELETE RESTRICT) makes this a 409.
 export async function deleteMilestone(id, user) {
-  await loadForInstructor(id, user);
   try {
-    await prisma.milestone.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      await lockForInstructor(tx, id, user);
+      await tx.milestone.delete({ where: { id } });
+    });
   } catch (err) {
     if (err.code === 'P2003') {
       throw new ApiError(409, 'MILESTONE_HAS_SUBMISSIONS', 'This milestone already has submissions and cannot be deleted');
     }
-    throw err;
+    throw mapNotFound(err);
   }
 }
 

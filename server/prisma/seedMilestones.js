@@ -6,15 +6,13 @@ export const SEED_MILESTONES = [
   { title: 'M3 Final release', description: 'Deployed final release and demonstration video', dueAt: '2026-12-13T16:59:00Z', weight: 40, maxScore: 100 },
 ];
 
-/** Matched by title so the seed stays safe to run on every deploy. Returns the number of milestones created. */
+/**
+ * The seed runs on every deploy. It adds the milestones only to a course that has **none**, so it never re-adds a
+ * milestone the instructor renamed or deleted, and never pushes the total over 100 % (BR-09, PR #48 review).
+ * Returns the number of milestones created (3 or 0).
+ */
 export async function seedMilestones(prisma, courseId) {
-  let created = 0;
-  for (const m of SEED_MILESTONES) {
-    const exists = await prisma.milestone.findFirst({ where: { courseId, title: m.title }, select: { id: true } });
-    if (!exists) {
-      await prisma.milestone.create({ data: { ...m, dueAt: new Date(m.dueAt), courseId } });
-      created += 1;
-    }
-  }
-  return created;
+  if ((await prisma.milestone.count({ where: { courseId } })) > 0) return 0;
+  await prisma.milestone.createMany({ data: SEED_MILESTONES.map((m) => ({ ...m, dueAt: new Date(m.dueAt), courseId })) });
+  return SEED_MILESTONES.length;
 }
