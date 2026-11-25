@@ -6,6 +6,8 @@ import RosterPage from './pages/RosterPage.jsx';
 import TeamProposalPage from './pages/TeamProposalPage.jsx';
 import ProposalReviewPage from './pages/ProposalReviewPage.jsx';
 import MilestonesPage from './pages/MilestonesPage.jsx';
+import SubmissionsPage from './pages/SubmissionsPage.jsx';
+import MyGradesPage from './pages/MyGradesPage.jsx';
 
 // F-01: session restore via /auth/me, header with current user, logout.
 export default function App() {
@@ -52,6 +54,7 @@ export default function App() {
             onOpenProposals={(c) => setView({ name: 'proposals', courseId: c.id })}
             onOpenTeamProposal={(c) => setView({ name: 'team-proposal', courseId: c.id })}
             onOpenMilestones={(c) => setView({ name: 'milestones', courseId: c.id })}
+            onOpenGrades={(c) => setView({ name: 'my-grades', courseId: c.id })}
             onUnauthenticated={onUnauthenticated}
           />
         )}
@@ -62,7 +65,24 @@ export default function App() {
           <ProposalReviewPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
         )}
         {view.name === 'milestones' && (
-          <MilestonesPage user={user} courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
+          <MilestonesPage
+            user={user}
+            courseId={view.courseId}
+            onBack={() => setView({ name: 'home' })}
+            onOpenSubmissions={(m) => setView({ name: 'submissions', milestoneId: m.id, courseId: view.courseId })}
+            onUnauthenticated={onUnauthenticated}
+          />
+        )}
+        {view.name === 'my-grades' && (
+          <MyGradesPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
+        )}
+        {view.name === 'submissions' && (
+          <SubmissionsPage
+            user={user}
+            milestoneId={view.milestoneId}
+            onBack={() => setView({ name: 'milestones', courseId: view.courseId })}
+            onUnauthenticated={onUnauthenticated}
+          />
         )}
         {view.name === 'team-proposal' && (
           <TeamProposalPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />

@@ -28,6 +28,12 @@ coursesRouter.get('/:courseId/roster', requireAuth, requireRole('INSTRUCTOR'), a
             },
           },
         },
+        // F-03 (F-01 contract v1.2): enrolled students without a team are listed as unassigned.
+        enrollments: {
+          where: { user: { memberships: { none: { courseId } } } },
+          include: { user: { select: { id: true, displayName: true, email: true } } },
+          orderBy: { userId: 'asc' },
+        },
       },
     });
     if (!course) throw new ApiError(404, 'NOT_FOUND', 'Course not found');
@@ -40,8 +46,10 @@ coursesRouter.get('/:courseId/roster', requireAuth, requireRole('INSTRUCTOR'), a
       teams: course.teams.map((t) => ({
         id: t.id,
         name: t.name,
+        joinCode: t.joinCode,
         members: t.members.map((m) => m.user),
       })),
+      unassigned: course.enrollments.map((e) => e.user),
     });
   } catch (err) {
     next(err);
@@ -54,7 +62,7 @@ coursesRouter.get('/', requireAuth, async (req, res, next) => {
     const where =
       req.user.role === 'INSTRUCTOR'
         ? { instructorId: req.user.id }
-        : { teams: { some: { members: { some: { userId: req.user.id } } } } };
+        : { enrollments: { some: { userId: req.user.id } } }; // F-03 T1: students see the courses they are enrolled in
     const courses = await prisma.course.findMany({
       where,
       select: { id: true, code: true, name: true },

@@ -18,6 +18,7 @@
 | 1.0 | 2026-11-07 | jaruwan18 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation |
 | 1.1 | 2026-11-07 | jaruwan18 | Order of checks: role (403) is checked by `requireRole` **before** input validation (400); review list opens on the "Submitted" filter | Reuses the F-01 `requireRole` middleware as planned in the F-01 contract; no AC or test changed (every AC-02 test uses a valid body for forbidden-role calls). Instructors mostly need the submitted queue |
 | 1.2 | 2026-11-07 | jaruwan18 | E2E tests use their own database `cpms_e2e` (`server/.env.e2e`), own API port 3100 and UI port 5174; they refuse to run unless the database name contains `e2e`. TEST-02-20 precondition updated | PR #6 review by Film26: the E2E cleanup (`deleteMany`) ran against `cpms_dev` and could delete development data |
+| 1.3 | 2026-11-25 | Film26 | Submit also requires `memberCount ≥ course.minTeamSize`, otherwise 409 `TEAM_TOO_SMALL` (checked after the transition and the deadline); `GET /courses/:id/my-team` returns 403 when the student is not enrolled (404 stays for enrolled without a team) and adds `team.joinCode`, `team.locked`, `course.minTeamSize`, `course.maxTeamSize`; seed: student4 joins Team Beta | F-03 BR-07 / T1 (planned as C-02 in Deliverable 1). Team Beta needs 2 members so the F-02 journeys still submit. F-02 tests unchanged apart from fixtures (`courseId` on memberships, enrollments) |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 

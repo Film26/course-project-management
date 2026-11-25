@@ -3,6 +3,9 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { LIMITS, checkWeightTotal } from './rules.js';
+import { teamStatus } from '../submissions/rules.js';
+import { currentByMilestone } from '../submissions/service.js';
+import { highestScore } from '../grades/service.js';
 
 const milestoneSelect = {
   id: true,
@@ -83,6 +86,13 @@ export async function updateMilestone(id, user, changes) {
         await lockCourse(tx, m.courseId);
         await checkWeightWithinLimit(tx, m.courseId, changes.weight, id);
       }
+      // F-06 G6: maxScore cannot drop below a score that was already given on this milestone.
+      if (changes.maxScore !== undefined) {
+        const top = await highestScore(tx, id);
+        if (top !== null && changes.maxScore < top) {
+          throw new ApiError(409, 'SCORE_ABOVE_MAX', `A grade of ${top} already exists on this milestone`, { highestScore: top });
+        }
+      }
       return tx.milestone.update({ where: { id }, data: changes, select: milestoneSelect });
     });
   } catch (err) {
@@ -117,13 +127,14 @@ export async function listMilestones(courseId, user) {
   if (user.role === 'INSTRUCTOR') {
     if (course.instructorId !== user.id) throw forbidden('You do not have access to this course');
   } else {
-    // Until F-03 adds Enrollment, a student belongs to a course through a team in it (F-01 rule).
-    const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id, team: { courseId } },
+    // M5 with F-03: a student must be enrolled in the course (403 otherwise); a team is optional (NO_TEAM).
+    const enrolled = await prisma.enrollment.findUnique({ where: { courseId_userId: { courseId, userId: user.id } } });
+    if (!enrolled) throw forbidden('You do not have access to this course');
+    const membership = await prisma.teamMember.findUnique({
+      where: { courseId_userId: { courseId, userId: user.id } },
       select: { team: { select: { id: true, name: true } } },
     });
-    if (!membership) throw forbidden('You do not have access to this course');
-    team = membership.team;
+    team = membership?.team ?? null;
   }
 
   const milestones = await prisma.milestone.findMany({ where: { courseId }, orderBy: order, select: milestoneSelect });
@@ -131,11 +142,12 @@ export async function listMilestones(courseId, user) {
   const publicCourse = { id: course.id, code: course.code, name: course.name };
 
   if (user.role === 'INSTRUCTOR') return { course: publicCourse, milestones, totalWeight };
-  // M6: F-05 replaces NOT_SUBMITTED with SUBMITTED / LATE from the team's current submission.
+  // M6 / F-05 S7: SUBMITTED / LATE / NOT_SUBMITTED from the team's current version; NO_TEAM without a team.
+  const current = team ? await currentByMilestone(team.id, milestones.map((m) => m.id)) : new Map();
   return {
     course: publicCourse,
     team,
     totalWeight,
-    milestones: milestones.map((m) => ({ ...m, teamStatus: team ? 'NOT_SUBMITTED' : 'NO_TEAM' })),
+    milestones: milestones.map((m) => ({ ...m, teamStatus: team ? teamStatus(current.get(m.id) ?? null) : 'NO_TEAM' })),
   };
 }

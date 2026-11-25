@@ -3,6 +3,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { ACTIVE_STATUSES, canTransition, isBeforeDeadline } from './rules.js';
+import { hasMinimumSize, isMembershipLocked } from '../teams/rules.js';
 
 const proposalSelect = {
   id: true,
@@ -31,7 +32,7 @@ async function isMember(db, teamId, userId) {
 async function loadProposal(id) {
   const p = await prisma.proposal.findUnique({
     where: { id },
-    select: { id: true, status: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true } } } } },
+    select: { id: true, status: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true, minTeamSize: true } } } } },
   });
   if (!p) throw notFound('Proposal');
   return p;
@@ -86,6 +87,14 @@ export async function submitProposal(id, user, now = new Date()) {
   if (!isBeforeDeadline(p.team.course.proposalDeadline, now)) {
     throw new ApiError(409, 'DEADLINE_PASSED', 'The proposal deadline has passed', {
       proposalDeadline: p.team.course.proposalDeadline.toISOString(),
+    });
+  }
+  // F-03 T4 / BR-07 (F-02 contract v1.3): checked after the transition and the deadline.
+  const memberCount = await prisma.teamMember.count({ where: { teamId: p.team.id } });
+  if (!hasMinimumSize(memberCount, p.team.course.minTeamSize)) {
+    throw new ApiError(409, 'TEAM_TOO_SMALL', `Your team needs at least ${p.team.course.minTeamSize} members to submit`, {
+      memberCount,
+      minTeamSize: p.team.course.minTeamSize,
     });
   }
   const { count } = await prisma.proposal.updateMany({
@@ -144,21 +153,32 @@ export async function listCourseProposals(courseId, user, status) {
 }
 
 // FR-09: the student's own team in a course, with all its proposals (newest first).
+// F-03 (F-02 contract v1.3): not enrolled → 403; enrolled without a team → 404; adds join code, lock and size limits.
 export async function getMyTeam(courseId, user) {
   const course = await loadCourse(courseId);
+  const enrolled = await prisma.enrollment.findUnique({ where: { courseId_userId: { courseId, userId: user.id } } });
+  if (!enrolled) throw forbidden('You are not enrolled in this course');
+  const limits = await prisma.course.findUnique({ where: { id: courseId }, select: { minTeamSize: true, maxTeamSize: true } });
   const team = await prisma.team.findFirst({
     where: { courseId, members: { some: { userId: user.id } } },
     select: {
       id: true,
       name: true,
+      joinCode: true,
       members: { select: { user: { select: { id: true, displayName: true } } }, orderBy: { userId: 'asc' } },
       proposals: { select: proposalSelect, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
     },
   });
   if (!team) throw new ApiError(404, 'NOT_FOUND', 'You are not in a team for this course');
   return {
-    course: publicCourse(course),
-    team: { id: team.id, name: team.name, members: team.members.map((m) => m.user) },
+    course: { ...publicCourse(course), ...limits },
+    team: {
+      id: team.id,
+      name: team.name,
+      joinCode: team.joinCode,
+      locked: isMembershipLocked(team.proposals.map((p) => p.status)),
+      members: team.members.map((m) => m.user),
+    },
     proposals: team.proposals,
   };
 }

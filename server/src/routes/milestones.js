@@ -5,6 +5,8 @@ import { ApiError } from '../errors.js';
 import { requireAuth, requireRole } from '../auth/middleware.js';
 import { validateMilestoneInput } from '../milestones/rules.js';
 import * as service from '../milestones/service.js';
+import { validateSubmissionInput } from '../submissions/rules.js';
+import * as submissions from '../submissions/service.js';
 import { parseId } from './proposals.js';
 
 function validated(result) {
@@ -64,5 +66,26 @@ milestonesRouter.delete(
   handle(async (req, res) => {
     await service.deleteMilestone(parseId(req.params.id, 'id'), req.user);
     res.status(204).end();
+  }),
+);
+
+// F-05: submissions of one milestone — contract docs/sprints/sprint-2/F-05-submissions.md §3.
+milestonesRouter.post(
+  '/:id/submissions',
+  requireAuth,
+  requireRole('STUDENT'),
+  handle(async (req, res) => {
+    const id = parseId(req.params.id, 'id');
+    const input = validated(validateSubmissionInput(req.body));
+    res.status(201).json({ submission: await submissions.submitDeliverable(id, req.user, input) });
+  }),
+);
+
+milestonesRouter.get(
+  '/:id/submissions',
+  requireAuth,
+  requireRole('INSTRUCTOR', 'STUDENT'),
+  handle(async (req, res) => {
+    res.json(await submissions.listSubmissions(parseId(req.params.id, 'id'), req.user));
   }),
 );
