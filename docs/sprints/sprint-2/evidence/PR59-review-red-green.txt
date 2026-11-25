@@ -11,3 +11,10 @@ AssertionError: expected 200 to be 409 // Object.is equality
 AssertionError: run 1: expected [ 200, 404 ] to include 500
  Test Files  2 failed (2)
       Tests  3 failed | 25 passed (28)
+
+# GREEN run (this commit), whole backend suite, 3 runs
+# run 1:  Tests 210 passed (210)
+# run 2:  Tests 210 passed (210)
+# run 3:  Tests 210 passed (210)
+# E2E (npx playwright test):   8 passed (22.8s)
+# fixes: proposals/service.js requireMinimumSize (team row lock) on submit and approve; teams/service.js joinTeam 404 when the locked team is gone; grades/service.js maxScore FOR SHARE in saveGrade

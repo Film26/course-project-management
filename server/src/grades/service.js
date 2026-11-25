@@ -57,6 +57,11 @@ export async function saveGrade(submissionId, user, { score, feedback }, now = n
   if (!range.ok) throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid input', range.details);
 
   return prisma.$transaction(async (tx) => {
+    // G6 (PR #59 review): read maxScore again under a share lock on the milestone row; PATCH milestone holds
+    // FOR UPDATE on that row, so a grade and a maxScore change cannot interleave.
+    const [{ maxScore }] = await tx.$queryRaw`SELECT "maxScore" FROM "Milestone" WHERE id = ${s.milestoneId} FOR SHARE`;
+    const lockedRange = checkScoreRange(score, maxScore);
+    if (!lockedRange.ok) throw new ApiError(400, 'VALIDATION_ERROR', 'Invalid input', lockedRange.details);
     const isCurrent = await lockAndCheckCurrent(tx, s);
     const existing = await tx.grade.findUnique({ where: { submissionId }, select: { id: true, releasedAt: true } });
     const check = canGrade({ isCurrent, releasedAt: existing?.releasedAt ?? null });
