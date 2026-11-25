@@ -1,0 +1,59 @@
+# F-06 TDD RED run
+# branch: feature/F-06-grading (contract v1.1 a2beb6c; F-05 merged in bef1fa4)  commit: (this commit: tests + Grade schema/migration + rules stub, before implementation)
+# date: 2026-11-25T21:38:49+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/grade.unit.test.js tests/grade.api.test.js
+
+ × tests/grade.api.test.js > grade — PUT /api/submissions/:id/grade (FR-17) > TEST-06-04 the course instructor grades the current version and can change it before release (AC-06-01) 528ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/grade.api.test.js > grade — PUT /api/submissions/:id/grade (FR-17) > TEST-06-05 invalid scores and feedback → 400 naming the field; 0 and maxScore are accepted (AC-06-02) 220ms
+ × tests/grade.api.test.js > grade — PUT /api/submissions/:id/grade (FR-17) > TEST-06-06 a version that is not current cannot be graded (AC-06-03) 232ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/grade.api.test.js > release — POST /api/submissions/:id/grade/release (FR-17, D-08) > TEST-06-07 not graded, before due, released, released again, edit after release (AC-06-04) 214ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/grade.api.test.js > release — POST /api/submissions/:id/grade/release (FR-17, D-08) > TEST-06-07b a grade of a version that is no longer current cannot be released (AC-06-04, G3b) 235ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/grade.api.test.js > student view — GET /api/courses/:courseId/my-grades (FR-18, BR-12) > TEST-06-08 members see released grades of their own team only (AC-06-05) 251ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/grade.api.test.js > cross-feature rules (G6) > TEST-06-09 after release the team cannot submit again; maxScore cannot drop below a score (AC-06-06) 262ms
+   → expected 201 to be 409 // Object.is equality
+ × tests/grade.api.test.js > access control (NFR-02, NFR-03) > TEST-06-10 students cannot grade or release; other instructors are refused; no team → 409 (AC-06-07) 267ms
+   → expected 404 to be 403 // Object.is equality
+ × tests/grade.api.test.js > access control (NFR-02, NFR-03) > TEST-06-11 every F-06 endpoint rejects requests without a session (AC-06-08) 209ms
+   → expected 404 to be 401 // Object.is equality
+ × tests/grade.api.test.js > concurrency (G8, AC-06-10) > TEST-06-13a a submit of v2 racing a grade of v1 never leaves a releasable grade on an old version 276ms
+ × tests/grade.api.test.js > concurrency (G8, AC-06-10) > TEST-06-13b an edit racing a release never changes a released grade 222ms
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > accepts an integer score and trims the feedback; other fields are ignored 37ms
+   → expected { ok: true, value: {} } to deeply equal { Object (ok, value) }
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects score = undefined and names the field 3ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects score = null and names the field 2ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects score = 85.5 and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects score = "85" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects feedback = undefined and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects feedback = "" and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects feedback = "   " and names the field 1ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > rejects feedback = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" and names the field 2ms
+   → expected true to be false // Object.is equality
+ ✓ tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > accepts 2000 characters of feedback (boundary) 1ms
+ × tests/grade.unit.test.js > TEST-06-01 validateGradeShape and checkScoreRange (AC-06-02, BR-12) > 0 and maxScore are accepted; -1 and maxScore + 1 are rejected with a message naming the maximum 2ms
+   → expected true to be false // Object.is equality
+ × tests/grade.unit.test.js > TEST-06-02 canGrade and canRelease (AC-06-03, AC-06-04, D-08 v1.1) > grading needs an unreleased grade on the current version 3ms
+   → expected { ok: true } to deeply equal { ok: false, …(1) }
+ × tests/grade.unit.test.js > TEST-06-02 canGrade and canRelease (AC-06-03, AC-06-04, D-08 v1.1) > release check order: NOT_GRADED → GRADE_RELEASED → NOT_CURRENT_VERSION → BEFORE_DUE 2ms
+   → expected { ok: true } to deeply equal { ok: false, code: 'NOT_GRADED' }
+ × tests/grade.unit.test.js > TEST-06-02 canGrade and canRelease (AC-06-03, AC-06-04, D-08 v1.1) > release is refused before and exactly at the due date, allowed 1 ms later (G3a boundary) 2ms
+   → expected { ok: true } to deeply equal { ok: false, code: 'BEFORE_DUE' }
+ × tests/grade.unit.test.js > TEST-06-03 visibleToStudent (AC-06-05, BR-12) > only released grades are visible to students 1ms
+   → expected true to be false // Object.is equality
+ Test Files  2 failed (2)
+      Tests  25 failed | 1 passed (26)
+
+# regression on the same commit (all other test files)
+ Test Files  12 passed (12)
+      Tests  180 passed (180)

@@ -4,7 +4,7 @@ import { prisma } from '../../src/db.js';
 
 export async function resetDb() {
   await prisma.$executeRawUnsafe(
-    'TRUNCATE "Submission", "Enrollment", "Milestone", "Proposal", "TeamMember", "Team", "Course", "Session", "User" RESTART IDENTITY CASCADE',
+    'TRUNCATE "Grade", "Submission", "Enrollment", "Milestone", "Proposal", "TeamMember", "Team", "Course", "Session", "User" RESTART IDENTITY CASCADE',
   );
 }
 

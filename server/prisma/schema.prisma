@@ -35,6 +35,7 @@ model User {
   enrollments      Enrollment[]
   decidedProposals Proposal[]   @relation("ProposalDecider")
   submissions      Submission[]
+  grades           Grade[]
 }
 
 // Server-side session: the cookie holds a random token, only its SHA-256 hash is stored.
@@ -161,7 +162,23 @@ model Submission {
   submittedById Int
   submittedBy   User      @relation(fields: [submittedById], references: [id])
   submittedAt   DateTime  @default(now())
+  grade         Grade?
 
   @@unique([milestoneId, teamId, version])
   @@index([teamId])
+}
+
+// F-06 (FR-17, FR-18, BR-12, D-08): one grade per submission. Only the current version is graded or released;
+// a released grade is final. score ≥ 0 is a CHECK in the migration; score ≤ maxScore is checked in the service.
+model Grade {
+  id           Int        @id @default(autoincrement())
+  submissionId Int        @unique
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  score        Int
+  feedback     String
+  gradedById   Int
+  gradedBy     User       @relation(fields: [gradedById], references: [id])
+  gradedAt     DateTime
+  releasedAt   DateTime?
+  updatedAt    DateTime   @updatedAt
 }
