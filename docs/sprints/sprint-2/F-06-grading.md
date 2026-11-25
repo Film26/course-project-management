@@ -18,6 +18,7 @@
 | 1.0 | 2026-11-24 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD; proposes decision D-08 | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-04/F-05 contracts |
 | 1.1 | 2026-11-25 | Film26 | D-08: a grade can be released only **after** the milestone due date (G3a, 409 `BEFORE_DUE`), so FR-16 is unchanged; release also requires the current version (G3b); `PUT` is a conditional write; grade, release and F-05 submit lock the same team row (G8, new AC-06-10 / TEST-06-13); UI shows "of {maxScore}"; API tests create their own fixtures | PR #47 review by jaruwan18 (points 1–5): D-08 v1.0 blocked resubmission before the due date (conflict with FR-16); an old version could be released; races between submit, grade and release |
 | 1.2 | 2026-11-25 | Film26 | Implementation notes, no rule changed: the grade object is returned by `PUT` and release; the instructor's submissions view carries `grade` per team; the Release button shows "available after the due date" until then; D-08 entered in SRS §8 (v0.3) | DoD item "D-08 added to SRS"; approved in the PR #47 review |
+| 1.3 | 2026-11-26 | Film26 | TEST-06-08 checks the unreleased score on the returned grades (scores, milestone ids), not by a text search of the JSON; expected result unchanged | The text search for "70" also matched timestamps such as `…:12.170Z` and failed at random (found in 2 of 8 repeated runs) |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
