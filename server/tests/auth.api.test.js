@@ -186,9 +186,11 @@ describe('GET /api/courses/:courseId/roster — role and ownership', () => {
         {
           id: expect.any(Number),
           name: 'Team Alpha',
+          joinCode: expect.stringMatching(/^[A-HJ-NP-Z2-9]{8}$/), // F-01 contract v1.2 (F-03)
           members: [{ id: student.id, displayName: 'Student One', email: 'student1@cpms.test' }],
         },
       ],
+      unassigned: [], // F-01 contract v1.2 (F-03): enrolled students without a team
     });
 
     const cookieB = await login('inst-b@cpms.test');

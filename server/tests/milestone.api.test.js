@@ -43,6 +43,8 @@ beforeEach(async () => {
   await prisma.team.create({
     data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id, courseId: course.id }] } },
   });
+  // F-03: students of CPE334 are enrolled; the outsider is not (F-04 M5 uses Enrollment once F-03 is merged).
+  await prisma.enrollment.createMany({ data: [student1, student3].map((s) => ({ courseId: course.id, userId: s.id })) });
 
   // Same three milestones as the seed: total weight 90 %. Created out of order to prove the sort.
   m3 = await makeMilestone({ title: 'M3 Final release', dueAt: new Date('2026-12-13T16:59:00Z'), weight: 40 });
@@ -209,9 +211,15 @@ describe('list milestones — GET /api/courses/:courseId/milestones (FR-13, FR-1
     expect((await request(app).get('/api/courses/abc/milestones').set('Cookie', ci)).status).toBe(400);
   });
 
-  // The NO_TEAM case needs a student who is in the course without a team. That only exists once
-  // F-03 adds Enrollment, so this part runs after F-03 is merged (contract v1.1, TEST-04-09b).
-  it.todo('TEST-04-09b an enrolled student without a team sees teamStatus NO_TEAM (AC-04-06, after F-03)');
+  // Was it.todo until F-03 added Enrollment (contract v1.1); runs from contract v1.3 on.
+  it('TEST-04-09b an enrolled student without a team sees teamStatus NO_TEAM (AC-04-06)', async () => {
+    const student5 = await createUser({ email: 'student5@cpms.test', displayName: 'Student Five' });
+    await prisma.enrollment.create({ data: { courseId: course.id, userId: student5.id } });
+    const res = await request(app).get(`/api/courses/${course.id}/milestones`).set('Cookie', await as(student5));
+    expect(res.status).toBe(200);
+    expect(res.body.team).toBeNull();
+    expect(res.body.milestones.map((m) => m.teamStatus)).toEqual(['NO_TEAM', 'NO_TEAM', 'NO_TEAM']);
+  });
 });
 
 describe('access control (NFR-02, NFR-03)', () => {

@@ -93,6 +93,11 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 | student1@cpms.test | STUDENT | Team Alpha |
 | student2@cpms.test | STUDENT | Team Alpha |
 | student3@cpms.test | STUDENT | Team Beta |
+| student4@cpms.test | STUDENT | Team Beta |
+| student5@cpms.test | STUDENT | none (enrolled) |
+| student6@cpms.test | STUDENT | none (enrolled) |
+
+Team Alpha's join code is `ALPHA234`, Team Beta's is `BETA2345`. All six students are enrolled in CPE334.
 
 ### Sprint 1 journey (F-01 + F-02)
 
@@ -103,6 +108,16 @@ All accounts use the password set in `SEED_PASSWORD` in `server/.env`.
 Rules enforced by the API: one active proposal per team, no submission after the course deadline,
 only `DRAFT→SUBMITTED→APPROVED|REJECTED`, a reason (≤ 500 chars) on reject, and only team members /
 the course instructor can act (see `docs/sprints/sprint-1/F-02-proposal.md`).
+
+### Sprint 2 journey: teams (F-03)
+
+1. Log in as `student5@cpms.test` → **My team proposal** → **Create team** → the page shows the join code.
+2. Log in as `student6@cpms.test` → **My team proposal** → **Join team** with that code; **Leave team** works while the team has no approved proposal.
+3. Log in as `instructor1@cpms.test` → **View roster**: join codes and the unassigned students.
+
+Rules enforced by the API: one team per student per course, 2–3 members per team, joining a full team is refused,
+a proposal can be submitted only with at least 2 members, and membership is locked once the proposal is approved
+(see `docs/sprints/sprint-2/F-03-teams.md`).
 
 ### Sprint 2 journey: milestones (F-04)
 

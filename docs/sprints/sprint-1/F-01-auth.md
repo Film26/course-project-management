@@ -17,6 +17,7 @@
 |---|---|---|---|---|
 | 1.0 | 2026-11-07 | Film26 | Initial contract: design, API, AC, STS | Written before implementation |
 | 1.1 | 2026-11-07 | Film26 | Added `GET /api/courses`, AC-01-11, TEST-01-14 | During UI work the Home page needed the current user's courses to link to the roster; scoped by the session user, no new data |
+| 1.2 | 2026-11-25 | Film26 | `GET /api/courses` lists a student's courses from `Enrollment` (was: courses where the student is in a team); the roster adds `team.joinCode` and `unassigned` (enrolled students without a team); TEST-01-12 expects the two new fields | F-03 (PR for #40): a student without a team must still see the course to create or join one, and the instructor needs the join codes and the unassigned students. No AC changed |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 

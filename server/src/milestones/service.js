@@ -117,13 +117,14 @@ export async function listMilestones(courseId, user) {
   if (user.role === 'INSTRUCTOR') {
     if (course.instructorId !== user.id) throw forbidden('You do not have access to this course');
   } else {
-    // Until F-03 adds Enrollment, a student belongs to a course through a team in it (F-01 rule).
-    const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id, team: { courseId } },
+    // M5 with F-03: a student must be enrolled in the course (403 otherwise); a team is optional (NO_TEAM).
+    const enrolled = await prisma.enrollment.findUnique({ where: { courseId_userId: { courseId, userId: user.id } } });
+    if (!enrolled) throw forbidden('You do not have access to this course');
+    const membership = await prisma.teamMember.findUnique({
+      where: { courseId_userId: { courseId, userId: user.id } },
       select: { team: { select: { id: true, name: true } } },
     });
-    if (!membership) throw forbidden('You do not have access to this course');
-    team = membership.team;
+    team = membership?.team ?? null;
   }
 
   const milestones = await prisma.milestone.findMany({ where: { courseId }, orderBy: order, select: milestoneSelect });
