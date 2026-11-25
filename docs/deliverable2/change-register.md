@@ -11,6 +11,7 @@
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 0.1 | 2026-11-25 | 67070507202 | First version. Drafted with an AI assistant (Claude Code); every commit, PR, run and revision was read from GitHub |
+| 0.5 | 2026-11-26 | 67070507202 | §3.2: release PR history (#59, #60, #49 closed; #64, #65; release branches) and review findings R-04 … R-07 |
 | 0.4 | 2026-11-26 | 67070507202 | §3.1: PRs merged into sprint branches without an approval (#50, #56, #57, #58, #61, #53) |
 | 0.3 | 2026-11-25 | 67070507202 | #47/#56/#57 merge order and missing reviews on #56/#57 recorded; release PRs #59/#60 and sync PR #61 |
 | 0.2 | 2026-11-25 | 67070507202 | PR #53 review by 67070507216: no reference to work that is not in the repository; F-03 / F-05 / F-07 now point to their PRs (#56, #57, #54); D-08 v1.1 approved; F-04 v1.2 review fixes (C-16); F-09 CI runs; allocation changes C-14 / C-17 with their timeline; #50 merge recorded as it happened |
@@ -77,6 +78,21 @@ To keep the Deliverable 2 schedule, the owner merged these PRs into `sprint-2` /
 | #58 | `plan.md` v0.4 (C-17) | — | none |
 | #53 | Deliverable 2 Parts A, D, E (this document) | — | changes requested on the first version (`d72d6f2`); all nine points addressed in `6b9b9a0` but not re-reviewed |
 | this PR (F-09 A2/A3) | audit entries for team changes and grade release | see PR | merged to keep the D2 candidate (#60) unchanged once its review starts |
+
+### 3.2 Release PR history (26 Nov 2026)
+
+| PR | What happened |
+|---|---|
+| #59 `sprint-2` → `staging` | jaruwan18's review (25 Nov 22:15 UTC) was the **first code review of F-03 / F-05 / F-06**. It found three defects (R-04 … R-06 below) and asked for a truthful description. The PR was **closed by the owner** after the fixes, and replaced by a new release PR from `release/sprint-2` |
+| #60 `sprint-3` → `staging`, #49 Lab 5/6 docs → `staging` | **Closed by the owner**; their content is in `release/d2-candidate` (sprint-3 + PR #65 + the Lab 5/6 documents) |
+| #64 → `sprint-2`, #65 → `sprint-3` | The review fixes and their sync into `sprint-3`; the release branches already contain these commits |
+
+| ID | Source | Finding | Fix (RED → GREEN) | Status |
+|---|---|---|---|---|
+| R-04 | PR #59 review | BR-07: a member could leave while the proposal was `SUBMITTED` and the instructor could approve a team below the minimum | approve re-checks the size under a team row lock, 409 `TEAM_TOO_SMALL` (`9e9d1da` → `42d0270`, F-02 v1.5, F-03 v1.3) | **Resolved** in the release branches |
+| R-05 | PR #59 review | join returned 500 when the team was deleted between look-up and lock | 404 (TEST-03-17b) | **Resolved** |
+| R-06 | PR #59 review | a grade racing a `maxScore` decrease stored 90 > 80 | `FOR SHARE` read in `saveGrade` (TEST-06-13c, F-06 v1.4) | **Resolved** |
+| R-07 | own finding (26 Nov) | TEST-06-08 failed at random (text search for "70" matched timestamps) | structured assertion (F-06 v1.3, PR #63) | **Resolved** |
 
 ## 4. What to update before submission
 - [ ] Every "pending" above → approval / merge date.

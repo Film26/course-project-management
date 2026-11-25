@@ -20,9 +20,9 @@ candidate is built in two releases:
 | Step | PR | Result |
 |---|---|---|
 | 1 | Feature PRs into `sprint-2`: #56 (F-03) → #57 (F-05) → #47 (F-06); F-04 already merged (#48) | Sprint 2 integrated, CI on each PR |
-| 2 | `sprint-2` → `staging` (PR #59) → `main` | tag **`v2.0-sprint2`** = the accepted Sprint 2 release (stays identifiable) |
+| 2 | `release/sprint-2` (= `sprint-2` + review fixes of #59, i.e. #64) → `staging` → `main` (PR #59 was closed after its review) | tag **`v2.0-sprint2`** = the accepted Sprint 2 release (stays identifiable) |
 | 3 | `sprint-2` merged into `sprint-3` (PR #61; 229/229, E2E 9/9); Sprint 3 PRs #52 (F-09 A1), #54 (F-07 contract), #58 (plan v0.4), #53 (docs) | Sprint 3 progress integrated |
-| 4 | `sprint-3` → `staging` (PR #60) → `main` | tag **`d2-candidate`** = the submitted Deliverable 2 version |
+| 4 | `release/d2-candidate` (= `sprint-3` + #65 + Lab 5/6 documents of the closed #49) → `staging` → `main` (replaces the closed #60) | tag **`d2-candidate`** = the submitted Deliverable 2 version |
 
 | Release | Commit | Tag | CI run | Deploy demo run | Cloud Run revision | `/api/version` |
 |---|---|---|---|---|---|---|
