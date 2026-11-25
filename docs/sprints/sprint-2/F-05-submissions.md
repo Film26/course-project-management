@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-24 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md`, F-02 and the F-03/F-04 contracts |
+| 1.1 | 2026-11-25 | Film26 | Migration name `20261125120000_f05_submissions`; TEST-05-13 already passes at RED because F-04 maps the FK error to 409 `MILESTONE_HAS_SUBMISSIONS` (M4) | Recorded while writing the RED tests. No AC changed |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -79,7 +80,7 @@ All endpoints require a session (`401 UNAUTHENTICATED`). Order of checks: authen
 
 ## 4. Data
 
-Migration `20261125000000_f05_submissions`:
+Migration `20261125120000_f05_submissions` *(v1.1)*:
 - New `Submission { id, milestoneId (FK Milestone, **restrict**), teamId (FK Team, cascade), version Int, url, note @default(""), isLate Boolean, submittedById (FK User), submittedAt DateTime @default(now()) }`.
 - `@@unique([milestoneId, teamId, version])`, `@@index([teamId])`; SQL `CHECK ("version" >= 1)`.
 - No seed submissions (tests create their own). The seed gives Team Alpha an `APPROVED` proposal only in the E2E/UAT reset script, not in the base seed, so the F-02 journeys still start from an empty state.
