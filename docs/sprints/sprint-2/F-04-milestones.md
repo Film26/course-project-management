@@ -20,6 +20,7 @@
 | 1.2 | 2026-11-25 | Film26 | `dueAt` must be a date that exists (30 Feb, 31 Apr rejected); the seed adds milestones only to a course without milestones; edit and delete lock the milestone row inside their transaction and map Prisma P2025 to 404; new TEST-04-13, TEST-04-14, TEST-04-14b | PR #48 review by jaruwan18: impossible dates rolled over to the next month; re-running the seed on deploy could re-add a renamed or deleted milestone and exceed 100 %; a delete racing another request could end in 500 |
 | 1.3 | 2026-11-25 | Film26 | M5 with F-03: a student must be **enrolled** in the course to list milestones (was: in a team of the course); without a team the list shows `NO_TEAM`. TEST-04-09b runs (was `it.todo`); the F-04 test fixture enrolls its students | F-03 adds `Enrollment` (planned in v1.1) |
 | 1.4 | 2026-11-25 | Film26 | M6 completed by F-05: `teamStatus` is `SUBMITTED` / `LATE` / `NOT_SUBMITTED` from the team's current version; each milestone opens its submissions page. M4 delete → 409 `MILESTONE_HAS_SUBMISSIONS` is now exercised by F-05 TEST-05-13 | F-05 (PR for #42), as planned in v1.0 |
+| 1.5 | 2026-11-25 | Film26 | `PATCH maxScore` below a score already given on the milestone → 409 `SCORE_ABOVE_MAX` (F-06 G6), checked in the edit transaction | F-06 (PR #47), as planned in v1.0 |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 

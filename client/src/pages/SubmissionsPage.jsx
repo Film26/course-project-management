@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { formatTime } from '../proposalUi.jsx';
+import { GradeBadge, GradeForm, gradeError } from '../gradeUi.jsx';
 
 // F-05 FR-15/FR-16 — one milestone's submissions. Students submit and see their own team's versions; the course
 // instructor sees every team's current version. The API enforces BR-10, BR-11 and ownership.
@@ -94,6 +95,21 @@ export default function SubmissionsPage({ user, milestoneId, onBack, onUnauthent
   }, [milestoneId, onUnauthenticated]);
   useEffect(load, [load]);
 
+  // F-06: save or release a grade of a team's current version (instructor).
+  async function gradeAction(path, body) {
+    setBusy(true);
+    setActionError('');
+    try {
+      await api(path, { method: body ? 'PUT' : 'POST', body });
+      load();
+    } catch (err) {
+      if (err.status === 401) return onUnauthenticated();
+      setActionError(gradeError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submit(body) {
     setBusy(true);
     setActionError('');
@@ -141,7 +157,7 @@ export default function SubmissionsPage({ user, milestoneId, onBack, onUnauthent
 
       {user.role === 'INSTRUCTOR' ? (
         <ul className="list" data-testid="team-submissions">
-          {state.data.teams.map(({ team, current, versionCount }) => (
+          {state.data.teams.map(({ team, current, versionCount, grade }) => (
             <li key={team.id} className="card" data-testid={`team-row-${team.name}`}>
               <div className="row">
                 <strong>{team.name}</strong>
@@ -160,6 +176,20 @@ export default function SubmissionsPage({ user, milestoneId, onBack, onUnauthent
                   </a>{' '}
                   · {formatTime(current.submittedAt)} · {versionCount} version(s)
                 </p>
+              )}
+              {current && (
+                <>
+                  <GradeBadge grade={grade} />
+                  <GradeForm
+                    key={`${current.id}-${grade?.releasedAt ?? 'open'}`}
+                    grade={grade}
+                    maxScore={milestone.maxScore}
+                    pastDue={pastDue}
+                    busy={busy}
+                    onSave={(body) => gradeAction(`/submissions/${current.id}/grade`, body)}
+                    onRelease={() => gradeAction(`/submissions/${current.id}/grade/release`)}
+                  />
+                </>
               )}
             </li>
           ))}

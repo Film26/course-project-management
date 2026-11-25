@@ -130,6 +130,16 @@ Rules enforced by the API: only a team with an approved proposal can submit; aft
 marked LATE, and once an on-time version exists no new version is accepted after the due date
 (see `docs/sprints/sprint-2/F-05-submissions.md`).
 
+### Sprint 2 journey: grading (F-06)
+
+1. As `instructor1@cpms.test` → **Milestones** → **Submissions** → enter a score (0 to the milestone's max score)
+   and feedback → **Save grade**. After the milestone due date → **Release**.
+2. The team's students see the grade under **My grades** only after it is released; other teams never see it.
+
+Rules enforced by the API (D-08): only the team's current version is graded or released, release only after the
+due date, a released grade cannot change and the team cannot submit that milestone again
+(see `docs/sprints/sprint-2/F-06-grading.md`).
+
 ### Sprint 2 journey: milestones (F-04)
 
 The seed adds three milestones to CPE334 (M1 20 %, M2 30 %, M3 40 %, total 90 %).

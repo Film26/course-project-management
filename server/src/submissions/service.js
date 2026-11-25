@@ -2,6 +2,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { canSubmit, currentVersion, isLate } from './rules.js';
+import { gradeSelect, hasReleasedGrade, toGrade } from '../grades/service.js';
 
 export const submissionSelect = {
   id: true,
@@ -53,7 +54,10 @@ export async function submitDeliverable(milestoneId, user, input, now = new Date
       where: { milestoneId, teamId: team.id },
       select: { version: true, isLate: true },
     });
-    // S5 (released grade → 409 GRADE_RELEASED) is added by F-06 here, after BR-10 and before S3.
+    // S5 / F-06 D-08: after a released grade the team cannot submit this milestone again (after BR-10, before S3).
+    if (await hasReleasedGrade(tx, milestoneId, team.id)) {
+      throw new ApiError(409, 'GRADE_RELEASED', 'The grade for this milestone has been released; no new version is accepted');
+    }
     const check = canSubmit({ versions, dueAt: milestone.dueAt, now });
     if (!check.ok) {
       throw new ApiError(409, check.code, 'The due date has passed and your team already has an on-time version');
@@ -87,12 +91,21 @@ export async function listSubmissions(milestoneId, user) {
       select: {
         id: true,
         name: true,
-        submissions: { where: { milestoneId }, orderBy: { version: 'desc' }, select: submissionSelect },
+        submissions: { where: { milestoneId }, orderBy: { version: 'desc' }, select: { ...submissionSelect, grade: { select: gradeSelect } } },
       },
     });
     return {
       milestone,
-      teams: teams.map((t) => ({ team: { id: t.id, name: t.name }, current: t.submissions[0] ?? null, versionCount: t.submissions.length })),
+      teams: teams.map((t) => {
+        // F-06: the instructor also sees the grade of the current version (never sent to students).
+        const { grade = null, ...current } = t.submissions[0] ?? {};
+        return {
+          team: { id: t.id, name: t.name },
+          current: t.submissions[0] ? current : null,
+          versionCount: t.submissions.length,
+          grade: toGrade(grade, milestone.maxScore),
+        };
+      }),
     };
   }
 

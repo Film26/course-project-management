@@ -5,6 +5,7 @@ import { ApiError } from '../errors.js';
 import { LIMITS, checkWeightTotal } from './rules.js';
 import { teamStatus } from '../submissions/rules.js';
 import { currentByMilestone } from '../submissions/service.js';
+import { highestScore } from '../grades/service.js';
 
 const milestoneSelect = {
   id: true,
@@ -84,6 +85,13 @@ export async function updateMilestone(id, user, changes) {
       if (changes.weight !== undefined) {
         await lockCourse(tx, m.courseId);
         await checkWeightWithinLimit(tx, m.courseId, changes.weight, id);
+      }
+      // F-06 G6: maxScore cannot drop below a score that was already given on this milestone.
+      if (changes.maxScore !== undefined) {
+        const top = await highestScore(tx, id);
+        if (top !== null && changes.maxScore < top) {
+          throw new ApiError(409, 'SCORE_ABOVE_MAX', `A grade of ${top} already exists on this milestone`, { highestScore: top });
+        }
       }
       return tx.milestone.update({ where: { id }, data: changes, select: milestoneSelect });
     });
