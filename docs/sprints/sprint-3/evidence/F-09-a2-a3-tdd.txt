@@ -35,3 +35,6 @@
 # whole suite run 1:  Tests 1 failed | 231 passed (232)
 # whole suite run 2:  Tests 232 passed (232)
 # E2E: npx playwright test — 9 passed (25.4s)
+
+# Note on "whole suite run 1: 1 failed": the failing test was TEST-06-08 (F-06), not an A2/A3 test. Its text search for "70"
+# also matched timestamps (…:12.170Z). Reproduced in 2 of 8 repeated runs; fixed in f2716a1 (F-06 v1.3); 10/10 runs pass after the fix.
