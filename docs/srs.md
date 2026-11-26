@@ -16,7 +16,7 @@
 | 0.1 | 2026-11-07 | 67070507202 | First draft of the full-product baseline: actors, scope, FR/BR/NFR, decisions |
 | 0.2 | 2026-11-10 | 67070507202 | Q-05 closed: theme and Sprint 1 roles confirmed from the registration sheet (Supervisor = Instructor); the Sprint 1 example itself was not available, so the scope is checked against the Deliverable 1 required outcome |
 | 0.3 | 2026-11-25 | 67070507202 | §8 adds D-08 (grading of the current version, release after the due date, release is final), approved in PR #47; FR-13 lists the milestone max score (closes gap G-04, change C-08) | F-04 and F-06 contracts |
-| 0.4 | 2026-11-26 | 67070507202 | BR-03 adds `SUBMITTED→DRAFT` (withdraw before the deadline, team member) — Lab 7 change request Issue #74 | Approved requirement change; F-02 contract v1.6 |
+| 0.4 | 2026-11-26 | 67070507202 | BR-03 adds `SUBMITTED→DRAFT` (withdraw before the deadline, team member); BR-05 names withdraw (PR #77 review) — Lab 7 change request Issue #74 | Approved requirement change; F-02 contract v1.6 |
 
 ---
 
@@ -103,7 +103,7 @@ IDs are stable. *Planned* = feature and sprint allocation (details in `docs/feat
 | **BR-02** | A proposal cannot be submitted after the course's `proposalDeadline` (server time). | FR-06 | F-02 / S1 |
 | **BR-03** | Allowed proposal transitions: `DRAFT→SUBMITTED` (team member), `SUBMITTED→APPROVED` and `SUBMITTED→REJECTED` (course instructor), and *(v0.4, Lab 7 Issue #74)* `SUBMITTED→DRAFT` (withdraw, team member, only while `now ≤ proposalDeadline`). Any other transition is rejected; `APPROVED` and `REJECTED` are final. | FR-06, FR-08 | F-02 / S1; changed in Lab 7 |
 | **BR-04** | Rejecting a proposal requires a non-empty reason of at most 500 characters. | FR-08 | F-02 / S1 |
-| **BR-05** | Only members of a team may create, edit, submit or read that team's proposal; only the course's instructor may decide on it. | FR-05–FR-09 | F-02 / S1 |
+| **BR-05** | Only members of a team may create, edit, submit, withdraw *(v0.4)* or read that team's proposal; only the course's instructor may decide on it. | FR-05–FR-09 | F-02 / S1 |
 | **BR-06** | A student belongs to at most one team per course. | FR-10, FR-11 | F-03 / S2 |
 | **BR-07** | Team size is between the course's `minTeamSize` and `maxTeamSize` (default 2–3); joining a full team is rejected; a proposal can be submitted only when the team has at least `minTeamSize` members. | FR-11, FR-06 | F-03 / S2 |
 | **BR-08** | Team membership is locked once the team's proposal is `APPROVED`. | FR-12 | F-03 / S2 |

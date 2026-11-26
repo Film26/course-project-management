@@ -24,11 +24,12 @@
 | Requirement | Feature | Document / section affected | AC | STS | Code module | Change |
 |---|---|---|---|---|---|---|
 | BR-03 | F-02 | SRS §5 BR-03 (v0.4) | AC-02-07 (revised), AC-02-15, AC-02-16 | TEST-02-01 (revised: 4 allowed pairs), TEST-02-21, TEST-02-22 | `server/src/proposals/rules.js` (`TRANSITIONS`) | add `SUBMITTED → DRAFT` |
-| BR-02 (deadline) | F-02 | F-02 contract P2 / new P9 | AC-02-15, AC-02-16 | TEST-02-02 (unchanged, reused), TEST-02-22 boundary | `rules.js` `isBeforeDeadline` (reused) | none in the rule; called by withdraw |
-| BR-05 (ownership) | F-02 | F-02 contract P6, System SDS §5 (new row) | AC-02-17 | TEST-02-23 | `proposals/service.js` (`loadForMember`), `routes/proposals.js` (new route, `requireRole('STUDENT')`) | new endpoint `POST /api/proposals/:id/withdraw` |
-| FR-05 / FR-06 | F-02 | F-02 contract §5 UI | AC-02-18 (UI) | TEST-02-24 (E2E) | `client/src/pages/TeamProposalPage.jsx` | "Withdraw submission" button on a `SUBMITTED` proposal |
-| NFR-06 (no partial data) | SR-02 | F-02 contract P3 | AC-02-16, AC-02-17 | TEST-02-22, 02-23 check the DB after every refusal | `service.js`: conditional update `WHERE status = 'SUBMITTED'` | race with approve/reject: whichever runs first wins; the other gets 409 |
-| FR-22 (audit) | F-09 | — | — | — | — | **N/A:** FR-22 records decisions, grade releases and membership changes; a withdraw is none of these (Issue #74 scope) |
+| BR-02 (deadline) | F-02 | F-02 contract P2 / new P9 | AC-02-15, AC-02-16 | TEST-02-02 (unchanged, reused); TEST-02-22 (a) service boundary `now = D` / `D + 1 ms`, (b) API ±1 minute | `rules.js` `isBeforeDeadline` (reused); `withdrawProposal(id, user, now)` takes `now` like `submitProposal` | none in the rule; called by withdraw. The exact boundary is tested at the service level because the route uses the server clock |
+| BR-05 (ownership) | F-02 | F-02 contract P6, SRS BR-05 ("withdraw" added), System SDS §5 (new row) | AC-02-17 | TEST-02-23 | `proposals/service.js` (`loadForMember`), `routes/proposals.js` (new route, `requireRole('STUDENT')`) | new endpoint `POST /api/proposals/:id/withdraw` |
+| FR-05 / FR-06 | F-02 | F-02 contract §5 UI | AC-02-18 (UI) | TEST-02-24 (E2E) | `client/src/pages/TeamProposalPage.jsx`; the call uses the generic `api()` helper in `client/src/api.js` (no per-endpoint functions there, so `api.js` itself does not change) | "Withdraw submission" button on a `SUBMITTED` proposal |
+| FR-08 (instructor decides) | F-02 | F-02 contract §5 review page row (v1.7) | AC-02-19 | TEST-02-25 (API + E2E) | `client/src/pages/ProposalReviewPage.jsx` (`decide`: on 409 `INVALID_TRANSITION` show the message and reload the list) | a list left open can show a proposal that was withdrawn meanwhile; Approve/Reject then gets 409, the page explains it and refreshes; no audit entry for the refused decision |
+| NFR-06 (no partial data) | SR-02 | F-02 contract P3 | AC-02-16, AC-02-17 | TEST-02-22, 02-23, 02-25 check the DB (and, for 02-25, the audit table) after every refusal | `service.js`: conditional update `WHERE status = 'SUBMITTED'` | race with approve/reject: whichever runs first wins; the other gets 409 |
+| FR-22 (audit) | F-09 | — | AC-02-19 | TEST-02-25 (no audit row for a refused decision) | — | **N/A for the withdraw itself:** FR-22 records decisions, grade releases and membership changes; a withdraw is none of these (Issue #74 scope). **Known limitation:** after a withdrawal `submittedAt` is null and nothing shows that the team had submitted; recorded as technical debt for Lab 7 Part D |
 | BR-07 / BR-08 | F-03 | — | — | TEST-03-13/13b (regression) | — | **N/A:** a withdrawn proposal is `DRAFT`; submit checks BR-07 again; BR-08 locks only at `APPROVED` |
 | F-08 / F-05 / F-06 | S2/S3 | — | — | regression suite | — | **N/A:** they read `APPROVED` proposals only (BR-10); `DRAFT/SUBMITTED` are not used |
 | Data / migration | — | — | — | — | — | **N/A:** no schema change (`status` enum already has `DRAFT`; `submittedAt` is nullable). Historical data: no existing row changes |
@@ -46,10 +47,12 @@
 | BR-07 at submit and approve, BR-08 lock | TEST-03-13, 03-13b/c, 03-12 |
 | Audit entry on decisions (F-09) | TEST-09-03 … 09-07 |
 
+Review of this document: PR #77, jaruwan18, 27 Nov 2026 — *Request changes* (boundary test, instructor page, traceability, approval record); fixed in the next commit (contract v1.7).
+
 The only existing expected result that changes is **TEST-02-01**: `canTransition('SUBMITTED', 'DRAFT')` becomes `true`. This is the approved requirement change (contract v1.6); the other 15 pairs keep their expected results.
 
 ## 4. Plan (order recorded in Git)
 1. Issue #74 (change request) → this document + contract/SRS/SDS revisions (**docs only**) → **review by jaruwan18 before code**
-2. RED commit: TEST-02-01 (revised) + TEST-02-21 … 02-24 run against the pre-change code (`ae801be` tree) — must fail because withdraw does not exist
+2. RED commit: TEST-02-01 (revised) + TEST-02-21 … 02-25 run against the pre-change code (`ae801be` tree) — must fail because withdraw does not exist
 3. GREEN commit: `rules.js`, `service.js`, `routes/proposals.js`, UI button
 4. PR into `sprint-3` (review jaruwan18) → `staging` → `main`, deploy, post-deploy checks of the changed behaviour and of a preserved Sprint 1 path
