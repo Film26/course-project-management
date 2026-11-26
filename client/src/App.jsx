@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage.jsx';
 import RosterPage from './pages/RosterPage.jsx';
 import TeamProposalPage from './pages/TeamProposalPage.jsx';
 import ProposalReviewPage from './pages/ProposalReviewPage.jsx';
+import AuditPage from './pages/AuditPage.jsx';
 import MilestonesPage from './pages/MilestonesPage.jsx';
 import SubmissionsPage from './pages/SubmissionsPage.jsx';
 import MyGradesPage from './pages/MyGradesPage.jsx';
@@ -53,6 +54,7 @@ export default function App() {
             onOpenRoster={(c) => setView({ name: 'roster', courseId: c.id })}
             onOpenProposals={(c) => setView({ name: 'proposals', courseId: c.id })}
             onOpenTeamProposal={(c) => setView({ name: 'team-proposal', courseId: c.id })}
+            onOpenAudit={(c) => setView({ name: 'audit', courseId: c.id })}
             onOpenMilestones={(c) => setView({ name: 'milestones', courseId: c.id })}
             onOpenGrades={(c) => setView({ name: 'my-grades', courseId: c.id })}
             onUnauthenticated={onUnauthenticated}
@@ -63,6 +65,9 @@ export default function App() {
         )}
         {view.name === 'proposals' && (
           <ProposalReviewPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
+        )}
+        {view.name === 'audit' && (
+          <AuditPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
         )}
         {view.name === 'milestones' && (
           <MilestonesPage

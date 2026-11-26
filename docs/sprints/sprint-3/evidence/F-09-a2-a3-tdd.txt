@@ -1,0 +1,40 @@
+# F-09 steps A2 + A3 — TDD RED run
+# branch: feature/F-09-audit-a2-a3 (from sprint-3 1cc3fd7, which now contains F-03 and F-06)  commit: RED = this commit (tests only)
+# date: 2026-11-26T04:41:33+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/audit.api.test.js
+
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-03 approving stores one PROPOSAL_APPROVED entry with actor, team, proposal id and title (AC-09-01) 313ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-04 rejecting stores one PROPOSAL_REJECTED entry that contains the reason (AC-09-02) 104ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-05 a decision request that is refused stores no entry (AC-09-03) 118ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-06 if the audit entry cannot be written, the decision is rolled back (AC-09-04, L1) 129ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05) 179ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-08 only the course instructor reads the log (AC-09-06) 134ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-09 an entry cannot be changed in the database (AC-09-07, L2) 88ms
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10 create, join and leave each store one entry with the student as actor and the team name (AC-09-08) 133ms
+   → expected [] to deeply equal [ …(3) ]
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10b the last member leaving an empty team is recorded before the team is deleted; refused requests store nothing (AC-09-08, F-03 T6) 113ms
+   → expected [] to deeply equal [ 'TEAM_CREATED', 'MEMBER_LEFT' ]
+ × tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-11 releasing a grade stores one GRADE_RELEASED entry with milestone, score and max score; saving a grade stores none (AC-09-09) 112ms
+   → expected [] to have a length of 1 but got +0
+ Test Files  1 failed (1)
+      Tests  3 failed | 7 passed (10)
+
+# GREEN run (this commit: record(tx, …) in F-03 create/join/leave and F-06 release), whole backend suite, 2 runs
+# command: cd server && npx vitest run --reporter=verbose tests/audit.api.test.js ; npx vitest run
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-03 approving stores one PROPOSAL_APPROVED entry with actor, team, proposal id and title (AC-09-01) 195ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-04 rejecting stores one PROPOSAL_REJECTED entry that contains the reason (AC-09-02) 100ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-05 a decision request that is refused stores no entry (AC-09-03) 115ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-06 if the audit entry cannot be written, the decision is rolled back (AC-09-04, L1) 141ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05) 169ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-08 only the course instructor reads the log (AC-09-06) 138ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-09 an entry cannot be changed in the database (AC-09-07, L2) 87ms
+ ✓ tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10 create, join and leave each store one entry with the student as actor and the team name (AC-09-08) 147ms
+ ✓ tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-10b the last member leaving an empty team is recorded before the team is deleted; refused requests store nothing (AC-09-08, F-03 T6) 121ms
+ ✓ tests/audit.api.test.js > recording membership changes and grade release (A2, A3) > TEST-09-11 releasing a grade stores one GRADE_RELEASED entry with milestone, score and max score; saving a grade stores none (AC-09-09) 122ms
+      Tests  10 passed (10)
+# whole suite run 1:  Tests 1 failed | 231 passed (232)
+# whole suite run 2:  Tests 232 passed (232)
+# E2E: npx playwright test — 9 passed (25.4s)
+
+# Note on "whole suite run 1: 1 failed": the failing test was TEST-06-08 (F-06), not an A2/A3 test. Its text search for "70"
+# also matched timestamps (…:12.170Z). Reproduced in 2 of 8 repeated runs; fixed in f2716a1 (F-06 v1.3); 10/10 runs pass after the fix.

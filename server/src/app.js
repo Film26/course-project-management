@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './errors.js';
 import { authRouter } from './routes/auth.js';
 import { coursesRouter } from './routes/courses.js';
 import { proposalsRouter, teamsRouter } from './routes/proposals.js';
+import { courseAuditRouter } from './routes/audit.js';
 import { courseMilestonesRouter, milestonesRouter } from './routes/milestones.js';
 import { courseTeamsRouter, teamMembershipRouter } from './routes/teams.js';
 import { gradesRouter, courseGradesRouter } from './routes/grades.js';
@@ -34,6 +35,7 @@ export function createApp() {
 
   app.use('/api/auth', authRouter); // F-01
   app.use('/api/courses', coursesRouter); // F-01 roster, F-02 course proposals / my team
+  app.use('/api/courses', courseAuditRouter); // F-09 course audit log
   app.use('/api/courses', courseMilestonesRouter); // F-04 list / create milestones of a course
   app.use('/api/courses', courseTeamsRouter); // F-03 create / join a team
   app.use('/api/courses', courseGradesRouter); // F-06 my released grades

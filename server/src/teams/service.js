@@ -2,6 +2,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { canJoin, isMembershipLocked } from './rules.js';
+import { record } from '../audit/service.js';
 
 const forbidden = (message) => new ApiError(403, 'FORBIDDEN', message);
 const notFound = (what) => new ApiError(404, 'NOT_FOUND', `${what} not found`);
@@ -52,6 +53,8 @@ export async function createTeam(courseId, user, { name }) {
         data: { name, courseId, members: { create: { userId: user.id, courseId } } },
         select: teamSelect,
       });
+      // F-09 A2 (L6): same transaction as the change.
+      await record(tx, { courseId, actorId: user.id, teamId: team.id, action: 'TEAM_CREATED', entityId: team.id, data: { teamName: team.name } });
       return toTeam(team);
     });
   } catch (err) {
@@ -81,6 +84,7 @@ export async function joinTeam(courseId, user, joinCode) {
         throw new ApiError(409, 'TEAM_FULL', `This team already has ${course.maxTeamSize} members`, { maxTeamSize: course.maxTeamSize });
       }
       await tx.teamMember.create({ data: { teamId: team.id, userId: user.id, courseId } });
+      await record(tx, { courseId, actorId: user.id, teamId: team.id, action: 'MEMBER_JOINED', entityId: team.id, data: { teamName: team.name } });
       return toTeam(await tx.team.findUnique({ where: { id: team.id }, select: teamSelect }));
     });
   } catch (err) {
@@ -99,6 +103,8 @@ export async function leaveTeam(teamId, user) {
     if (isMembershipLocked(team.proposals.map((p) => p.status))) throw locked();
 
     await tx.teamMember.delete({ where: { teamId_userId: { teamId, userId: user.id } } });
+    // Recorded before an empty team is deleted (F-03 T6), so the entry keeps the team id and name (L6).
+    await record(tx, { courseId: team.courseId, actorId: user.id, teamId, action: 'MEMBER_LEFT', entityId: teamId, data: { teamName: team.name } });
     const teamDeleted = team.members.length === 1 && team.proposals.length === 0;
     if (teamDeleted) await tx.team.delete({ where: { id: teamId } });
     return { left: true, teamDeleted };
