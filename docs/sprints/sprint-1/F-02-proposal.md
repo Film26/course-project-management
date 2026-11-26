@@ -21,6 +21,7 @@
 | 1.3 | 2026-11-25 | Film26 | Submit also requires `memberCount ≥ course.minTeamSize`, otherwise 409 `TEAM_TOO_SMALL` (checked after the transition and the deadline); `GET /courses/:id/my-team` returns 403 when the student is not enrolled (404 stays for enrolled without a team) and adds `team.joinCode`, `team.locked`, `course.minTeamSize`, `course.maxTeamSize`; seed: student4 joins Team Beta | F-03 BR-07 / T1 (planned as C-02 in Deliverable 1). Team Beta needs 2 members so the F-02 journeys still submit. F-02 tests unchanged apart from fixtures (`courseId` on memberships, enrollments) |
 | 1.4 | 2026-11-25 | Film26 | Approve/reject (P3, P5) run the conditional update and the F-09 audit entry in one transaction; no AC, API or status code changed | F-09 step A1 (FR-22, L1): a decision must never be stored without its audit entry. v1.3 is the F-03 change (BR-07 submit check), recorded in the F-03 PR |
 | 1.5 | 2026-11-26 | Film26 | Approve also requires `memberCount ≥ minTeamSize` (409 `TEAM_TOO_SMALL`), checked in one transaction with a lock on the team row; submit counts and writes in the same kind of transaction. Reject is unchanged | PR #59 review by jaruwan18: a member could leave while the proposal was `SUBMITTED` and the instructor could then approve a team below the minimum (BR-07). v1.4 is the F-09 audit change on `sprint-3` |
+| 1.6 | 2026-11-26 | Film26 | **Lab 7 change (Issue #74):** new transition `SUBMITTED → DRAFT` (withdraw) by a team member while `now ≤ proposalDeadline`; P9, API row, UI row, AC-02-07 revised, AC-02-15 … 02-18, TEST-02-01 revised, TEST-02-21 … 02-24 | Approved requirement change (see `docs/labs/lab07/change-impact.md`); written and reviewed **before** the code change |
 
 ## 1. Linked requirements (summary — full text in `docs/srs.md`)
 
@@ -59,17 +60,18 @@
 
 State machine (BR-03). Any pair not listed is rejected with `409 INVALID_TRANSITION`:
 
-| From \ To | SUBMITTED | APPROVED | REJECTED |
-|---|---|---|---|
-| DRAFT | ✔ member, before deadline | ✘ | ✘ |
-| SUBMITTED | ✘ | ✔ course instructor | ✔ course instructor + reason |
-| APPROVED | ✘ | ✘ | ✘ |
-| REJECTED | ✘ | ✘ | ✘ |
+| From \ To | DRAFT | SUBMITTED | APPROVED | REJECTED |
+|---|---|---|---|---|
+| DRAFT | — | ✔ member, before deadline | ✘ | ✘ |
+| SUBMITTED | ✔ member, before deadline *(v1.6, withdraw)* | ✘ | ✔ course instructor | ✔ course instructor + reason |
+| APPROVED | ✘ | ✘ | ✘ | ✘ |
+| REJECTED | ✘ | ✘ | ✘ | ✘ |
 
 ### Business rules as implemented
 - **P1 (BR-01)** Create is rejected with `409 ACTIVE_PROPOSAL_EXISTS` when the team already has a `DRAFT`, `SUBMITTED` or `APPROVED` proposal. The check and the insert run in one DB transaction that first locks the team row (`SELECT … FOR UPDATE`), so two concurrent creates cannot both succeed. Rejected proposals are kept (history, D-05).
 - **P2 (BR-02)** Submit is allowed while `now <= proposalDeadline`; `now > proposalDeadline` → `409 DEADLINE_PASSED`. **Boundary:** submitting exactly at the deadline is accepted. Server clock only; the client sends no time.
 - **P3 (BR-03)** Each transition is a conditional update (`UPDATE … WHERE id = ? AND status = <expected>`). If no row changed, the request returns `409 INVALID_TRANSITION` and nothing is written.
+- **P9 (BR-03, v1.6 — withdraw)** A STUDENT member of the team may move a `SUBMITTED` proposal back to `DRAFT` while `now <= proposalDeadline` (same boundary as P2: exactly at the deadline is allowed). Conditional update `WHERE status = 'SUBMITTED'` sets `status = DRAFT`, `submittedAt = null`; nothing else changes. Check order: 401 → role (403) → id (400) → 404 → membership (403) → `INVALID_TRANSITION` (not `SUBMITTED`) → `DEADLINE_PASSED`. If the instructor decides at the same moment, whichever update runs first wins and the other request gets 409 `INVALID_TRANSITION`. No audit entry (FR-22 does not list withdrawals).
 - **P4 (FR-05)** Only a `DRAFT` may be edited; editing any other status → `409 INVALID_TRANSITION`.
 - **P5 (FR-06, FR-08)** Submit sets `submittedAt = now`. Approve/reject sets `decidedAt = now`, `decidedById = current user`; reject also stores `rejectReason`.
 - **P6 (BR-05)** Ownership:
@@ -104,6 +106,7 @@ All errors use `{ "error": { "code", "message", "details"? } }`. All endpoints r
 | `GET /api/proposals/:id` | team member or course instructor | — | `200 { proposal: P, team: { id, name }, course: { id, code } }` | 400, 403, 404 |
 | `PATCH /api/proposals/:id` | STUDENT, team member | `{ title?, description? }` | `200 { proposal: P }` | 400, 403, 404, 409 `INVALID_TRANSITION` (not DRAFT) |
 | `POST /api/proposals/:id/submit` | STUDENT, team member | — | `200 { proposal: P }` with `SUBMITTED`, `submittedAt` set | 403, 404, 409 `DEADLINE_PASSED`, 409 `INVALID_TRANSITION` |
+| `POST /api/proposals/:id/withdraw` *(v1.6)* | STUDENT, team member | — | `200 { proposal: P }` with `DRAFT`, `submittedAt: null` | 400, 403, 404, 409 `INVALID_TRANSITION`, 409 `DEADLINE_PASSED` |
 | `GET /api/courses/:courseId/proposals?status=` | INSTRUCTOR, owns course | optional `status` | `200 { course: { id, code, name, proposalDeadline }, proposals: [ P & { team: { id, name } } ] }` — sorted by team name, newest first | 400, 403, 404 |
 | `POST /api/proposals/:id/approve` | INSTRUCTOR, owns course | — | `200 { proposal: P }` with `APPROVED`, `decidedAt`, `decidedBy` | 403, 404, 409 `INVALID_TRANSITION` |
 | `POST /api/proposals/:id/reject` | INSTRUCTOR, owns course | `{ reason }` | `200 { proposal: P }` with `REJECTED`, `rejectReason`, `decidedAt`, `decidedBy` | 400, 403, 404, 409 `INVALID_TRANSITION` |
@@ -128,7 +131,7 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 | Screen / element | Behaviour |
 |---|---|
 | Home — course card | STUDENT: button **"My team proposal"**. INSTRUCTOR: buttons **"View roster"** and **"Review proposals"**. Hidden buttons are convenience only — the API returns 403. |
-| My team proposal (Student) | Loading state; shows team name, members, deadline (Asia/Bangkok). No active proposal → **create form** (title, description, field errors before submit). `DRAFT` → edit form with **Save draft** and **Submit proposal**. `SUBMITTED` → read-only "Waiting for instructor decision". `APPROVED` → read-only, green status. `REJECTED` → shows the reason and a create form for a new proposal. Earlier proposals listed under "History". Server errors (e.g. `DEADLINE_PASSED`, `ACTIVE_PROPOSAL_EXISTS`) shown in an alert. No team → "You are not in a team for this course." |
+| My team proposal (Student) | Loading state; shows team name, members, deadline (Asia/Bangkok). No active proposal → **create form** (title, description, field errors before submit). `DRAFT` → edit form with **Save draft** and **Submit proposal**. `SUBMITTED` → read-only "Waiting for instructor decision". `APPROVED` → read-only, green status. `REJECTED` → shows the reason and a create form for a new proposal. Earlier proposals listed under "History". Server errors (e.g. `DEADLINE_PASSED`, `ACTIVE_PROPOSAL_EXISTS`) shown in an alert. No team → "You are not in a team for this course." *(v1.6)* A `SUBMITTED` proposal shows **Withdraw submission** (confirm dialog) while the deadline has not passed; after withdrawing, the edit form is shown again. |
 | Review proposals (Instructor) | Status filter (All / Draft / Submitted / Approved / Rejected), opens on **Submitted** *(v1.1)*; loading, empty ("No proposals"), error (403 "You do not have access to this course") states. Each row: team, title, status badge, submitted time. `SUBMITTED` rows have **Approve** and **Reject**; Reject opens a reason text area (required, ≤ 500 chars, counter) and **Confirm reject**. List refreshes after a decision. |
 
 ## 6. Acceptance criteria
@@ -141,7 +144,7 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 | AC-02-04 | A member can edit a `DRAFT`; editing a `SUBMITTED`/`APPROVED`/`REJECTED` proposal → 409 `INVALID_TRANSITION` and the stored text is unchanged. | FR-05, BR-03 |
 | AC-02-05 | Before (or exactly at) the deadline, a member submits a `DRAFT` → 200, `SUBMITTED`, `submittedAt` stored. | FR-06, BR-02 |
 | AC-02-06 | After the course deadline, submit → 409 `DEADLINE_PASSED`; the proposal stays `DRAFT` with `submittedAt = null`. | BR-02, NFR-06 |
-| AC-02-07 | Transitions outside BR-03 (submit a non-draft; approve/reject a `DRAFT`, `APPROVED` or `REJECTED`) → 409 `INVALID_TRANSITION`; status unchanged. | BR-03 |
+| AC-02-07 | Transitions outside BR-03 (submit a non-draft; approve/reject a `DRAFT`, `APPROVED` or `REJECTED`) → 409 `INVALID_TRANSITION`; status unchanged. *(v1.6: `SUBMITTED → DRAFT` by a team member before the deadline is now inside BR-03, see AC-02-15.)* | BR-03 |
 | AC-02-08 | The course instructor approves a `SUBMITTED` proposal → 200 `APPROVED`, `decidedAt` and `decidedBy` = that instructor are stored. | FR-08 |
 | AC-02-09 | The course instructor rejects with a reason → 200 `REJECTED`, reason/decider/time stored. Missing, blank or > 500-char reason → 400 and the proposal stays `SUBMITTED`. | FR-08, BR-04 |
 | AC-02-10 | A student who is not a member of the team cannot create, read, edit or submit that team's proposal (403, no proposal data). An instructor cannot create/edit/submit (403). | BR-05, NFR-03 |
@@ -149,12 +152,16 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 | AC-02-12 | All F-02 endpoints without a valid session → 401 `UNAUTHENTICATED`, no proposal data. | NFR-02 |
 | AC-02-13 | Team members see their team, its proposals, status and the decision/reason via `GET /courses/:id/my-team` and `GET /proposals/:id`; the course instructor can list proposals filtered by status; an invalid status filter → 400; unknown ids → 404. | FR-07, FR-09 |
 | AC-02-14 | UI journey: student creates and submits a proposal; instructor sees it under "Submitted", rejects it with a reason; the student sees `REJECTED` and the reason; the student creates a new proposal, submits it, and the instructor approves it; the student sees `APPROVED`. | FR-05–FR-09, NFR-09 |
+| AC-02-15 *(v1.6)* | Given a `SUBMITTED` proposal and a team member, when they withdraw before or exactly at the deadline, then 200, `DRAFT`, `submittedAt = null`, text unchanged; the team can edit and submit it again. | BR-03, Issue #74 |
+| AC-02-16 *(v1.6)* | Withdraw after the deadline (1 ms later) → 409 `DEADLINE_PASSED`; withdraw a `DRAFT`, `APPROVED` or `REJECTED` proposal → 409 `INVALID_TRANSITION`; the stored proposal is unchanged. | BR-03, BR-02, NFR-06 |
+| AC-02-17 *(v1.6)* | The course instructor, an instructor of another course and a student of another team cannot withdraw (403); no session → 401; nothing changes. | BR-05, NFR-02, NFR-03 |
+| AC-02-18 *(v1.6)* | UI: student submits, sees **Withdraw submission**, withdraws, edits the title and submits again; the instructor sees only the second submission time. | FR-05, FR-06, NFR-09 |
 
 ## 7. Software Test Specification
 
 | Test ID | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
-| TEST-02-01 | AC-02-07 | Unit | every (from, to) pair of the 4 statuses | `canTransition(from, to)` | true only for DRAFT→SUBMITTED, SUBMITTED→APPROVED, SUBMITTED→REJECTED |
+| TEST-02-01 | AC-02-07 | Unit | every (from, to) pair of the 4 statuses | `canTransition(from, to)` | true only for DRAFT→SUBMITTED, SUBMITTED→APPROVED, SUBMITTED→REJECTED **and SUBMITTED→DRAFT** *(v1.6, changed expected result for one pair; the other 15 pairs unchanged)* |
 | TEST-02-02 | AC-02-05, AC-02-06 | Unit | deadline `D` | `isBeforeDeadline(D, D-1ms)`, `(D, D)`, `(D, D+1ms)` | true, **true (boundary)**, false |
 | TEST-02-03 | AC-02-02 | Unit | statuses | `isActiveStatus(s)` | DRAFT/SUBMITTED/APPROVED true; REJECTED false |
 | TEST-02-04 | AC-02-03, AC-02-09 | Unit | inputs: `{}`, blanks, 121-char title, 5001-char description, reason `""`, `"  "`, 500 and 501 chars | `validateProposalInput`, `validateRejectReason` | errors name the right fields; trimmed values returned; 500 chars ok, 501 rejected |
@@ -174,9 +181,13 @@ Order of checks per request *(v1.1)*: authenticate (401) → role via `requireRo
 | TEST-02-18 | AC-02-12 | API | no cookie | call each F-02 endpoint | 401 `UNAUTHENTICATED`, no `proposal(s)` |
 | TEST-02-19 | AC-02-13 | API+DB | Alpha: 1 REJECTED + 1 SUBMITTED; Beta: DRAFT | student1 GET my-team & GET proposal; A GET list, `?status=SUBMITTED`, `?status=BOGUS`; GET unknown proposal; student without team GET my-team | member sees team + 2 proposals newest first with reason; list returns 3 / filtered 1 with team names; 400; 404; 404 |
 | TEST-02-20 | AC-02-14 | E2E (Playwright) | *(v1.2)* separate E2E database `cpms_e2e`, migrated + seeded when the E2E API starts; proposals of the seeded course cleared in `cpms_e2e` only | student3 creates + submits → instructor1 rejects with reason → student3 sees reason, creates + submits new → instructor1 approves → student3 sees APPROVED | each step visible in the UI; screenshots saved to `evidence/screenshots/F02-*.png` |
+| TEST-02-21 *(v1.6)* | AC-02-15 | API+DB | Alpha `SUBMITTED`, deadline in the future | student2 POST withdraw; PATCH title; POST submit | 200 `DRAFT`, `submittedAt` null, text unchanged in DB; 200; 200 `SUBMITTED` with a new `submittedAt` |
+| TEST-02-22 *(v1.6)* | AC-02-15, AC-02-16 | API+DB | `SUBMITTED`; course deadline set to the request time (boundary) / 1 minute ago; `DRAFT`, `APPROVED`, `REJECTED` proposals | POST withdraw for each | boundary: 200 `DRAFT`; past deadline: 409 `DEADLINE_PASSED`, DB still `SUBMITTED` with the same `submittedAt`; other states: 409 `INVALID_TRANSITION`, DB unchanged |
+| TEST-02-23 *(v1.6)* | AC-02-17 | API+DB | Alpha `SUBMITTED`; instructor A (course owner), instructor B, student3 (Team Beta) | POST withdraw as each; without cookie | 403 ×3 (no `proposal` in body), 401; DB still `SUBMITTED` |
+| TEST-02-24 *(v1.6)* | AC-02-18 | E2E (Playwright) | `cpms_e2e`, Team Beta has no active proposal | student3 creates + submits → Withdraw submission → edit title → submit; instructor1 sees the new title under Submitted | each step visible; screenshots `docs/labs/lab07/evidence/L7-*.png` |
 
 ## 8. Definition of Done (F-02 instance of the Product DoD)
-- [ ] AC-02-01 … AC-02-14 implemented.
+- [ ] AC-02-01 … AC-02-14 implemented; *(v1.6)* AC-02-15 … AC-02-18 implemented.
 - [ ] TEST-02-01 … TEST-02-19 automated and passing in `npm test`; TEST-02-20 passing in `npm run test:e2e`.
 - [ ] Red → green evidence kept in `docs/sprints/sprint-1/evidence/F-02-tdd-red.txt` and `F-02-tdd-green.txt` (tests committed before implementation).
 - [ ] F-01 tests still pass (no regression).

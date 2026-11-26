@@ -14,6 +14,7 @@
 | 0.1 | 2026-11-07 | 67070507202 | First draft: architecture, data model, UI/API conventions, access matrix, auth, configuration, deployment plan |
 | 0.2 | 2026-11-07 | 67070507202 | §5 F-02 rows now list the real endpoints from PR #6; §2.2 records how BR-01 is enforced |
 | 0.3 | 2026-11-25 | 67070507202 | §2.3 lists the Sprint 2/3 migrations with their status; §5 names the real Sprint 2/3 endpoints and the Enrollment-based student access (F-03) | Deliverable 2 Part D; contracts F-03 … F-09 |
+| 0.4 | 2026-11-26 | 67070507202 | §5: withdraw endpoint (Lab 7, Issue #74) | F-02 contract v1.6 |
 
 ---
 
@@ -194,6 +195,7 @@ Detailed endpoints are specified in each feature contract (`docs/sprints/sprint-
 | View my team in a course | `GET /api/courses/:courseId/my-team` | ✘ | own | enrolled (403 otherwise); 404 when enrolled without a team |
 | Create draft proposal | `POST /api/teams/:teamId/proposals` | ✘ | own | member of the team (BR-01, BR-05) |
 | Edit draft proposal | `PATCH /api/proposals/:id` | ✘ | own | member of the team; only `DRAFT` |
+| Withdraw submitted proposal *(v0.4, Lab 7)* | `POST /api/proposals/:id/withdraw` | ✘ | own | member of the team; only `SUBMITTED`, before the deadline (BR-03) |
 | Submit proposal | `POST /api/proposals/:id/submit` | ✘ | own | member of the team (BR-02, BR-03) |
 | View a proposal | `GET /api/proposals/:id` | own | own | instructor of the course **or** team member |
 | List course proposals | `GET /api/courses/:courseId/proposals` | own | ✘ | instructor of the course |

@@ -17,6 +17,7 @@
 | 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4`; G-08 records how Q-05 was closed (PR #14) |
 | 0.5 | 2026-11-25 | 67070507202 | Sprint 2/3 rows filled from the F-03 … F-09 contracts with real AC and TEST IDs and honest status (implemented on PR / RED / contract only); new §3.2 per-AC status table; status legend extended. Baseline revisions C-07 … C-15 and D-08 are listed in `docs/deliverable2/change-register.md` §3. Drafted with an AI assistant (Claude Code) |
 | 0.6 | 2026-11-25 | 67070507202 | PR #53 review by 67070507216: statuses refreshed to the real PRs and CI runs (F-03 #56, F-05 #57, F-06 #47, F-07 #54, F-09 #52, F-04 and F-08 merged); §3.2 regenerated from the current contract versions (69 ACs, incl. AC-06-10; AC-07-04 and AC-08-03 now show their tests) |
+| 0.8 | 2026-11-26 | 67070507202 | BR-03 row: Lab 7 change (withdraw), AC-02-15 … 02-18 and TEST-02-21 … 02-24 planned |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
@@ -61,7 +62,7 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 |---|---|---|---|---|---|---|
 | BR-01 | One active proposal per team; new one only after `REJECTED` | F-02 | S1 | AC-02-02 | TEST-02-03 (P-U); TEST-02-06, TEST-02-07, TEST-02-08 concurrency (P-API) | Verified (auto); see G-01 |
 | BR-02 | No submit after `proposalDeadline` (server time) | F-02 | S1 | AC-02-05, AC-02-06 | TEST-02-02 boundary (P-U); TEST-02-11, TEST-02-12 (P-API) | Verified (auto) |
-| BR-03 | Only `DRAFT→SUBMITTED`, `SUBMITTED→APPROVED/REJECTED`; final states | F-02 | S1 | AC-02-04, AC-02-07 | TEST-02-01 all 16 pairs (P-U); TEST-02-10, TEST-02-13 (P-API) | Verified (auto) |
+| BR-03 | `DRAFT→SUBMITTED`, `SUBMITTED→APPROVED/REJECTED`, *(Lab 7)* `SUBMITTED→DRAFT` before the deadline; final states | F-02 | S1, changed in Lab 7 (Issue #74) | AC-02-04, AC-02-07, AC-02-15 … AC-02-18 | TEST-02-01 all 16 pairs (P-U); TEST-02-10, TEST-02-13, TEST-02-21 … 02-23 (P-API); TEST-02-24 (E2E) | Sprint 1 part Verified (auto); Lab 7 part planned (contract v1.6 under review) |
 | BR-04 | Reject reason required, ≤ 500 chars | F-02 | S1 | AC-02-09 | TEST-02-04 500/501 boundary (P-U); TEST-02-15 (P-API) | Verified (auto) |
 | BR-05 | Only team members act on / read own proposal; only course instructor decides | F-02 | S1 | AC-02-10, AC-02-11 | TEST-02-16, TEST-02-17 (P-API); TEST-02-20 other-team 403 (P-E2E) | Verified (auto) |
 | BR-06 | One team per student per course | F-03 | S2 | AC-03-04 | TEST-03-08 incl. concurrency (T-API); DB unique `TeamMember(courseId, userId)` | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
