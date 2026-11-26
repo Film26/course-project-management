@@ -1,0 +1,6 @@
+# Release candidate check — branch release/d2-candidate — 2026-11-26T06:47:07+07:00
+# contents: sprint-3 (1cc3fd7 + #62 caa5ed6) + PR #65 sync (f897fed, review fixes of #59) + Lab 5/6 documents (a34f5de)
+# fresh database, all 7 migrations: 20261107000000_init 20261124164659_f04_milestones 20261125060000_f03_team_formation 20261125090000_f09_audit_log 20261125120000_f05_submissions 20261125150000_f06_grades 
+# backend: npx vitest run — 236 passed (236), 16 files, two runs
+# E2E: npx playwright test — 9 passed (23.0s): TEST-01-13, 01-13b, 02-20, 02-20b (Sprint 1 continuity), 03-17, 04-12, 05-15, 06-12, 09-12
+# UI build: npm run build — ok
