@@ -86,6 +86,9 @@ To keep the Deliverable 2 schedule, the owner merged these PRs into `sprint-2` /
 | #59 `sprint-2` → `staging` | jaruwan18's review (25 Nov 22:15 UTC) was the **first code review of F-03 / F-05 / F-06**. It found three defects (R-04 … R-06 below) and asked for a truthful description. The PR was **closed by the owner** after the fixes, and replaced by a new release PR from `release/sprint-2` |
 | #60 `sprint-3` → `staging`, #49 Lab 5/6 docs → `staging` | **Closed by the owner**; their content is in `release/d2-candidate` (sprint-3 + PR #65 + the Lab 5/6 documents) |
 | #64 → `sprint-2`, #65 → `sprint-3` | The review fixes and their sync into `sprint-3`; the release branches already contain these commits |
+| #66 `release/sprint-2` → `main` | Closed: duplicate of #67 that skipped `staging` |
+| #67 → `staging`, #69 → `main` | Sprint 2 release, **approved by `Nontok9164`**, who is not one of the two team students (jaruwan18 was not available); merged 25 Nov 23:57 and 26 Nov 00:19 UTC; deployed as `cpms-00006-zs5`, tag `v2.0-sprint2` → `4bd0f8f` |
+| #68 `release/d2-candidate` → `staging` | Closed by the owner; the D2 candidate is released through a new PR from the same branch |
 
 | ID | Source | Finding | Fix (RED → GREEN) | Status |
 |---|---|---|---|---|

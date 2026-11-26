@@ -1,0 +1,13 @@
+# Post-deployment check — https://cpms-t4xsm3f7aa-as.a.run.app — 2026-11-26T00:23:34.245Z
+PASS  GET /api/version  → 200 {"commit":"4bd0f8f382f74ad473372c37dbe8f9838ea1102f"} (expected 4bd0f8f)
+PASS  GET /api/ready  → 200 {"status":"ready","db":"connected"}
+PASS  F-01 courses without session  GET /api/courses → 401 UNAUTHENTICATED
+PASS  F-02 proposals list without session  GET /api/courses/1/proposals → 401 UNAUTHENTICATED
+PASS  F-03 join team without session  POST /api/courses/1/teams/join → 401 UNAUTHENTICATED
+PASS  F-04 milestones without session  GET /api/courses/1/milestones → 401 UNAUTHENTICATED
+PASS  F-05 submissions without session  GET /api/milestones/1/submissions → 401 UNAUTHENTICATED
+PASS  F-06 my grades without session  GET /api/courses/1/my-grades → 401 UNAUTHENTICATED
+FAIL  F-09 audit log without session  GET /api/courses/1/audit → 404 NOT_FOUND
+RESULT: some checks FAILED
+# Note: F-09 (audit log) is Sprint 3 work and is not part of v2.0-sprint2, so 404 is the expected result for that line.
+# Sprint 2 result: version, readiness and all F-01 ... F-06 routes PASS on revision cpms-00006-zs5 (Deploy demo run 45727869372).
