@@ -70,7 +70,9 @@ export async function joinTeam(courseId, user, joinCode) {
     return await prisma.$transaction(async (tx) => {
       const found = await tx.team.findFirst({ where: { courseId, joinCode }, select: { id: true } });
       if (!found) throw notFound('Team with this code in this course');
-      await tx.$queryRaw`SELECT id FROM "Team" WHERE id = ${found.id} FOR UPDATE`;
+      // The team may have been deleted (last member left, T6) between the look-up and the lock → 404, not 500.
+      const lockedRows = await tx.$queryRaw`SELECT id FROM "Team" WHERE id = ${found.id} FOR UPDATE`;
+      if (lockedRows.length === 0) throw notFound('Team with this code in this course');
 
       if (await tx.teamMember.findUnique({ where: { courseId_userId: { courseId, userId: user.id } } })) throw alreadyInTeam();
       const team = await tx.team.findUnique({ where: { id: found.id }, select: teamSelect });

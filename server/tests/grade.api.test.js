@@ -220,6 +220,25 @@ describe('access control (NFR-02, NFR-03)', () => {
 });
 
 describe('concurrency (G8, AC-06-10)', () => {
+  it('TEST-06-13c a grade racing a maxScore decrease never leaves a score above maxScore (G6, PR #59 review point 4)', async () => {
+    const ci = await as(instructor1);
+    for (let i = 0; i < 10; i += 1) {
+      await prisma.grade.deleteMany();
+      await prisma.submission.deleteMany();
+      await prisma.milestone.update({ where: { id: m1.id }, data: { maxScore: 100 } });
+      const v1 = await version(m1, alpha, 1);
+      const [gr, patch] = await Promise.all([
+        put(ci, v1, { score: 90, feedback: 'race' }),
+        request(app).patch(`/api/milestones/${m1.id}`).set('Cookie', ci).send({ maxScore: 80 }),
+      ]);
+      const stored = await gradeOf(v1);
+      const max = (await prisma.milestone.findUnique({ where: { id: m1.id } })).maxScore;
+      if (stored) expect(stored.score, `run ${i}`).toBeLessThanOrEqual(max);
+      expect([200, 400], `run ${i}`).toContain(gr.status);
+      expect([200, 409], `run ${i}`).toContain(patch.status);
+    }
+  });
+
   it('TEST-06-13a a submit of v2 racing a grade of v1 never leaves a releasable grade on an old version', async () => {
     const cs = await as(s2);
     const ci = await as(instructor1);

@@ -80,6 +80,18 @@ export async function updateDraft(id, user, changes) {
   return findProposal(id);
 }
 
+/**
+ * BR-07 (F-03 T4, PR #59 review): lock the team row — the same lock F-03 join/leave take — and count the members
+ * inside the caller's transaction, so nobody can leave between the size check and the status change.
+ */
+async function requireMinimumSize(tx, teamId, min) {
+  await tx.$queryRaw`SELECT id FROM "Team" WHERE id = ${teamId} FOR UPDATE`;
+  const memberCount = await tx.teamMember.count({ where: { teamId } });
+  if (!hasMinimumSize(memberCount, min)) {
+    throw new ApiError(409, 'TEAM_TOO_SMALL', `The team needs at least ${min} members`, { memberCount, minTeamSize: min });
+  }
+}
+
 // FR-06, BR-02, BR-03: DRAFT → SUBMITTED before the course deadline.
 export async function submitProposal(id, user, now = new Date()) {
   const p = await loadForMember(id, user);
@@ -89,19 +101,15 @@ export async function submitProposal(id, user, now = new Date()) {
       proposalDeadline: p.team.course.proposalDeadline.toISOString(),
     });
   }
-  // F-03 T4 / BR-07 (F-02 contract v1.3): checked after the transition and the deadline.
-  const memberCount = await prisma.teamMember.count({ where: { teamId: p.team.id } });
-  if (!hasMinimumSize(memberCount, p.team.course.minTeamSize)) {
-    throw new ApiError(409, 'TEAM_TOO_SMALL', `Your team needs at least ${p.team.course.minTeamSize} members to submit`, {
-      memberCount,
-      minTeamSize: p.team.course.minTeamSize,
+  // F-03 T4 / BR-07 (F-02 v1.3): after the transition and the deadline; count and write in one transaction (v1.5).
+  await prisma.$transaction(async (tx) => {
+    await requireMinimumSize(tx, p.team.id, p.team.course.minTeamSize);
+    const { count } = await tx.proposal.updateMany({
+      where: { id, status: 'DRAFT' },
+      data: { status: 'SUBMITTED', submittedAt: now },
     });
-  }
-  const { count } = await prisma.proposal.updateMany({
-    where: { id, status: 'DRAFT' },
-    data: { status: 'SUBMITTED', submittedAt: now },
+    if (count === 0) throw invalidTransition((await tx.proposal.findUnique({ where: { id }, select: { status: true } })).status, 'SUBMITTED');
   });
-  if (count === 0) throw invalidTransition((await loadProposal(id)).status, 'SUBMITTED');
   return findProposal(id);
 }
 
@@ -109,11 +117,16 @@ export async function submitProposal(id, user, now = new Date()) {
 export async function decideProposal(id, user, to, reason = null, now = new Date()) {
   const p = await loadForCourseInstructor(id, user);
   if (!canTransition(p.status, to)) throw invalidTransition(p.status, to);
-  const { count } = await prisma.proposal.updateMany({
-    where: { id, status: 'SUBMITTED' },
-    data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+  await prisma.$transaction(async (tx) => {
+    // BR-07 at approval (F-02 v1.5, PR #59 review): a member may leave while the proposal is SUBMITTED, so the size is
+    // checked again before APPROVED locks the membership (BR-08). Rejecting a too-small team stays possible.
+    if (to === 'APPROVED') await requireMinimumSize(tx, p.team.id, p.team.course.minTeamSize);
+    const { count } = await tx.proposal.updateMany({
+      where: { id, status: 'SUBMITTED' },
+      data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+    });
+    if (count === 0) throw invalidTransition((await tx.proposal.findUnique({ where: { id }, select: { status: true } })).status, to);
   });
-  if (count === 0) throw invalidTransition((await loadProposal(id)).status, to);
   return findProposal(id);
 }
 

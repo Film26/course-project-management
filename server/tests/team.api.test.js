@@ -304,3 +304,45 @@ describe('views (FR-10, FR-04)', () => {
     expect(courses.body.courses.map((c) => c.code)).toEqual(['CPE334']);
   });
 });
+
+// PR #59 review (jaruwan18): BR-07 must also hold when the proposal is approved, not only when it is submitted.
+describe('BR-07 on approval — PR #59 review (F-03 v1.3, F-02 v1.5)', () => {
+  it('TEST-03-13b a member leaves after submit; approving the now too-small team → 409 TEAM_TOO_SMALL, proposal stays SUBMITTED (AC-03-09)', async () => {
+    const gamma = await makeTeam('Team Gamma', 'GAMMA234', [s5, s6]);
+    const p = await prisma.proposal.create({ data: { teamId: gamma.id, title: 'Gamma idea', description: 'd', status: 'SUBMITTED', submittedAt: new Date() } });
+
+    // SUBMITTED does not lock membership (BR-08 locks at APPROVED), so s6 may leave.
+    expect((await leave(await as(s6), gamma)).status).toBe(200);
+
+    const ci = await as(instructor1);
+    const res = await request(app).post(`/api/proposals/${p.id}/approve`).set('Cookie', ci);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('TEAM_TOO_SMALL');
+    expect(await prisma.proposal.findUnique({ where: { id: p.id } })).toMatchObject({ status: 'SUBMITTED', decidedAt: null, decidedById: null });
+
+    // With the minimum size again, the approval succeeds (boundary = minTeamSize).
+    await addMember(gamma, s6);
+    const ok = await request(app).post(`/api/proposals/${p.id}/approve`).set('Cookie', ci);
+    expect(ok.status).toBe(200);
+    expect(ok.body.proposal.status).toBe('APPROVED');
+  });
+
+  it('TEST-03-13c rejecting a too-small team is still allowed (BR-07 only guards approval)', async () => {
+    const delta = await makeTeam('Team Delta', 'DELTA234', [s5]);
+    const p = await prisma.proposal.create({ data: { teamId: delta.id, title: 'Delta idea', description: 'd', status: 'SUBMITTED', submittedAt: new Date() } });
+    const res = await request(app).post(`/api/proposals/${p.id}/reject`).set('Cookie', await as(instructor1)).send({ reason: 'Team is too small' });
+    expect(res.status).toBe(200);
+    expect(res.body.proposal.status).toBe('REJECTED');
+  });
+
+  it('TEST-03-17b a join racing the deletion of an empty team gives 200 or 404, never 500 (PR #59 review point 3)', async () => {
+    for (let i = 0; i < 10; i += 1) {
+      await prisma.teamMember.deleteMany({ where: { userId: { in: [s5.id, s6.id] } } });
+      await prisma.team.deleteMany({ where: { name: 'Team Solo' } });
+      const solo = await makeTeam('Team Solo', 'SKYW2345', [s5]);
+      const [left, joined] = await Promise.all([leave(await as(s5), solo), join(await as(s6), 'SKYW2345')]);
+      expect(left.status, `run ${i}`).toBe(200);
+      expect([200, 404], `run ${i}`).toContain(joined.status);
+    }
+  });
+});
