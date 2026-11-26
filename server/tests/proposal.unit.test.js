@@ -13,7 +13,8 @@ import {
 const STATUSES = ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'];
 
 describe('TEST-02-01 canTransition (AC-02-07, BR-03)', () => {
-  const allowed = new Set(['DRAFT>SUBMITTED', 'SUBMITTED>APPROVED', 'SUBMITTED>REJECTED']);
+  // F-02 v1.6 (Lab 7, Issue #74): SUBMITTED → DRAFT (withdraw) is now allowed; the other 15 pairs keep their results.
+  const allowed = new Set(['DRAFT>SUBMITTED', 'SUBMITTED>APPROVED', 'SUBMITTED>REJECTED', 'SUBMITTED>DRAFT']);
 
   for (const from of STATUSES) {
     for (const to of STATUSES) {

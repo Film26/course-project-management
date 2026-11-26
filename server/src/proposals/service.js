@@ -114,6 +114,25 @@ export async function submitProposal(id, user, now = new Date()) {
   return findProposal(id);
 }
 
+// Lab 7 (Issue #74), F-02 v1.7 P9, BR-03: a team member withdraws SUBMITTED → DRAFT before the course deadline.
+// Same boundary as submit (exactly at the deadline is allowed). The conditional update loses cleanly to a decision
+// made at the same moment (409 INVALID_TRANSITION). No audit entry: FR-22 does not list withdrawals.
+export async function withdrawProposal(id, user, now = new Date()) {
+  const p = await loadForMember(id, user);
+  if (!canTransition(p.status, 'DRAFT')) throw invalidTransition(p.status, 'DRAFT');
+  if (!isBeforeDeadline(p.team.course.proposalDeadline, now)) {
+    throw new ApiError(409, 'DEADLINE_PASSED', 'The proposal deadline has passed', {
+      proposalDeadline: p.team.course.proposalDeadline.toISOString(),
+    });
+  }
+  const { count } = await prisma.proposal.updateMany({
+    where: { id, status: 'SUBMITTED' },
+    data: { status: 'DRAFT', submittedAt: null },
+  });
+  if (count === 0) throw invalidTransition((await prisma.proposal.findUnique({ where: { id }, select: { status: true } })).status, 'DRAFT');
+  return findProposal(id);
+}
+
 // FR-08, BR-03, BR-04: SUBMITTED → APPROVED | REJECTED by the course instructor.
 // F-09 A1 (FR-22, L1): the decision and its audit entry are written in one transaction, both or neither.
 export async function decideProposal(id, user, to, reason = null, now = new Date()) {

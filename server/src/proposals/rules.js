@@ -6,9 +6,10 @@ export const STATUSES = ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'];
 export const ACTIVE_STATUSES = ['DRAFT', 'SUBMITTED', 'APPROVED'];
 
 // BR-03: the only allowed transitions. APPROVED and REJECTED are final.
+// SUBMITTED → DRAFT is the withdraw added in Lab 7 (Issue #74, F-02 v1.6 P9).
 const TRANSITIONS = {
   DRAFT: ['SUBMITTED'],
-  SUBMITTED: ['APPROVED', 'REJECTED'],
+  SUBMITTED: ['APPROVED', 'REJECTED', 'DRAFT'],
   APPROVED: [],
   REJECTED: [],
 };

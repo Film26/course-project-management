@@ -73,6 +73,16 @@ proposalsRouter.post(
   }),
 );
 
+// Lab 7 (Issue #74): withdraw a submitted proposal — BR-03, BR-05. The server clock decides the deadline.
+proposalsRouter.post(
+  '/:id/withdraw',
+  requireAuth,
+  requireRole('STUDENT'),
+  handle(async (req, res) => {
+    res.json({ proposal: await service.withdrawProposal(parseId(req.params.id, 'id'), req.user) });
+  }),
+);
+
 proposalsRouter.post(
   '/:id/approve',
   requireAuth,

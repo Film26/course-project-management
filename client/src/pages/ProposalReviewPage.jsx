@@ -106,6 +106,12 @@ export default function ProposalReviewPage({ courseId, onBack, onUnauthenticated
       setReloadKey((k) => k + 1);
     } catch (err) {
       if (err.status === 401) return onUnauthenticated();
+      // Lab 7 (AC-02-19): the team may have withdrawn the proposal while this list was open.
+      if (err.status === 409 && err.code === 'INVALID_TRANSITION') {
+        setActionError('This proposal is no longer submitted. The list has been refreshed.');
+        setReloadKey((k) => k + 1);
+        return;
+      }
       setActionError(err.message);
     } finally {
       setBusy(false);
