@@ -15,6 +15,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft of the full-product baseline: actors, scope, FR/BR/NFR, decisions |
 | 0.2 | 2026-11-10 | 67070507202 | Q-05 closed: theme and Sprint 1 roles confirmed from the registration sheet (Supervisor = Instructor); the Sprint 1 example itself was not available, so the scope is checked against the Deliverable 1 required outcome |
+| 0.3 | 2026-11-25 | 67070507202 | §8 adds D-08 (grading of the current version, release after the due date, release is final), approved in PR #47; FR-13 lists the milestone max score (closes gap G-04, change C-08) | F-04 and F-06 contracts |
 
 ---
 
@@ -82,7 +83,7 @@ IDs are stable. *Planned* = feature and sprint allocation (details in `docs/feat
 | **FR-10** | A Student can create a team in a course and receives a join code. | Student | F-03 / S2 |
 | **FR-11** | A Student can join a team using its join code. | Student | F-03 / S2 |
 | **FR-12** | A Student can leave their team while the team has no approved proposal. | Student | F-03 / S2 |
-| **FR-13** | An Instructor can create, edit and delete milestones (title, description, due date, weight %) for their course. | Instructor | F-04 / S2 |
+| **FR-13** | An Instructor can create, edit and delete milestones (title, description, due date, weight %, max score) for their course. | Instructor | F-04 / S2 |
 | **FR-14** | Students can view the milestones of their course with due dates and their team's submission status. | Student | F-04 / S2 |
 | **FR-15** | A team member can submit a deliverable (URL + note) for a milestone. | Student | F-05 / S2 |
 | **FR-16** | A team can resubmit before the due date; the latest version is current and previous versions are kept. | Student | F-05 / S2 |
@@ -149,6 +150,7 @@ IDs are stable. *Planned* = feature and sprint allocation (details in `docs/feat
 | D-05 | Proposal history: a rejected proposal stays stored; the team creates a new proposal. | Edit-in-place after rejection | Keeps decision history and reasons (FR-08, FR-22). |
 | D-06 | Deliverables submitted as **URLs**, not uploaded files. | Cloud Storage upload | Avoids file storage/virus scanning in the course timeframe; can be added later. |
 | D-07 | Same-origin deployment: Express serves the built React app and `/api` from one container. | Separate frontend hosting + CORS | Cookies stay same-origin; one Cloud Run service. |
+| D-08 | Only a team's **current** version of a milestone is graded or released; a grade is released only **after** the milestone due date; a released grade is final and the team cannot submit that milestone again. (Approved by 67070507216 in PR #47, 25 Nov 2026; F-06 contract v1.1.) | Grade any version; edit after release; change FR-16 | Students never see a grade change silently, a grade refers to the current work, and FR-16 (resubmit before the due date) stays unchanged. |
 
 ## 9. Questions and resolutions
 

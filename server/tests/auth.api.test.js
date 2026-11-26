@@ -23,9 +23,13 @@ beforeEach(async () => {
       name: 'Software Engineering',
       instructorId: instructorA.id,
       proposalDeadline: new Date('2026-12-31T16:59:59Z'),
-      teams: { create: { name: 'Team Alpha', members: { create: { userId: student.id } } } },
     },
   });
+  // F-03: a membership also records its course (BR-06), and members are enrolled in the course.
+  await prisma.team.create({
+    data: { name: 'Team Alpha', courseId: course.id, members: { create: { userId: student.id, courseId: course.id } } },
+  });
+  await prisma.enrollment.create({ data: { courseId: course.id, userId: student.id } });
 });
 
 afterAll(() => prisma.$disconnect());
@@ -182,9 +186,11 @@ describe('GET /api/courses/:courseId/roster — role and ownership', () => {
         {
           id: expect.any(Number),
           name: 'Team Alpha',
+          joinCode: expect.stringMatching(/^[A-HJ-NP-Z2-9]{8}$/), // F-01 contract v1.2 (F-03)
           members: [{ id: student.id, displayName: 'Student One', email: 'student1@cpms.test' }],
         },
       ],
+      unassigned: [], // F-01 contract v1.2 (F-03): enrolled students without a team
     });
 
     const cookieB = await login('inst-b@cpms.test');

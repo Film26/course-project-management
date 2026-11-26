@@ -3,6 +3,7 @@
 import { prisma } from '../db.js';
 import { ApiError } from '../errors.js';
 import { ACTIVE_STATUSES, canTransition, isBeforeDeadline } from './rules.js';
+import { hasMinimumSize, isMembershipLocked } from '../teams/rules.js';
 
 const proposalSelect = {
   id: true,
@@ -31,7 +32,7 @@ async function isMember(db, teamId, userId) {
 async function loadProposal(id) {
   const p = await prisma.proposal.findUnique({
     where: { id },
-    select: { id: true, status: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true } } } } },
+    select: { id: true, status: true, team: { select: { id: true, name: true, course: { select: { id: true, code: true, instructorId: true, proposalDeadline: true, minTeamSize: true } } } } },
   });
   if (!p) throw notFound('Proposal');
   return p;
@@ -79,6 +80,18 @@ export async function updateDraft(id, user, changes) {
   return findProposal(id);
 }
 
+/**
+ * BR-07 (F-03 T4, PR #59 review): lock the team row — the same lock F-03 join/leave take — and count the members
+ * inside the caller's transaction, so nobody can leave between the size check and the status change.
+ */
+async function requireMinimumSize(tx, teamId, min) {
+  await tx.$queryRaw`SELECT id FROM "Team" WHERE id = ${teamId} FOR UPDATE`;
+  const memberCount = await tx.teamMember.count({ where: { teamId } });
+  if (!hasMinimumSize(memberCount, min)) {
+    throw new ApiError(409, 'TEAM_TOO_SMALL', `The team needs at least ${min} members`, { memberCount, minTeamSize: min });
+  }
+}
+
 // FR-06, BR-02, BR-03: DRAFT → SUBMITTED before the course deadline.
 export async function submitProposal(id, user, now = new Date()) {
   const p = await loadForMember(id, user);
@@ -88,11 +101,15 @@ export async function submitProposal(id, user, now = new Date()) {
       proposalDeadline: p.team.course.proposalDeadline.toISOString(),
     });
   }
-  const { count } = await prisma.proposal.updateMany({
-    where: { id, status: 'DRAFT' },
-    data: { status: 'SUBMITTED', submittedAt: now },
+  // F-03 T4 / BR-07 (F-02 v1.3): after the transition and the deadline; count and write in one transaction (v1.5).
+  await prisma.$transaction(async (tx) => {
+    await requireMinimumSize(tx, p.team.id, p.team.course.minTeamSize);
+    const { count } = await tx.proposal.updateMany({
+      where: { id, status: 'DRAFT' },
+      data: { status: 'SUBMITTED', submittedAt: now },
+    });
+    if (count === 0) throw invalidTransition((await tx.proposal.findUnique({ where: { id }, select: { status: true } })).status, 'SUBMITTED');
   });
-  if (count === 0) throw invalidTransition((await loadProposal(id)).status, 'SUBMITTED');
   return findProposal(id);
 }
 
@@ -100,11 +117,16 @@ export async function submitProposal(id, user, now = new Date()) {
 export async function decideProposal(id, user, to, reason = null, now = new Date()) {
   const p = await loadForCourseInstructor(id, user);
   if (!canTransition(p.status, to)) throw invalidTransition(p.status, to);
-  const { count } = await prisma.proposal.updateMany({
-    where: { id, status: 'SUBMITTED' },
-    data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+  await prisma.$transaction(async (tx) => {
+    // BR-07 at approval (F-02 v1.5, PR #59 review): a member may leave while the proposal is SUBMITTED, so the size is
+    // checked again before APPROVED locks the membership (BR-08). Rejecting a too-small team stays possible.
+    if (to === 'APPROVED') await requireMinimumSize(tx, p.team.id, p.team.course.minTeamSize);
+    const { count } = await tx.proposal.updateMany({
+      where: { id, status: 'SUBMITTED' },
+      data: { status: to, decidedAt: now, decidedById: user.id, rejectReason: to === 'REJECTED' ? reason : null },
+    });
+    if (count === 0) throw invalidTransition((await tx.proposal.findUnique({ where: { id }, select: { status: true } })).status, to);
   });
-  if (count === 0) throw invalidTransition((await loadProposal(id)).status, to);
   return findProposal(id);
 }
 
@@ -144,21 +166,32 @@ export async function listCourseProposals(courseId, user, status) {
 }
 
 // FR-09: the student's own team in a course, with all its proposals (newest first).
+// F-03 (F-02 contract v1.3): not enrolled → 403; enrolled without a team → 404; adds join code, lock and size limits.
 export async function getMyTeam(courseId, user) {
   const course = await loadCourse(courseId);
+  const enrolled = await prisma.enrollment.findUnique({ where: { courseId_userId: { courseId, userId: user.id } } });
+  if (!enrolled) throw forbidden('You are not enrolled in this course');
+  const limits = await prisma.course.findUnique({ where: { id: courseId }, select: { minTeamSize: true, maxTeamSize: true } });
   const team = await prisma.team.findFirst({
     where: { courseId, members: { some: { userId: user.id } } },
     select: {
       id: true,
       name: true,
+      joinCode: true,
       members: { select: { user: { select: { id: true, displayName: true } } }, orderBy: { userId: 'asc' } },
       proposals: { select: proposalSelect, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
     },
   });
   if (!team) throw new ApiError(404, 'NOT_FOUND', 'You are not in a team for this course');
   return {
-    course: publicCourse(course),
-    team: { id: team.id, name: team.name, members: team.members.map((m) => m.user) },
+    course: { ...publicCourse(course), ...limits },
+    team: {
+      id: team.id,
+      name: team.name,
+      joinCode: team.joinCode,
+      locked: isMembershipLocked(team.proposals.map((p) => p.status)),
+      members: team.members.map((m) => m.user),
+    },
     proposals: team.proposals,
   };
 }
