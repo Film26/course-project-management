@@ -1,5 +1,5 @@
 Lab 7 GREEN evidence — withdraw a submitted proposal (Issue #74, F-02 contract v1.7)
-RED commit: 3a6d3e1 (tests only). GREEN: the next commit on lab7/withdraw-proposal (PR #77)
+RED commit: 3a6d3e1 (tests only). GREEN: 603b894 on lab7/withdraw-proposal (PR #77)
 Run: 2026-11-27 00:53 +0700, local PostgreSQL test DB cpms_test / E2E DB cpms_e2e
 Changed: server/src/proposals/rules.js, server/src/proposals/service.js, server/src/routes/proposals.js, client/src/pages/TeamProposalPage.jsx, client/src/pages/ProposalReviewPage.jsx
 
@@ -25,6 +25,17 @@ Changed: server/src/proposals/rules.js, server/src/proposals/service.js, server/
       Tests  242 passed (242)
 
 === npx playwright test (all E2E) ===
+  ok  1 e2e\audit.spec.js:37:1 › TEST-09-12 instructor rejects and approves; the audit log shows both decisions, newest first (1.9s)
+  ok  2 e2e\auth.spec.js:16:1 › TEST-01-13 instructor: invalid login → login → roster → logout (1.0s)
+  ok  3 e2e\auth.spec.js:45:1 › TEST-01-13b student: no roster button, and the API itself forbids the roster (AC-01-07) (616ms)
+  ok  4 e2e\grades.spec.js:48:1 › TEST-06-12 instructor grades Team Alpha M1, students see it only after release and only for their team (2.6s)
+  ok  5 e2e\milestones.spec.js:47:1 › TEST-04-12 instructor adds a milestone up to 100 %, is stopped at 101 %, edits it; student sees the list (1.7s)
+  ok  6 e2e\proposal.spec.js:41:1 › TEST-02-20 student submits → instructor rejects with reason → resubmit → instructor approves (3.0s)
+  ok  7 e2e\proposal.spec.js:99:1 › TEST-02-20b student of another team is forbidden by the API, not just the UI (AC-02-10, AC-02-11) (559ms)
+  ok  8 e2e\submissions.spec.js:43:1 › TEST-05-15 two members submit and resubmit M1; the instructor sees the current version per team (1.9s)
+  ok  9 e2e\teams.spec.js:36:1 › TEST-03-17 student5 creates a team, student6 joins with the code and leaves again (1.8s)
+  ok 10 e2e\withdraw.spec.js:49:1 › TEST-02-24 student withdraws a submitted proposal, edits it and submits again (AC-02-18) (1.7s)
+  ok 11 e2e\withdraw.spec.js:77:1 › TEST-02-25 instructor approves a proposal the team withdrew meanwhile → message, list refreshed (AC-02-19) (1.5s)
   11 passed (26.7s)
 
 Client build: npm run build -w client → built OK
