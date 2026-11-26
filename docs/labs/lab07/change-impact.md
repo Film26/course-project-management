@@ -4,7 +4,7 @@
 |---|---|
 | Team | 67070507202 น.ส.ทรรศน์วรรณ นามกา (Film26) · 67070507216 น.ส.จารุวรรณ อินคา (jaruwan18) |
 | Change request | Issue #74 — BR-03: add `SUBMITTED → DRAFT` (withdraw) by a team member before the deadline |
-| Approval | Course instructor — name and date: _to fill_ (instructor stated TA approval is not needed) |
+| Approval | **Approved verbally by the course instructor, อาจารย์สุเทพ** (stated that TA approval is not needed). Recorded by Film26 on 27 Nov 2026 in Issue #74, before the RED commit; no written message exists, and the exact date of the instructor's statement is as reported by Film26 |
 | Accepted Sprint 1 baseline | `v1.0-sprint1` → `18a3cd9` (old rule implemented here; UAT round 1 accepted on `c83a17a`) |
 | Actual pre-change implementation | `main` @ `ae801be` (`d2-candidate`), deployed `cpms-00007-zhs`; branch base `24a95a4` = same tree as `ae801be` |
 | Author / reviewer | Film26 / **jaruwan18 — reviews this document and the contract revision before any code is written** |
