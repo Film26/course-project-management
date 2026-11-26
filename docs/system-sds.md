@@ -13,6 +13,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | First draft: architecture, data model, UI/API conventions, access matrix, auth, configuration, deployment plan |
 | 0.2 | 2026-11-07 | 67070507202 | §5 F-02 rows now list the real endpoints from PR #6; §2.2 records how BR-01 is enforced |
+| 0.3 | 2026-11-25 | 67070507202 | §2.3 lists the Sprint 2/3 migrations with their status; §5 names the real Sprint 2/3 endpoints and the Enrollment-based student access (F-03) | Deliverable 2 Part D; contracts F-03 … F-09 |
 
 ---
 
@@ -95,7 +96,20 @@
 | **TeamMember** | teamId, userId | PK (teamId, userId); FKs cascade. **Owner of team data:** its members. |
 | **Proposal** | id, teamId, title, description, status (`DRAFT`/`SUBMITTED`/`APPROVED`/`REJECTED`), rejectReason?, submittedAt?, decidedAt?, decidedById?, createdAt, updatedAt | FK team (cascade); FK decidedBy → User; index teamId. **Readable by:** team members and the course instructor. BR-01 (one active proposal per team) is enforced in a transaction that locks the team row, not by a DB constraint. A partial unique index cannot be expressed in the Prisma schema (see the F-02 contract). |
 
-### 2.3 Entities and changes planned for Sprints 2–3 (each via a new migration)
+### 2.3 Entities and changes for Sprints 2–3 (each via a new migration)
+
+*Status v0.3 (25 Nov 2026):* **implemented** = migration exists and its tests pass on the named PR.
+
+| Migration | Entity / change | Status |
+|---|---|---|
+| `20261124164659_f04_milestones` | **Milestone** (CHECK weight 1–100, maxScore 1–1000) | implemented, merged (PR #48) |
+| `20261125060000_f03_team_formation` | **Enrollment** (courseId, userId); Course `minTeamSize`/`maxTeamSize` (CHECK); Team `joinCode` (UNIQUE, default `cpms_join_code()`); TeamMember `courseId` + UNIQUE (courseId, userId); back-fill of existing data | implemented (PR #56) |
+| `20261125090000_f09_audit_log` | **AuditEntry** (append-only: trigger refuses UPDATE; `teamId` without FK) | implemented, step A1 (PR #52) |
+| `20261125120000_f05_submissions` | **Submission** (UNIQUE milestoneId+teamId+version, CHECK version ≥ 1, milestone FK ON DELETE RESTRICT) | implemented (PR #57) |
+| `20261125150000_f06_grades` | **Grade** (UNIQUE submissionId, CHECK score ≥ 0) | implemented (PR #47) |
+| — | **PeerRating** (F-07) | planned (contract PR #54) |
+
+Original plan (v0.1), kept for history:
 
 | Change | Fields / constraints | For |
 |---|---|---|
@@ -175,9 +189,9 @@ Detailed endpoints are specified in each feature contract (`docs/sprints/sprint-
 |---|---|---|---|---|
 | Log in | `POST /api/auth/login` | ✔ | ✔ | public |
 | Current user / log out | `GET /api/auth/me`, `POST /api/auth/logout` | ✔ | ✔ | own session |
-| List my courses | `GET /api/courses` | own | own | instructor: teaches course; student: member of a team in it |
+| List my courses | `GET /api/courses` | own | own | instructor: teaches course; student: **enrolled** in it (v0.3, F-03) |
 | View course roster | `GET /api/courses/:id/roster` | own | ✘ | `course.instructorId = me` |
-| View my team in a course | `GET /api/courses/:courseId/my-team` | ✘ | own | member of a team in the course |
+| View my team in a course | `GET /api/courses/:courseId/my-team` | ✘ | own | enrolled (403 otherwise); 404 when enrolled without a team |
 | Create draft proposal | `POST /api/teams/:teamId/proposals` | ✘ | own | member of the team (BR-01, BR-05) |
 | Edit draft proposal | `PATCH /api/proposals/:id` | ✘ | own | member of the team; only `DRAFT` |
 | Submit proposal | `POST /api/proposals/:id/submit` | ✘ | own | member of the team (BR-02, BR-03) |
@@ -185,14 +199,15 @@ Detailed endpoints are specified in each feature contract (`docs/sprints/sprint-
 | List course proposals | `GET /api/courses/:courseId/proposals` | own | ✘ | instructor of the course |
 | Approve proposal | `POST /api/proposals/:id/approve` | own | ✘ | instructor of the course (BR-03) |
 | Reject proposal | `POST /api/proposals/:id/reject` | own | ✘ | instructor of the course (BR-03, BR-04) |
-| Create / join / leave team | S2 (F-03) | ✘ | ✔ / own | BR-06…BR-08 |
-| Manage milestones | S2 (F-04) | own | ✘ | instructor of the course |
-| View milestones | S2 (F-04) | own | own | course member |
-| Submit deliverable | S2 (F-05) | ✘ | own | team member, BR-10/11 |
-| Grade / release | S2 (F-06) | own | ✘ | instructor of the course |
-| View released grades | S2 (F-06) | own | own | team member, only after release |
+| Create / join / leave team | `POST /api/courses/:courseId/teams`, `…/teams/join`, `POST /api/teams/:teamId/leave` | ✘ | own | enrolled; member for leave; BR-06…BR-08 |
+| Manage milestones | `POST /api/courses/:courseId/milestones`, `PATCH`/`DELETE /api/milestones/:id` | own | ✘ | instructor of the course; BR-09 |
+| View milestones | `GET /api/courses/:courseId/milestones` | own | own | instructor of the course; enrolled student |
+| Submit deliverable / view versions | `POST`/`GET /api/milestones/:id/submissions` | view all teams (own course) | own team | team member, BR-10/11 |
+| Grade / release | `PUT /api/submissions/:id/grade`, `POST …/grade/release` | own | ✘ | instructor of the course; D-08 |
+| View released grades | `GET /api/courses/:courseId/my-grades` | ✘ | own | team member, only after release (BR-12) |
 | Peer evaluation | S3 (F-07) | view aggregates (own course) | own ratings only | BR-13 |
-| Dashboard, audit log | S3 (F-08, F-09) | own | ✘ | instructor of the course |
+| Audit log | `GET /api/courses/:courseId/audit` | own | ✘ | instructor of the course (F-09 A1) |
+| Dashboard | S3 (F-08, contract merged in PR #50) | own | ✘ | instructor of the course |
 
 **A hidden frontend control is not authorization.** Every row above is enforced by middleware/route code and verified by API tests that call the endpoint directly (e.g. TEST-01-11, TEST-01-12).
 

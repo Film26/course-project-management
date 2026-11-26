@@ -151,4 +151,11 @@ Rules enforced by the API: the weights of a course add up to at most 100 % (exac
 1–100 and max score 1–1000 as whole numbers, and only the course instructor can change milestones
 (see `docs/sprints/sprint-2/F-04-milestones.md`).
 
+### Sprint 3 journey: audit log (F-09, step A1)
+
+Log in as `instructor1@cpms.test` → approve or reject a submitted proposal → **Audit log**: every decision is
+listed newest first with the instructor, the team and the reject reason; filter by action, **Load more** for older
+entries. A decision and its audit entry are saved together or not at all, and entries cannot be edited
+(see `docs/sprints/sprint-3/F-09-audit.md`).
+
 Never commit `server/.env` / `server/.env.test` or any real password.

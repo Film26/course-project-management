@@ -1,0 +1,106 @@
+# F-09 (step A1) TDD GREEN run
+# branch: feature/F-09-audit  RED commit: 97069d9 (tests unchanged since RED)  GREEN: 3bca213 (implementation); CI: RED run 45560963405 failed, GREEN run 45561424547 passed
+# date: 2026-11-25T13:32:34+07:00
+# command: cd server && npx vitest run --reporter=verbose   (whole backend suite: F-09 + F-01/F-02 regression)
+# note: the 'INTERNAL_ERROR' log line during TEST-09-06 is the injected audit failure the test expects
+
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-05 a team member creates a DRAFT for their own team; client-supplied status/teamId are ignored (AC-02-01) 162ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-06 a second active proposal is rejected while DRAFT, SUBMITTED or APPROVED exists (AC-02-02, BR-01) 95ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-07 after a rejection the team may create a new proposal and the rejected one is kept (AC-02-02, D-05) 75ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-08 concurrent creates for the same team store exactly one proposal (AC-02-02, NFR-06) 230ms
+ ✓ tests/proposal.api.test.js > create proposal — POST /api/teams/:teamId/proposals > TEST-02-09 invalid input → 400 VALIDATION_ERROR naming the fields, nothing stored or changed (AC-02-03) 87ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-10 a DRAFT can be edited; a SUBMITTED proposal cannot (AC-02-04) 80ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-11 a member submits a DRAFT before the deadline → SUBMITTED with submittedAt (AC-02-05) 72ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-12 submit after the course deadline → 409 DEADLINE_PASSED, still DRAFT (AC-02-06, BR-02) 74ms
+ ✓ tests/proposal.api.test.js > edit and submit — PATCH /api/proposals/:id, POST /api/proposals/:id/submit > TEST-02-13 transitions outside the state machine → 409 INVALID_TRANSITION, status unchanged (AC-02-07, BR-03) 101ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-14 the course instructor approves a SUBMITTED proposal; decider and time are stored (AC-02-08) 86ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-15 reject needs a reason of 1–500 chars; invalid reasons change nothing (AC-02-09, BR-04) 89ms
+ ✓ tests/proposal.api.test.js > decide — POST /api/proposals/:id/approve | reject > TEST-02-15b Issue #36 (UAT-06c): reject with an empty or blank reason → 400, proposal stays SUBMITTED (AC-02-09, BR-04) 77ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-16 a non-member student and an instructor cannot create, read, edit or submit a team proposal (AC-02-10) 129ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-17 students cannot list or decide; an instructor of another course cannot read, list or decide (AC-02-11) 100ms
+ ✓ tests/proposal.api.test.js > access control (BR-05, NFR-02, NFR-03) > TEST-02-18 every F-02 endpoint rejects requests without a session (AC-02-12) 66ms
+ ✓ tests/proposal.api.test.js > view proposals (FR-07, FR-09) > TEST-02-19 members see their team and decisions; the instructor lists and filters the course (AC-02-13) 130ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-03 approving stores one PROPOSAL_APPROVED entry with actor, team, proposal id and title (AC-09-01) 273ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-04 rejecting stores one PROPOSAL_REJECTED entry that contains the reason (AC-09-02) 77ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-05 a decision request that is refused stores no entry (AC-09-03) 97ms
+ ✓ tests/audit.api.test.js > recording proposal decisions (A1) > TEST-09-06 if the audit entry cannot be written, the decision is rolled back (AC-09-04, L1) 101ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-07 newest first, filtered by action, paged with limit and before; invalid query → 400 (AC-09-05) 151ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-08 only the course instructor reads the log (AC-09-06) 106ms
+ ✓ tests/audit.api.test.js > reading the log — GET /api/courses/:courseId/audit (FR-22) > TEST-09-09 an entry cannot be changed in the database (AC-09-07, L2) 68ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-04 valid credentials → 200, user only, HttpOnly cookie, hashed session token (AC-01-01, AC-01-09) 135ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-05 wrong password and unknown email → identical 401, no cookie, no session (AC-01-02) 62ms
+ ✓ tests/auth.api.test.js > POST /api/auth/login > TEST-01-06 missing / empty fields → 400 VALIDATION_ERROR naming the fields (AC-01-03) 50ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-07 identity comes from the session, client-supplied id/role are ignored (AC-01-04) 56ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-08 no cookie or an unknown token → 401 without private data (AC-01-05) 62ms
+ ✓ tests/auth.api.test.js > GET /api/auth/me > TEST-01-09 an expired session → 401 (AC-01-05, NFR-04) 55ms
+ ✓ tests/auth.api.test.js > POST /api/auth/logout > TEST-01-10 logout revokes the session; the old cookie no longer works (AC-01-06) 64ms
+ ✓ tests/auth.api.test.js > GET /api/courses — list scoped to the current user > TEST-01-14 instructor sees courses they teach; student sees courses of their team; other instructor sees none (AC-01-11) 75ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-11 a STUDENT is forbidden (AC-01-07) 58ms
+ ✓ tests/auth.api.test.js > GET /api/courses/:courseId/roster — role and ownership > TEST-01-12 owning instructor 200; other instructor 403; unknown course 404 (AC-01-08) 75ms
+ ✓ tests/health.test.js > baseline > GET /api/health returns ok 25ms
+ ✓ tests/health.test.js > baseline > unknown API route returns the standard error shape 4ms
+ ✓ tests/health.test.js > baseline > test database is migrated and writable 188ms
+ ✓ tests/deploy.test.js > readiness and version (smoke test endpoints) > GET /api/ready reports the database as connected 180ms
+ ✓ tests/deploy.test.js > readiness and version (smoke test endpoints) > GET /api/version returns the commit the build came from 4ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > serves index.html at / and for any non-API path (single-page app) 13ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > unknown /api routes still return the JSON 404, never the UI 4ms
+ ✓ tests/deploy.test.js > serving the built UI from the same origin (container mode) > without CLIENT_DIST_DIR (local dev) the API does not serve the UI 3ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > defaults to 50 entries, no cursor, no filter 1ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > accepts the limit boundaries 1 and 100, a cursor and a known action 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "0" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "101" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "x" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects limit = "2.5" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "-1" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "0" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects before = "abc" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects action = "BOGUS" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-01 parseAuditQuery (AC-09-05) > rejects action = "proposal_rejected" and names the field 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > proposal approved: title only 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > proposal rejected: title and reason 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > membership actions: team name only (A2) 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > grade released: milestone title, score and max score (A3) 0ms
+ ✓ tests/audit.unit.test.js > TEST-09-02 buildDetails keeps only the whitelisted fields (L3) > an unknown action is a programming error 1ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is active when not revoked and expiresAt is in the future 1ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is expired exactly at expiresAt (boundary) 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive once revoked, even before expiry 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-01 isSessionActive (AC-01-05, rule R2) > is inactive for a missing session 0ms
+ ✓ tests/auth.unit.test.js > TEST-01-02 password hashing (AC-01-09) > stores a bcrypt hash, not the plaintext, and verifies correctly 5ms
+ ✓ tests/auth.unit.test.js > TEST-01-03 session token hashing (AC-01-09, rule R3) > produces a random token and a deterministic SHA-256 hex hash 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → DRAFT is rejected 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → SUBMITTED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → APPROVED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → REJECTED is allowed 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → DRAFT is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → SUBMITTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → APPROVED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → REJECTED is rejected 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > rejects unknown statuses 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > allows submission 1 ms before the deadline 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > allows submission exactly at the deadline (boundary) 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-02 isBeforeDeadline (AC-02-05, AC-02-06, BR-02) > rejects submission 1 ms after the deadline 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-03 isActiveStatus (AC-02-02, BR-01) > treats DRAFT, SUBMITTED and APPROVED as active and REJECTED as inactive 1ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > requires title and description on create 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > rejects blank strings and non-strings 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > enforces the 120-char title and 5000-char description limits 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > returns trimmed values and ignores unknown fields 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > partial (edit) mode accepts one field but requires at least one 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > reject reason: required, trimmed, at most 500 characters 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > Issue #36 (UAT-06c): an empty or blank reject reason is refused with "Reason is required" (AC-02-09, BR-04) 0ms
+ ✓ tests/proposal.unit.test.js > TEST-02-04 input validation (AC-02-03, AC-02-09, BR-04) > status filter: optional, must be a known status 0ms
+ Test Files  8 passed (8)
+      Tests  92 passed (92)
+   Duration  10.04s (transform 138ms, setup 79ms, collect 1.71s, tests 3.67s, environment 1ms, prepare 803ms)
+
+# E2E: npx playwright test (repo root)
+  ok TEST-09-12 instructor rejects and approves; the audit log shows both decisions, newest first
+  ok TEST-01-13, TEST-01-13b, TEST-02-20, TEST-02-20b (regression)
+  5 passed — screenshots: docs/sprints/sprint-3/evidence/screenshots/F09-*.png

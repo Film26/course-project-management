@@ -14,6 +14,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-07 | 67070507202 | Initial inventory F-01 to F-09 and system responsibilities SR-01 to SR-04 |
 | 0.2 | 2026-11-09 | 67070507202 | SR-03: records the NFR-07 README run (21 min 36 s, not met, fix in S2), aligned with `traceability.md` (PR #9 and PR #12 reviews) |
+| 0.3 | 2026-11-25 | 67070507202 | Status column of F-03 … F-09 updated to the PRs and contract versions; status words as in `traceability.md` v0.6 | Deliverable 2 Part D |
 
 ---
 
@@ -25,13 +26,13 @@ Status key: **Done** = merged into `sprint-1` with passing tests · **Planned** 
 |---|---|---|---|---|---|---|
 | **F-01** | Authentication & role-based access | Login, logout and current user through server-side sessions. Instructor/Student roles, backend role and ownership checks. Instructors see the roster of the courses they teach. | FR-01, FR-02, FR-03, FR-04 · NFR-01, NFR-02, NFR-03, NFR-04 | Baseline scaffold (data model, seed) | **1** | Done: `docs/sprints/sprint-1/F-01-auth.md` (v1.1), PR #3 |
 | **F-02** | Project proposal workflow | A Student creates a draft proposal for their team, edits it and submits it. The course Instructor lists the proposals, then approves them or rejects them with a reason. State machine `DRAFT → SUBMITTED → APPROVED / REJECTED`. | FR-05, FR-06, FR-07, FR-08, FR-09 · BR-01, BR-02, BR-03, BR-04, BR-05 · NFR-02, NFR-03, NFR-05, NFR-06, NFR-09 | F-01 | **1** | Done: `docs/sprints/sprint-1/F-02-proposal.md` (v1.2), PR #6 |
-| **F-03** | Team formation | A Student creates a team (gets a join code), joins or leaves one. Team-size limits apply, and membership locks once the proposal is approved. Seeded teams are replaced by teams the students form themselves. | FR-10, FR-11, FR-12 · BR-06, BR-07, BR-08 | F-01, F-02 (BR-07 adds a minimum-size check to F-02 submit; BR-08 reads proposal status) | **2** | Planned |
-| **F-04** | Course milestones | The Instructor creates, edits and deletes milestones (title, due date, weight, max score). Students see the milestones and their team's status for each. | FR-13, FR-14 · BR-09 | F-01 | **2** | Planned |
-| **F-05** | Deliverable submission | A team member submits a URL and a note for a milestone. Resubmitting keeps the version history, and late work is flagged `LATE`. | FR-15, FR-16 · BR-10, BR-11 | F-02 (approved proposal), F-04 | **2** | Planned |
-| **F-06** | Grading & feedback | The Instructor scores a submission, writes feedback and releases the grade. The team sees only released grades. | FR-17, FR-18 · BR-12 | F-05 | **2** | Planned |
-| **F-07** | Peer evaluation | A Student rates each teammate (1–5 + comment) once per milestone. The Instructor sees per-student averages. | FR-19, FR-20 · BR-13 | F-03, F-04 | **3** | Planned |
-| **F-08** | Course dashboard | Per-team overview for the Instructor: proposal status, submissions, late count and released grades. | FR-21 · NFR-10 | F-02, F-05, F-06 | **3** | Planned |
-| **F-09** | Audit log | Records proposal decisions, grade releases and membership changes. The course Instructor can view the log. | FR-22 | F-02, F-03, F-06 | **3** | Planned |
+| **F-03** | Team formation | A Student creates a team (gets a join code), joins or leaves one. Team-size limits apply, and membership locks once the proposal is approved. Seeded teams are replaced by teams the students form themselves. | FR-10, FR-11, FR-12 · BR-06, BR-07, BR-08 | F-01, F-02 (BR-07 adds a minimum-size check to F-02 submit; BR-08 reads proposal status) | **2** | Implemented (PR #56): `docs/sprints/sprint-2/F-03-teams.md` v1.2 |
+| **F-04** | Course milestones | The Instructor creates, edits and deletes milestones (title, due date, weight, max score). Students see the milestones and their team's status for each. | FR-13, FR-14 · BR-09 | F-01 | **2** | Done, merged (PR #48): `docs/sprints/sprint-2/F-04-milestones.md` v1.5 |
+| **F-05** | Deliverable submission | A team member submits a URL and a note for a milestone. Resubmitting keeps the version history, and late work is flagged `LATE`. | FR-15, FR-16 · BR-10, BR-11 | F-02 (approved proposal), F-04 | **2** | Implemented (PR #57): `docs/sprints/sprint-2/F-05-submissions.md` v1.3 |
+| **F-06** | Grading & feedback | The Instructor scores a submission, writes feedback and releases the grade. The team sees only released grades. | FR-17, FR-18 · BR-12 | F-05 | **2** | Implemented (PR #47): `docs/sprints/sprint-2/F-06-grading.md` v1.2 |
+| **F-07** | Peer evaluation | A Student rates each teammate (1–5 + comment) once per milestone. The Instructor sees per-student averages. | FR-19, FR-20 · BR-13 | F-03, F-04 | **3** | Contract (PR #54): `docs/sprints/sprint-3/F-07-peer-eval.md` v1.0 |
+| **F-08** | Course dashboard | Per-team overview for the Instructor: proposal status, submissions, late count and released grades. | FR-21 · NFR-10 | F-02, F-05, F-06 | **3** | Contract merged (PR #50): `docs/sprints/sprint-3/F-08-dashboard.md` v1.1 |
+| **F-09** | Audit log | Records proposal decisions, grade releases and membership changes. The course Instructor can view the log. | FR-22 | F-02, F-03, F-06 | **3** | Step A1 implemented (PR #52): `docs/sprints/sprint-3/F-09-audit.md` v1.1; A2/A3 planned |
 
 ## 2. Cross-cutting system responsibilities
 

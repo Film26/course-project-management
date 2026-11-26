@@ -1,0 +1,14 @@
+# Sprint integration check: sprint-2 merged into sprint-3 (Sprint 1 + Sprint 2 + Sprint 3 work together)
+# branch: sync/sprint-2-into-sprint-3  date: 2026-11-25T23:54:42+07:00
+# conflicts resolved by keeping both sides: README, App.jsx, HomePage.jsx, app.js, proposals/service.js (audit + BR-07),
+#   schema.prisma (AuditEntry + Enrollment/Milestone/Submission/Grade), tests/helpers/db.js, F-02 contract rows v1.3 then v1.4
+# integration fix: tests/audit.api.test.js memberships carry courseId (F-03 schema)
+# migrations applied in order on a fresh database: 20261107000000_init 20261124164659_f04_milestones 20261125060000_f03_team_formation 20261125090000_f09_audit_log 20261125120000_f05_submissions 20261125150000_f06_grades 
+
+# command: cd server && npx vitest run   (2 runs)
+ Test Files 16 passed (16)  Tests 229 passed (229) 
+ Test Files 16 passed (16)  Tests 229 passed (229) 
+
+# command: npx playwright test — 9 passed (26.8s)
+#   TEST-09-12, TEST-01-13, TEST-01-13b, TEST-06-12, TEST-04-12, TEST-02-20, TEST-02-20b, TEST-05-15, TEST-03-17
+#   Sprint 1 continuity: TEST-01-13, TEST-01-13b, TEST-02-20, TEST-02-20b pass on the integrated code

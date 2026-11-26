@@ -34,6 +34,7 @@ model User {
   coursesTaught    Course[]     @relation("CourseInstructor")
   enrollments      Enrollment[]
   decidedProposals Proposal[]   @relation("ProposalDecider")
+  auditEntries     AuditEntry[]
   submissions      Submission[]
   grades           Grade[]
 }
@@ -63,6 +64,7 @@ model Course {
   minTeamSize      Int          @default(2)
   maxTeamSize      Int          @default(3)
   teams            Team[]
+  auditEntries     AuditEntry[]
   milestones       Milestone[]
   enrollments      Enrollment[]
   memberships      TeamMember[]
@@ -125,6 +127,33 @@ model Proposal {
   updatedAt    DateTime       @updatedAt
 
   @@index([teamId])
+}
+
+// F-09 (FR-22): append-only audit log. Each entry is written in the same transaction as the change it
+// records (L1). A trigger in the migration rejects UPDATE (L2). teamId has no FK on purpose: an entry keeps
+// the id of a team that is deleted later (F-03 T6); the team name is kept in details.
+enum AuditAction {
+  PROPOSAL_APPROVED
+  PROPOSAL_REJECTED
+  TEAM_CREATED
+  MEMBER_JOINED
+  MEMBER_LEFT
+  GRADE_RELEASED
+}
+
+model AuditEntry {
+  id        Int         @id @default(autoincrement())
+  courseId  Int
+  course    Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  actorId   Int
+  actor     User        @relation(fields: [actorId], references: [id])
+  teamId    Int?
+  action    AuditAction
+  entityId  Int
+  details   Json
+  createdAt DateTime    @default(now())
+
+  @@index([courseId, createdAt])
 }
 
 // F-04 (FR-13, BR-09): course milestones. weight is an integer percentage; the course total ≤ 100 is
