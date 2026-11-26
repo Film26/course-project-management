@@ -1,0 +1,20 @@
+# PR #59 review fixes (jaruwan18, 25 Nov) — RED run on sprint-2 head d087a37 + new tests only
+# date: 2026-11-26T05:26:47+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/team.api.test.js tests/grade.api.test.js   (3 runs, same result)
+# note: TEST-03-17b first failed with 400 because the test used the join code SOLO2345 (O is not allowed); fixed to SKYW2345 before this RED run.
+
+ × tests/team.api.test.js > BR-07 on approval — PR #59 review (F-03 v1.3, F-02 v1.5) > TEST-03-13b a member leaves after submit; approving the now too-small team → 409 TEAM_TOO_SMALL, proposal stays SUBMITTED (AC-03-09) 118ms
+ × tests/team.api.test.js > BR-07 on approval — PR #59 review (F-03 v1.3, F-02 v1.5) > TEST-03-17b a join racing the deletion of an empty team gives 200 or 404, never 500 (PR #59 review point 3) 151ms
+ × tests/grade.api.test.js > concurrency (G8, AC-06-10) > TEST-06-13c a grade racing a maxScore decrease never leaves a score above maxScore (G6, PR #59 review point 4) 178ms
+AssertionError: run 1: expected 90 to be less than or equal to 80
+AssertionError: expected 200 to be 409 // Object.is equality
+AssertionError: run 1: expected [ 200, 404 ] to include 500
+ Test Files  2 failed (2)
+      Tests  3 failed | 25 passed (28)
+
+# GREEN run (this commit), whole backend suite, 3 runs
+# run 1:  Tests 210 passed (210)
+# run 2:  Tests 210 passed (210)
+# run 3:  Tests 210 passed (210)
+# E2E (npx playwright test):   8 passed (22.8s)
+# fixes: proposals/service.js requireMinimumSize (team row lock) on submit and approve; teams/service.js joinTeam 404 when the locked team is gone; grades/service.js maxScore FOR SHARE in saveGrade

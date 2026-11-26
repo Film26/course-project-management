@@ -15,6 +15,9 @@ beforeEach(async () => {
   await resetDb();
   student1 = await createUser({ email: 'student1@cpms.test', displayName: 'Student One' });
   const student3 = await createUser({ email: 'student3@cpms.test', displayName: 'Student Three' });
+  // BR-07 at approval (F-02 v1.5): teams need minTeamSize (2) members to be approved, so each team has two.
+  const student2 = await createUser({ email: 'student2@cpms.test', displayName: 'Student Two' });
+  const student4 = await createUser({ email: 'student4@cpms.test', displayName: 'Student Four' });
   instructor1 = await createUser({ email: 'instructor1@cpms.test', role: 'INSTRUCTOR', displayName: 'Instructor One' });
   instructor2 = await createUser({ email: 'instructor2@cpms.test', role: 'INSTRUCTOR', displayName: 'Instructor Two' });
 
@@ -25,8 +28,8 @@ beforeEach(async () => {
     data: { code: 'CPE999', name: 'Other Course', instructorId: instructor2.id, proposalDeadline: new Date(Date.now() + 30 * DAY) },
   });
   // Sync with sprint-2 (F-03): a membership records its course (BR-06 unique per course).
-  alpha = await prisma.team.create({ data: { name: 'Team Alpha', courseId: course.id, members: { create: [{ userId: student1.id, courseId: course.id }] } } });
-  beta = await prisma.team.create({ data: { name: 'Team Beta', courseId: course.id, members: { create: [{ userId: student3.id, courseId: course.id }] } } });
+  alpha = await prisma.team.create({ data: { name: 'Team Alpha', courseId: course.id, members: { create: [student1, student2].map((u) => ({ userId: u.id, courseId: course.id })) } } });
+  beta = await prisma.team.create({ data: { name: 'Team Beta', courseId: course.id, members: { create: [student3, student4].map((u) => ({ userId: u.id, courseId: course.id })) } } });
 });
 
 afterAll(() => prisma.$disconnect());
