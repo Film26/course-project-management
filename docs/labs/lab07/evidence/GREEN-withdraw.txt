@@ -1,0 +1,30 @@
+Lab 7 GREEN evidence — withdraw a submitted proposal (Issue #74, F-02 contract v1.7)
+RED commit: 3a6d3e1 (tests only). GREEN: the next commit on lab7/withdraw-proposal (PR #77)
+Run: 2026-11-27 00:53 +0700, local PostgreSQL test DB cpms_test / E2E DB cpms_e2e
+Changed: server/src/proposals/rules.js, server/src/proposals/service.js, server/src/routes/proposals.js, client/src/pages/TeamProposalPage.jsx, client/src/pages/ProposalReviewPage.jsx
+
+=== npm test -w server (full suite, includes all regression tests) ===
+ ✓ tests/proposal.withdraw.test.js (6 tests) 798ms
+ ✓ tests/proposal.unit.test.js (29 tests) 5ms
+ ✓ tests/team.api.test.js (16 tests) 2655ms
+ ✓ tests/proposal.api.test.js (16 tests) 2064ms
+ ✓ tests/grade.api.test.js (12 tests) 2314ms
+ ✓ tests/milestone.api.test.js (13 tests) 1885ms
+ ✓ tests/submission.api.test.js (10 tests) 1461ms
+ ✓ tests/audit.api.test.js (10 tests) 1440ms
+ ✓ tests/auth.api.test.js (10 tests) 966ms
+ ✓ tests/health.test.js (3 tests) 131ms
+ ✓ tests/deploy.test.js (5 tests) 93ms
+ ✓ tests/auth.unit.test.js (6 tests) 9ms
+ ✓ tests/milestone.unit.test.js (33 tests) 6ms
+ ✓ tests/submission.unit.test.js (18 tests) 5ms
+ ✓ tests/audit.unit.test.js (16 tests) 5ms
+ ✓ tests/grade.unit.test.js (15 tests) 4ms
+ ✓ tests/team.unit.test.js (24 tests) 6ms
+ Test Files  17 passed (17)
+      Tests  242 passed (242)
+
+=== npx playwright test (all E2E) ===
+  11 passed (26.7s)
+
+Client build: npm run build -w client → built OK
