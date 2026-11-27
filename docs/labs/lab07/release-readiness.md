@@ -12,8 +12,8 @@
 | Test change (RED) | `3a6d3e1` | 7 unit/API + 2 E2E fail on the old code |
 | Fix (GREEN) | `603b894`; evidence `e1cda39` | 242/242, E2E 11/11 |
 | Merged to `sprint-3` | `c6c4b62` (PR #77) | |
-| `staging` | PR #78 → `_after merge_` | code review by jaruwan18 on #78 (approved 26 Nov 18:15 UTC) |
-| Accepted `main` release | PR `#__` → `_____`, tag `v2.1-lab7` | *to fill after merge* |
+| `staging` | PR #78 → `d804f3a` (27 Nov 06:15 UTC) | code review by jaruwan18 on #78 (approved 26 Nov 18:15 UTC) |
+| Accepted `main` release | PR #79 → `_____`, tag `v2.1-lab7` | *to fill after merge* |
 | Deployed revision | `cpms-000__-___` | *to fill after deploy* |
 
 Merge-commit differences: `staging`/`main` receive merge commits only; the tree of the `main` release equals `c6c4b62` plus those merges. Unrelated later-sprint changes in the window: none — `staging...sprint-3` contained only the 19 Lab 7 files (checked in the #78 review).
