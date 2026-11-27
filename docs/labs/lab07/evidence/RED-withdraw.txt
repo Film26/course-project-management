@@ -1,0 +1,53 @@
+Lab 7 RED evidence — withdraw a submitted proposal (Issue #74, F-02 contract v1.7)
+Code under test: pre-change implementation, branch lab7/withdraw-proposal @ 3182796 (server/ client/ identical to main ae801be / d2-candidate; only docs differ)
+Run: 2026-11-27 00:42 +0700, local PostgreSQL test DB cpms_test / E2E DB cpms_e2e
+Expected: every new or revised test fails because withdraw does not exist yet; all other tests pass.
+
+=== npx vitest run tests/proposal.unit.test.js tests/proposal.withdraw.test.js ===
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-21 a member withdraws a SUBMITTED proposal, edits it and submits it again (AC-02-15) 189ms
+     → expected 404 to be 200 // Object.is equality
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (a) service boundary: now = deadline → DRAFT; deadline + 1 ms → 409 DEADLINE_PASSED, unchanged (AC-02-15, AC-02-16) 88ms
+     → expected 'undefined' to be 'function' // Object.is equality
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (b) API: deadline in 1 minute → 200; 1 minute ago → 409 DEADLINE_PASSED, unchanged (AC-02-15, AC-02-16) 95ms
+     → expected 404 to be 200 // Object.is equality
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (c) only a SUBMITTED proposal can be withdrawn: DRAFT, APPROVED, REJECTED → 409 INVALID_TRANSITION (AC-02-16) 93ms
+     → DRAFT: expected 404 to be 409 // Object.is equality
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-23 course instructor, other instructor, other team → 403; no session → 401; unchanged (AC-02-17) 92ms
+     → inst-a@cpms.test: expected 404 to be 403 // Object.is equality
+   × withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-25 (API) approve or reject after the team withdrew → 409 INVALID_TRANSITION, still DRAFT, no audit entry (AC-02-19) 96ms
+     → expected 404 to be 200 // Object.is equality
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → DRAFT is rejected 1ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → SUBMITTED is allowed 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → APPROVED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > DRAFT → REJECTED is rejected 0ms
+   × TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → DRAFT is allowed 9ms
+     → expected false to be true // Object.is equality
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → SUBMITTED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → APPROVED is allowed 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → REJECTED is allowed 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → DRAFT is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → SUBMITTED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → APPROVED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > APPROVED → REJECTED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → DRAFT is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → SUBMITTED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → APPROVED is rejected 0ms
+   ✓ TEST-02-01 canTransition (AC-02-07, BR-03) > REJECTED → REJECTED is rejected 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/proposal.unit.test.js > TEST-02-01 canTransition (AC-02-07, BR-03) > SUBMITTED → DRAFT is allowed
+     22|       it(`${from} → ${to} is ${expected ? 'allowed' : 'rejected'}`, ()…
+ FAIL  tests/proposal.withdraw.test.js > withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (a) service boundary: now = deadline → DRAFT; deadline + 1 ms → 409 DEADLINE_PASSED, unchanged (AC-02-15, AC-02-16)
+ FAIL  tests/proposal.withdraw.test.js > withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (b) API: deadline in 1 minute → 200; 1 minute ago → 409 DEADLINE_PASSED, unchanged (AC-02-15, AC-02-16)
+ FAIL  tests/proposal.withdraw.test.js > withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-22 (c) only a SUBMITTED proposal can be withdrawn: DRAFT, APPROVED, REJECTED → 409 INVALID_TRANSITION (AC-02-16)
+ FAIL  tests/proposal.withdraw.test.js > withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-23 course instructor, other instructor, other team → 403; no session → 401; unchanged (AC-02-17)
+ FAIL  tests/proposal.withdraw.test.js > withdraw — POST /api/proposals/:id/withdraw (Lab 7, BR-03 v0.4) > TEST-02-25 (API) approve or reject after the team withdrew → 409 INVALID_TRANSITION, still DRAFT, no audit entry (AC-02-19)
+    165|   it('TEST-02-25 (API) approve or reject after the team withdrew → 409…
+ Test Files  2 failed (2)
+      Tests  7 failed | 28 passed (35)
+
+=== npx playwright test e2e/withdraw.spec.js ===
+    Error: locator.click: Test timeout of 30000ms exceeded.
+      - waiting for getByRole('button', { name: 'Withdraw submission' })
+    Error: locator.click: Test ended.
+      - waiting for getByRole('button', { name: 'Withdraw submission' })
+  2 failed
