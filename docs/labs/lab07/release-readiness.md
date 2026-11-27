@@ -13,8 +13,8 @@
 | Fix (GREEN) | `603b894`; evidence `e1cda39` | 242/242, E2E 11/11 |
 | Merged to `sprint-3` | `c6c4b62` (PR #77) | |
 | `staging` | PR #78 → `d804f3a` (27 Nov 06:15 UTC) | code review by jaruwan18 on #78 (approved 26 Nov 18:15 UTC) |
-| Accepted `main` release | PR #79 → `_____`, tag `v2.1-lab7` | *to fill after merge* |
-| Deployed revision | `cpms-000__-___` | *to fill after deploy* |
+| Accepted `main` release | PR #79 → **`f0142cd`**, tag **`v2.1-lab7`** | approved by jaruwan18 27 Nov 12:44 UTC; merged 27 Nov 18:10 UTC (merge commit) |
+| Deployed revision | **`cpms-00008-vtz`** (100 % traffic) | Deploy demo run 46047397951, success 18:13 UTC; `/api/version` → `f0142cd` |
 
 Merge-commit differences: `staging`/`main` receive merge commits only; the tree of the `main` release equals `c6c4b62` plus those merges. Unrelated later-sprint changes in the window: none — `staging...sprint-3` contained only the 19 Lab 7 files (checked in the #78 review).
 
@@ -22,16 +22,16 @@ Merge-commit differences: `staging`/`main` receive merge commits only; the tree 
 
 | Check | Result | Evidence |
 |---|---|---|
-| Submitted / deployed version | `main` `_____` / `cpms-000__` | Part B release record |
-| Approved change works (withdraw) | Auto: TEST-02-21 … 02-25 pass (CI run 45873332862 for API/DB; E2E local). Post-deploy: *to fill* | `GREEN-withdraw.txt`, L7-1 … L7-4 |
-| Previously accepted Sprint 1 behaviour unchanged | Auto: TEST-01-*, TEST-02-01 … 02-20b all pass (only TEST-02-01 changed one expected pair, as approved). Post-deploy Sprint 1 path: *to fill* | same; post-deploy check |
+| Submitted / deployed version | `main` `f0142cd` (`v2.1-lab7`) / `cpms-00008-vtz` | Part B release record; `evidence/post-deploy-v2.1-lab7.txt` |
+| Approved change works (withdraw) | Auto: TEST-02-21 … 02-25 pass (CI run 45873332862 for API/DB; E2E local). Post-deploy: `POST /api/proposals/:id/withdraw` deployed (401 without session, not 404) | `GREEN-withdraw.txt`, L7-1 … L7-4, `post-deploy-v2.1-lab7.txt` |
+| Previously accepted Sprint 1 behaviour unchanged | Auto: TEST-01-*, TEST-02-01 … 02-20b all pass (only TEST-02-01 changed one expected pair, as approved). Post-deploy: F-01 and F-02 submit / approve / reject routes answer 401 without session (NFR-02), version and readiness PASS | same; `post-deploy-v2.1-lab7.txt` (14/14 PASS) |
 | Automated tests | Server 242 passed / 0 failed / 0 skipped (CI, `c6c4b62`). E2E 11 / 0 / 0 (**local only**, not in CI) | M3 |
 | Selected user tests (manual) | *jaruwan18, on the deployed URL, after deploy:* withdraw → DRAFT → resubmit; submit → reject with reason / approve | *to fill* (manual) |
 | Defects by severity / status | **Major 1** (#36): resolved and deployed 23 Nov. **Open defects: none known** (basis: open Issues at the snapshot, UAT report, #77/#78 reviews). Review findings R-04 … R-07 (Sprint 2/3 code) resolved in D2 | M4; `docs/uat/findings-and-acceptance.md` |
 | Technical debt | 6 items, §3 | |
 | Configuration / secrets | DB URL and session secret in GCP Secret Manager; GitHub → GCP via Workload Identity Federation (no key file); no secrets in Git; synthetic seed accounts only | `docs/labs/lab05/deployment.md` |
 | Documentation / run instructions | README (local run, tests, E2E DB); `deployment.md`; F-02 contract v1.7, SRS v0.4, SDS v0.4, traceability v0.9 updated for the change | repo |
-| Deployment / smoke | CI Docker smoke test passed on `c6c4b62`. Deploy + post-deploy check: *to fill* | Part B |
+| Deployment / smoke | CI Docker smoke test passed on `c6c4b62` and on PR #79. Deploy success; post-deploy check 14/14 PASS (27 Nov 18:14 UTC) | Part B; `post-deploy-v2.1-lab7.txt` |
 | No schema / data migration | Confirmed: no migration, seed unchanged | #78 review |
 
 **Decision: _READY / NOT READY — to state after the post-deploy check_.** Proposed: **READY** for the maintained Sprint 1 scope if the post-deploy and manual checks pass, with the outstanding items below (none blocks the Sprint 1 behaviour).
@@ -65,7 +65,7 @@ Merge-commit differences: `staging`/`main` receive merge commits only; the tree 
 |---|---|---|
 | Change request #74, impact analysis, contract v1.6/v1.7 | author | reviewer (#77, requested 3 changes) |
 | RED / GREEN code and evidence | author | code reviewer (#78) |
-| Release PRs, deploy, post-deploy check | author / merger | approver |
+| Release PRs, deploy, post-deploy check | author / merger, tag, automated post-deploy check | approver (#78, #79) |
 | Manual test on the deployed URL | — | *to fill* |
 | Metrics (Part C) | data and source tables | interpretation *(to confirm)* |
 | Readiness, debt (Part D) | draft | retrospective, check |
