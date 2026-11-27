@@ -17,6 +17,9 @@
 | 0.4 | 2026-11-09 | 67070507216 | NFR-07 / G-06: README run recorded on PR #10 (2026-11-09, `bb734b0`): all steps and tests passed, 21 min 36 s, target not met; fix planned in S2. C-06 records PR #10. PR #13 review by Film26: NFR-07 Verified column shows the S2 rerun; G-06 says the two setup failures came from an earlier attempt on `a32fbe4`; G-08 records how Q-05 was closed (PR #14) |
 | 0.5 | 2026-11-25 | 67070507202 | Sprint 2/3 rows filled from the F-03 … F-09 contracts with real AC and TEST IDs and honest status (implemented on PR / RED / contract only); new §3.2 per-AC status table; status legend extended. Baseline revisions C-07 … C-15 and D-08 are listed in `docs/deliverable2/change-register.md` §3. Drafted with an AI assistant (Claude Code) |
 | 0.6 | 2026-11-25 | 67070507202 | PR #53 review by 67070507216: statuses refreshed to the real PRs and CI runs (F-03 #56, F-05 #57, F-06 #47, F-07 #54, F-09 #52, F-04 and F-08 merged); §3.2 regenerated from the current contract versions (69 ACs, incl. AC-06-10; AC-07-04 and AC-08-03 now show their tests) |
+| 0.7 | 2026-11-26 | 67070507202 | BR-03 row: Lab 7 change (withdraw), AC-02-15 … 02-18 and TEST-02-21 … 02-24 planned *(first written as 0.8 by mistake; there was no 0.7 — corrected in the PR #77 review)* |
+| 0.8 | 2026-11-27 | 67070507202 | PR #77 review by 67070507216: FR-05, FR-06, FR-08, BR-05 rows and the F-02 AC table (§3.1) list AC-02-15 … AC-02-19 and TEST-02-21 … 02-25 (Lab 7, planned) |
+| 0.9 | 2026-11-27 | 67070507202 | Lab 7 rows: RED → GREEN in PR #77, tests pass locally; release pending |
 
 ### How to read this document
 - Every baseline requirement in `docs/srs.md` appears exactly once in §1–§3.
@@ -36,10 +39,10 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 | FR-02 | Log out; the session cannot be reused | F-01 | S1 | AC-01-06, AC-01-10 | TEST-01-10 (A-API); TEST-01-13 (A-E2E) | Verified (auto) |
 | FR-03 | Current user + role from the session only | F-01 | S1 | AC-01-04, AC-01-11 | TEST-01-07, TEST-01-14 (A-API) | Verified (auto) |
 | FR-04 | Instructor views roster of own course | F-01 | S1 | AC-01-08, AC-01-10 | TEST-01-12 (A-API); TEST-01-13 (A-E2E) | Verified (auto) |
-| FR-05 | Student creates / edits a draft proposal for own team | F-02 Proposal workflow | S1 | AC-02-01, AC-02-03, AC-02-04, AC-02-14 | TEST-02-04 (P-U); TEST-02-05, TEST-02-09, TEST-02-10 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
-| FR-06 | Student submits draft → `SUBMITTED`, time recorded | F-02 | S1 (revised S2, see C-02) | AC-02-05, AC-02-14 | TEST-02-02 (P-U); TEST-02-11 (P-API); TEST-02-20 (P-E2E) | Partial — Sprint 1 scope Verified (auto): submit, status change, `submittedAt`, deadline (BR-02). Minimum team size before submit (BR-07) Planned S2 with F-03 |
+| FR-05 | Student creates / edits a draft proposal for own team | F-02 Proposal workflow | S1 | AC-02-01, AC-02-03, AC-02-04, AC-02-14; AC-02-15, AC-02-18 *(Lab 7, PR #77)* | TEST-02-04 (P-U); TEST-02-05, TEST-02-09, TEST-02-10 (P-API); TEST-02-20 (P-E2E); TEST-02-21, TEST-02-24 *(Lab 7, PR #77)* | Verified (auto) |
+| FR-06 | Student submits draft → `SUBMITTED`, time recorded | F-02 | S1 (revised S2, see C-02) | AC-02-05, AC-02-14; AC-02-15, AC-02-18 *(Lab 7, PR #77)* | TEST-02-02 (P-U); TEST-02-11 (P-API); TEST-02-20 (P-E2E); TEST-02-21, TEST-02-22, TEST-02-24 *(Lab 7, PR #77)* | Partial — Sprint 1 scope Verified (auto): submit, status change, `submittedAt`, deadline (BR-02). Minimum team size before submit (BR-07) Planned S2 with F-03 |
 | FR-07 | Instructor lists course proposals by status | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
-| FR-08 | Instructor approves / rejects with reason; decider + time recorded | F-02 | S1 | AC-02-08, AC-02-09, AC-02-14 | TEST-02-14, TEST-02-15 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
+| FR-08 | Instructor approves / rejects with reason; decider + time recorded | F-02 | S1 | AC-02-08, AC-02-09, AC-02-14; AC-02-19 *(Lab 7, PR #77)* | TEST-02-14, TEST-02-15 (P-API); TEST-02-20 (P-E2E); TEST-02-25 *(Lab 7, PR #77)* | Verified (auto) |
 | FR-09 | Team members view proposal, status, decision/reason | F-02 | S1 | AC-02-13, AC-02-14 | TEST-02-19 (P-API); TEST-02-20 (P-E2E) | Verified (auto) |
 | FR-10 | Student creates a team, gets a join code | F-03 Team formation | S2 | AC-03-01, AC-03-02, AC-03-12, AC-03-13 | TEST-03-01 (T-U); TEST-03-02, TEST-03-05, TEST-03-06, TEST-03-16 (T-API); TEST-03-17 (E2E) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
 | FR-11 | Student joins a team by join code | F-03 | S2 | AC-03-03, AC-03-06 | TEST-03-01 (T-U); TEST-03-07, TEST-03-10 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
@@ -61,9 +64,9 @@ Test files: `server/tests/auth.unit.test.js` (A-U), `server/tests/auth.api.test.
 |---|---|---|---|---|---|---|
 | BR-01 | One active proposal per team; new one only after `REJECTED` | F-02 | S1 | AC-02-02 | TEST-02-03 (P-U); TEST-02-06, TEST-02-07, TEST-02-08 concurrency (P-API) | Verified (auto); see G-01 |
 | BR-02 | No submit after `proposalDeadline` (server time) | F-02 | S1 | AC-02-05, AC-02-06 | TEST-02-02 boundary (P-U); TEST-02-11, TEST-02-12 (P-API) | Verified (auto) |
-| BR-03 | Only `DRAFT→SUBMITTED`, `SUBMITTED→APPROVED/REJECTED`; final states | F-02 | S1 | AC-02-04, AC-02-07 | TEST-02-01 all 16 pairs (P-U); TEST-02-10, TEST-02-13 (P-API) | Verified (auto) |
+| BR-03 | `DRAFT→SUBMITTED`, `SUBMITTED→APPROVED/REJECTED`, *(Lab 7)* `SUBMITTED→DRAFT` before the deadline; final states | F-02 | S1, changed in Lab 7 (Issue #74) | AC-02-04, AC-02-07, AC-02-15 … AC-02-19 | TEST-02-01 all 16 pairs (P-U); TEST-02-10, TEST-02-13, TEST-02-21 … 02-23, 02-25 (P-API); TEST-02-22 (a) service boundary; TEST-02-24, 02-25 (E2E) | Sprint 1 part Verified (auto); Lab 7 part implemented in PR #77 (RED `3a6d3e1` → GREEN `603b894`), tests pass locally (242/242, E2E 11/11); not yet released |
 | BR-04 | Reject reason required, ≤ 500 chars | F-02 | S1 | AC-02-09 | TEST-02-04 500/501 boundary (P-U); TEST-02-15 (P-API) | Verified (auto) |
-| BR-05 | Only team members act on / read own proposal; only course instructor decides | F-02 | S1 | AC-02-10, AC-02-11 | TEST-02-16, TEST-02-17 (P-API); TEST-02-20 other-team 403 (P-E2E) | Verified (auto) |
+| BR-05 | Only team members act on / read own proposal; only course instructor decides | F-02 | S1 | AC-02-10, AC-02-11; AC-02-17 *(Lab 7, PR #77)* | TEST-02-16, TEST-02-17 (P-API); TEST-02-20 other-team 403 (P-E2E); TEST-02-23 *(Lab 7, PR #77)* | Verified (auto) |
 | BR-06 | One team per student per course | F-03 | S2 | AC-03-04 | TEST-03-08 incl. concurrency (T-API); DB unique `TeamMember(courseId, userId)` | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
 | BR-07 | Team size min/max; submit only with ≥ `minTeamSize` members | F-03 (+ change to F-02 submit) | S2 | AC-03-05, AC-03-09 | TEST-03-03 boundaries (T-U); TEST-03-09 incl. concurrency, TEST-03-13 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending (see C-02, C-11) |
 | BR-08 | Membership locked after proposal `APPROVED` | F-03 | S2 | AC-03-08 | TEST-03-04 (T-U); TEST-03-12 (T-API) | Implemented, tests pass on PR #56 (CI run 45653168539); merge into `sprint-2` pending |
@@ -112,6 +115,11 @@ Every Sprint 1 acceptance criterion maps to at least one test:
 | | | AC-02-12 | TEST-02-18 |
 | | | AC-02-13 | TEST-02-19 |
 | | | AC-02-14 | TEST-02-20 |
+| | | AC-02-15 *(Lab 7)* | TEST-02-21, 02-22 — pass locally, PR #77 |
+| | | AC-02-16 *(Lab 7)* | TEST-02-22 — pass locally, PR #77 |
+| | | AC-02-17 *(Lab 7)* | TEST-02-23 — pass locally, PR #77 |
+| | | AC-02-18 *(Lab 7)* | TEST-02-24 — pass locally, PR #77 |
+| | | AC-02-19 *(Lab 7)* | TEST-02-25 — pass locally, PR #77 |
 
 ### 3.2 Sprint 2 and Sprint 3 acceptance criteria: implementation and verification status (2026-11-25, v0.6)
 

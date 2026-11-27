@@ -148,6 +148,20 @@ export default function TeamProposalPage({ courseId, onBack, onUnauthenticated }
           </div>
           {current.status !== 'DRAFT' && <p className="pre">{current.description}</p>}
           {current.status === 'SUBMITTED' && <p className="muted">Submitted {formatTime(current.submittedAt)} — waiting for the instructor's decision.</p>}
+          {/* Lab 7 (Issue #74): withdraw back to DRAFT while the deadline has not passed; the API decides (403/409). */}
+          {current.status === 'SUBMITTED' && Date.now() <= new Date(course.proposalDeadline).getTime() && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                if (window.confirm('Withdraw this submission? The proposal goes back to draft so your team can edit it and submit again.')) {
+                  run(() => api(`/proposals/${current.id}/withdraw`, { method: 'POST' }));
+                }
+              }}
+            >
+              Withdraw submission
+            </button>
+          )}
           {current.status === 'APPROVED' && (
             <p className="ok">
               Approved by {current.decidedBy?.displayName} on {formatTime(current.decidedAt)}.
