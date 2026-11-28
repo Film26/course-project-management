@@ -1,0 +1,29 @@
+# F-08 TDD GREEN run
+# branch: feature/F-08-dashboard  RED commit: 4d7b8e7  GREEN: this commit (src/dashboard/rules.js, service.js, route in routes/courses.js, DashboardPage, E2E, perf scripts)
+# date: 2026-11-28T21:22:45+07:00
+# command 1: cd server && npx vitest run --reporter=verbose tests/dashboard.unit.test.js tests/dashboard.api.test.js
+# note: TEST-08-04 was made stricter after RED (the listener must see queries; 5–6 dashboard queries) so it cannot pass by counting nothing.
+
+ ✓ tests/dashboard.api.test.js > dashboard — GET /api/courses/:courseId/dashboard (FR-21) > TEST-08-03 rows, cells and totals match the stored records (AC-08-01 … AC-08-04) 466ms
+ ✓ tests/dashboard.api.test.js > dashboard — GET /api/courses/:courseId/dashboard (FR-21) > a team whose only proposals are rejected shows the newest rejected one; an empty course shows no teams 229ms
+TEST-08-04 dashboard queries: 6 (2 teams)
+TEST-08-04 dashboard queries: 6 (20 teams)
+ ✓ tests/dashboard.api.test.js > dashboard — GET /api/courses/:courseId/dashboard (FR-21) > TEST-08-04 the response uses a fixed number of queries, for 2 teams and for 20 teams (D4, NFR-10) 439ms
+ ✓ tests/dashboard.api.test.js > access control (NFR-02, NFR-03) > TEST-08-05 student and other instructor → 403 without data; no session 401; unknown 404; abc 400 (AC-08-05) 210ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-01 currentProposal (AC-08-01, D2) > none → null 2ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-01 currentProposal (AC-08-01, D2) > only rejected → the newest by decidedAt, then by id 2ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-01 currentProposal (AC-08-01, D2) > an active proposal wins over rejected ones 1ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > no versions → NOT_SUBMITTED with no grade 1ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > the current (highest) version decides the status and the grade 1ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > graded but not released → GRADED; released → RELEASED 0ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > lateCount counts late current versions; the weighted score uses released grades only, rounded once 0ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > rounds half up to 2 decimals on the exact sum 0ms
+ ✓ tests/dashboard.unit.test.js > TEST-08-02 cellFor and teamTotals (AC-08-02, AC-08-03, D3) > no released grade → 0 0ms
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+
+# command 2 (regression, whole server suite): cd server && npx vitest run
+ Test Files  21 passed (21)
+      Tests  282 passed (282)
+
+# command 3 (E2E, cpms_e2e): npx playwright test   → 13 passed (incl. TEST-08-07 e2e/dashboard.spec.js; screenshot F08-1-instructor-dashboard.png)

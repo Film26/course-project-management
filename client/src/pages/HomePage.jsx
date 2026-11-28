@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
-export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTeamProposal, onOpenMilestones, onOpenGrades, onOpenAudit, onOpenPeerSummary, onUnauthenticated }) {
+export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTeamProposal, onOpenMilestones, onOpenGrades, onOpenAudit, onOpenPeerSummary, onOpenDashboard, onUnauthenticated }) {
   const [state, setState] = useState({ loading: true, courses: [], error: '' });
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export default function HomePage({ user, onOpenRoster, onOpenProposals, onOpenTe
               {/* Convenience only — the API enforces role + ownership (403 otherwise). */}
               {user.role === 'INSTRUCTOR' && (
                 <span className="actions">
+                  <button onClick={() => onOpenDashboard(c)}>Dashboard</button>
                   <button onClick={() => onOpenRoster(c)}>View roster</button>
                   <button onClick={() => onOpenProposals(c)}>Review proposals</button>
                   <button onClick={() => onOpenAudit(c)}>Audit log</button>

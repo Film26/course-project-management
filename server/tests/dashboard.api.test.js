@@ -136,6 +136,7 @@ describe('dashboard — GET /api/courses/:courseId/dashboard (FR-21)', () => {
     const auth = await countFor('/api/auth/me');
     const count = async () => (await countFor(`/api/courses/${course.id}/dashboard`)) - auth;
     const small = await count();
+    console.log(`TEST-08-04 dashboard queries: ${small} (2 teams)`);
 
     for (let i = 3; i <= 20; i++) {
       const u = await createUser({ email: `extra${i}@cpms.test` });
@@ -145,7 +146,10 @@ describe('dashboard — GET /api/courses/:courseId/dashboard (FR-21)', () => {
       await grade(await version(m1, t, 1), 50 + i);
     }
     const large = await count();
+    console.log(`TEST-08-04 dashboard queries: ${large} (20 teams)`);
     expect((await dashboard(c)).body.teams).toHaveLength(20);
+    expect(auth).toBeGreaterThan(0); // the listener really sees queries
+    expect(small).toBeGreaterThanOrEqual(5);
     expect(small).toBeLessThanOrEqual(6);
     expect(large).toBe(small);
     prisma.$off?.('query', listener);

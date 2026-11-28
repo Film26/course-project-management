@@ -1,0 +1,16 @@
+# F-08 TEST-08-06 (NFR-10) — LOCAL, INDICATIVE run only (not the reference deployment)
+# The official measurement (contract §4, AC-08-06) runs on a separate Cloud Run service `cpms-perf` with its own
+# database `cpms_perf`, from Cloud Shell in asia-southeast1, and is recorded in F-08-perf.txt. This file only shows
+# that the scripts work and the dashboard stays far below the target on the same data volume.
+# machine: developer laptop (Windows 11), PostgreSQL on localhost, API started with NODE_ENV=production on port 3200
+# data: node server/scripts/seed-perf.js against local database cpms_perf → PERF50 = 50 teams, 150 students, 400 submissions
+# command: PERF_PASSWORD=<synthetic> node server/scripts/perf-lists.js http://localhost:3200 --warmup 20 --requests 200 --concurrency 10
+# code: branch feature/F-08-dashboard at 4d7b8e7 + the GREEN changes (committed right after this run)
+
+# NFR-10 measurement — 2026-11-28T14:21:46.111Z
+# target http://localhost:3200  commit local-4d7b8e7+wip  course PERF50 (id 1)
+# warm-up 20, measured 200 requests, concurrency 10, target p95 < 500 ms
+roster         rows  50  n 200  p50 21.4 ms  p95 45.7 ms  max 145.2 ms  errors 0  PASS
+proposal list  rows  50  n 200  p50 31.1 ms  p95 44.0 ms  max 53.0 ms  errors 0  PASS
+dashboard      rows  50  n 200  p50 32.4 ms  p95 43.6 ms  max 47.8 ms  errors 0  PASS
+RESULT: PASS (each p95 < 500 ms)

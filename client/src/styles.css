@@ -204,3 +204,22 @@ button.secondary {
   margin: 4px 0 0;
   padding-left: 18px;
 }
+
+/* F-08: dashboard summary tiles */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tile strong {
+  font-size: 22px;
+}
+.table .badge {
+  white-space: nowrap;
+}

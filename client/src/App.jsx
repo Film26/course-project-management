@@ -11,6 +11,7 @@ import SubmissionsPage from './pages/SubmissionsPage.jsx';
 import MyGradesPage from './pages/MyGradesPage.jsx';
 import PeerRatePage from './pages/PeerRatePage.jsx';
 import PeerSummaryPage from './pages/PeerSummaryPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
 
 // F-01: session restore via /auth/me, header with current user, logout.
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
             onOpenMilestones={(c) => setView({ name: 'milestones', courseId: c.id })}
             onOpenGrades={(c) => setView({ name: 'my-grades', courseId: c.id })}
             onOpenPeerSummary={(c) => setView({ name: 'peer-summary', courseId: c.id })}
+            onOpenDashboard={(c) => setView({ name: 'dashboard', courseId: c.id })}
             onUnauthenticated={onUnauthenticated}
           />
         )}
@@ -99,6 +101,9 @@ export default function App() {
             onBack={() => setView({ name: 'milestones', courseId: view.courseId })}
             onUnauthenticated={onUnauthenticated}
           />
+        )}
+        {view.name === 'dashboard' && (
+          <DashboardPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />
         )}
         {view.name === 'peer-summary' && (
           <PeerSummaryPage courseId={view.courseId} onBack={() => setView({ name: 'home' })} onUnauthenticated={onUnauthenticated} />

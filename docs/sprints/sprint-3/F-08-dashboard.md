@@ -17,6 +17,7 @@
 |---|---|---|---|---|
 | 1.0 | 2026-11-25 | Film26 | Initial contract: design, API, data, UI, AC, STS (incl. NFR-10 measurement), DoD | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-02 … F-06 contracts |
 | 1.1 | 2026-11-25 | Film26 | D2: "newest rejected" = `decidedAt` desc, then `id` desc; grade state is one shape everywhere (`grade: { state: NONE \| GRADED \| RELEASED, score }`); D3: rounding half up to 2 decimals on the team total only; §4/TEST-08-06: measured on a separate Cloud Run service `cpms-perf` with its own database `cpms_perf` on the same Cloud SQL instance, fixed conditions (Cloud Shell in `asia-southeast1`, 20 warm-up + 200 measured requests, concurrency 10, commit **and** revision recorded); NFR-10 measured for all three list endpoints (roster, proposal list, dashboard); DoD lists RED/GREEN and performance evidence; STS names every AC in full | PR #50 review by jaruwan18 (points 1–5): the seed could not run against the UAT database `cpms`; NFR-10 names three endpoints; DoD had no TDD evidence; two grade shapes; tie order not defined |
+| 1.2 | 2026-11-28 | Film26 | Implementation details made explicit, no rule changed: §3 module signature is `cellFor(milestone, versions)` (each version carries its grade) instead of `cellFor(submissions, grade)`; D3 a team without released grades has `releasedWeightedScore: 0`; `perMilestone.submitted` = teams with at least one version (on time or late); D4 measured at **6** queries (submissions and their grades are 2); the test Prisma client emits query events (only when `NODE_ENV=test`); §8 DoD ticked with evidence; TEST-08-06 run locally as an indicative check, the reference run on `cpms-perf` is still to do | Written with the implementation (RED `4d7b8e7` before code); code and tests drafted with Claude Code, checked by the owner |
 
 ## 1. Linked requirements (summary)
 
@@ -79,9 +80,10 @@ Modules: `src/dashboard/rules.js` (pure: `currentProposal(proposals)`, `cellFor(
 | TEST-08-07 | AC-08-07 | E2E | `cpms_e2e` with the TEST-08-03 data | journey of AC-08-07; screenshots `F08-*.png` |
 
 ## 8. Definition of Done
-- [ ] AC-08-01 … 07; TEST-08-01 … 05 in `npm test`, TEST-08-07 in E2E, TEST-08-06 measured and recorded for the three NFR-10 endpoints.
-- [ ] Red → green evidence in `docs/sprints/sprint-3/evidence/F-08-tdd-red.txt` and `F-08-tdd-green.txt`; performance output in `F-08-perf.txt` *(v1.1)*.
-- [ ] No schema change; F-01 … F-07 tests still pass.
+- [x] AC-08-01 … 05, 07; TEST-08-01 … 05 in `npm test` (`server/tests/dashboard.unit.test.js`, `dashboard.api.test.js`, 13 tests), TEST-08-07 in E2E (`e2e/dashboard.spec.js`).
+- [ ] AC-08-06 / TEST-08-06 on the reference deployment `cpms-perf` → `F-08-perf.txt`. *(v1.2: scripts `server/scripts/seed-perf.js` and `perf-lists.js` done; local indicative run in `F-08-perf-local.txt`: p95 roster 45.7 ms, proposal list 44.0 ms, dashboard 43.6 ms — not the reference deployment.)*
+- [x] Red → green evidence: `evidence/F-08-tdd-red.txt` (13 failed on `4d7b8e7`), `evidence/F-08-tdd-green.txt` (13/13; whole server suite 282/282; E2E 13/13); screenshot `F08-1-instructor-dashboard.png`.
+- [x] No schema change; F-01 … F-07 tests still pass.
 - [ ] PR into `sprint-3` reviewed by jaruwan18; `Closes #45`.
 
 ## 9. Known limitations
