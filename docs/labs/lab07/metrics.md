@@ -12,7 +12,7 @@ Scope: repository `Film26/course-project-management` (CPMS, team TH-034) only. W
 
 Derived percentage: M2 review coverage = 21 ÷ 27. *Note on #77:* it counts as reviewed under the M2 definition (reviews before merge: jaruwan18 *changes requested* 17:15 UTC and Nontok9164 *approved* 17:51 UTC, both on the contract), but the RED/GREEN code commits (17:51–17:53 UTC) were pushed after those reviews, so #77 had **no code review** before merge; the code review is #78. M2 counts any review, not code review, so it overstates code-review coverage by at least this PR. CI success rate (non-RED) = 45 ÷ (51 − 4 RED − 2 cancelled) = 45 ÷ 45.
 
-## Interpretation (≤ 100 words) — *draft, jaruwan18 to confirm or rewrite*
+## Interpretation (≤ 100 words) — written by Film26 (not confirmed by jaruwan18)
 
 > M2 shows 6 of 27 merged PRs (22 %) had no review before merge (F-03, F-05, F-09 A2/A3), and #77 was merged before its code review. When review happened on release PR #59, it found three real defects (R-04 … R-06). M3 and M5 are healthy but E2E tests do not run in CI. **Action:** before Final Delivery, add a ruleset on `sprint-*` requiring one teammate approval and the `test-and-docker` check, and run Playwright in CI. **Owner:** Film26 (ruleset, CI job), jaruwan18 (reviews every feature PR). **Check:** M2 review coverage 100 % in the final window.
 

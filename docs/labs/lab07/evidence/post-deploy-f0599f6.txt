@@ -1,0 +1,17 @@
+# Post-deployment check — https://cpms-t4xsm3f7aa-as.a.run.app — 2026-11-28T12:14:22.076Z
+PASS  GET /api/version  → 200 {"commit":"f0599f657d1e0553433cfa5c5057fc957a7e37af"} (expected f0599f6)
+PASS  GET /api/ready  → 200 {"status":"ready","db":"connected"}
+PASS  F-01 courses without session  GET /api/courses → 401 UNAUTHENTICATED
+PASS  F-02 proposals list without session  GET /api/courses/1/proposals → 401 UNAUTHENTICATED
+PASS  F-03 join team without session  POST /api/courses/1/teams/join → 401 UNAUTHENTICATED
+PASS  F-04 milestones without session  GET /api/courses/1/milestones → 401 UNAUTHENTICATED
+PASS  F-05 submissions without session  GET /api/milestones/1/submissions → 401 UNAUTHENTICATED
+PASS  F-06 my grades without session  GET /api/courses/1/my-grades → 401 UNAUTHENTICATED
+PASS  F-09 audit log without session  GET /api/courses/1/audit → 401 UNAUTHENTICATED
+PASS  Lab 7 withdraw (new route) without session  POST /api/proposals/1/withdraw → 401 UNAUTHENTICATED
+PASS  F-02 submit (Sprint 1 path) without session  POST /api/proposals/1/submit → 401 UNAUTHENTICATED
+PASS  F-02 approve (Sprint 1 path) without session  POST /api/proposals/1/approve → 401 UNAUTHENTICATED
+PASS  F-02 reject (Sprint 1 path) without session  POST /api/proposals/1/reject → 401 UNAUTHENTICATED
+RESULT: all checks passed
+# Deployed: PR #81 (sprint-3 → main, docs only) merge commit f0599f6, Deploy demo run 46143328353 (success, 2026-11-28 12:13 UTC), Cloud Run revision cpms-00009-2ft serving 100 %.
+# git diff --name-only f0142cd f0599f6 lists only 6 files under docs/labs/lab07/ — the application code is identical to the v2.1-lab7 release.
