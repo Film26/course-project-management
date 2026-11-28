@@ -106,7 +106,7 @@ function errorText(err) {
   return err.message;
 }
 
-export default function MilestonesPage({ user, courseId, onBack, onOpenSubmissions, onUnauthenticated }) {
+export default function MilestonesPage({ user, courseId, onBack, onOpenSubmissions, onOpenPeerRating, onUnauthenticated }) {
   const isInstructor = user.role === 'INSTRUCTOR';
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   const [reloadKey, setReloadKey] = useState(0);
@@ -219,6 +219,12 @@ export default function MilestonesPage({ user, courseId, onBack, onOpenSubmissio
                     <button className="secondary" onClick={() => onOpenSubmissions(m)}>
                       {isInstructor ? 'Submissions' : m.teamStatus === 'NOT_SUBMITTED' ? 'Submit' : 'Resubmit / history'}
                     </button>
+                    {/* F-07: students in a team rate their teammates for this milestone. */}
+                    {!isInstructor && (
+                      <button className="secondary" onClick={() => onOpenPeerRating(m)}>
+                        Rate teammates
+                      </button>
+                    )}
                   </div>
                 )}
                 {isInstructor && (

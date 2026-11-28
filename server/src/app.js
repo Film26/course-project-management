@@ -12,6 +12,7 @@ import { courseAuditRouter } from './routes/audit.js';
 import { courseMilestonesRouter, milestonesRouter } from './routes/milestones.js';
 import { courseTeamsRouter, teamMembershipRouter } from './routes/teams.js';
 import { gradesRouter, courseGradesRouter } from './routes/grades.js';
+import { milestonePeerRouter, coursePeerRouter } from './routes/peer.js';
 
 export function createApp() {
   const app = express();
@@ -39,10 +40,12 @@ export function createApp() {
   app.use('/api/courses', courseMilestonesRouter); // F-04 list / create milestones of a course
   app.use('/api/courses', courseTeamsRouter); // F-03 create / join a team
   app.use('/api/courses', courseGradesRouter); // F-06 my released grades
+  app.use('/api/courses', coursePeerRouter); // F-07 peer rating averages
   app.use('/api/teams', teamsRouter); // F-02 create proposal
   app.use('/api/teams', teamMembershipRouter); // F-03 leave a team
   app.use('/api/proposals', proposalsRouter); // F-02 view / edit / submit / decide
   app.use('/api/milestones', milestonesRouter); // F-04 edit / delete, F-05 submissions
+  app.use('/api/milestones', milestonePeerRouter); // F-07 rate teammates
   app.use('/api/submissions', gradesRouter); // F-06 grade / release
 
   app.use('/api', notFoundHandler);

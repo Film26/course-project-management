@@ -16,6 +16,7 @@
 | Version | Date | Author | Change | Reason |
 |---|---|---|---|---|
 | 1.0 | 2026-11-25 | Film26 | Initial contract: design, API, data, UI, AC, STS, DoD | Written before tests and implementation. First draft prepared with an AI assistant (Claude Code) and checked by the owner against `docs/srs.md` and the F-03/F-04 contracts |
+| 1.1 | 2026-11-28 | Film26 | Implementation details made explicit, no rule changed: §3 a `?milestoneId=` of another course → 404; "my ratings" for a milestone of a course the student is not enrolled in → 403; `rating` in the 201 body has no rater field; §5 the button sits next to **Submit / Resubmit** for students in a team; §8 DoD ticked with evidence | Written with the implementation (RED `c44305b` before code); first draft of code and tests with Claude Code, checked by the owner |
 
 ## 1. Linked requirements (summary)
 
@@ -50,7 +51,7 @@
 |---|---|---|---|---|
 | `POST /api/milestones/:id/peer-ratings` | STUDENT, member of a team in the course | `{ rateeId, score, comment? }` | `201 { rating: { id, milestoneId, ratee: { id, displayName }, score, comment, createdAt } }` | 400, 401, 403, 404, 409 `SELF_RATING` / `NOT_A_TEAMMATE` / `ALREADY_RATED` / `NO_TEAM` |
 | `GET /api/milestones/:id/peer-ratings/mine` | STUDENT, as above | — | `200 { milestone, teammates: [ { id, displayName, rated: boolean, myRating: { score, comment } \| null } ] }` | 401, 403, 404, 409 `NO_TEAM` |
-| `GET /api/courses/:courseId/peer-ratings` | INSTRUCTOR, owns course | `?milestoneId=` | `200 { course, students: [ { id, displayName, team: { id, name } \| null, average, count, comments: [string] } ] }` sorted by team, name | 400, 401, 403, 404 |
+| `GET /api/courses/:courseId/peer-ratings` | INSTRUCTOR, owns course | `?milestoneId=` (must belong to the course, else 404) *(v1.1)* | `200 { course, students: [ { id, displayName, team: { id, name } \| null, average, count, comments: [string] } ] }` sorted by team, name | 400, 401, 403, 404 |
 
 Modules: `src/peer/rules.js` (`validateRatingInput`, `averageOf`), `src/peer/service.js`, `src/routes/peer.js`.
 
@@ -94,8 +95,8 @@ Migration `f07_peer_ratings`: `PeerRating { id, milestoneId (FK Milestone, casca
 | TEST-07-10 | AC-07-09 | E2E | `cpms_e2e` | journey of AC-07-09 | screenshots `F07-*.png` |
 
 ## 8. Definition of Done
-- [ ] AC-07-01 … 09 implemented; TEST-07-01 … 09 in `npm test`, TEST-07-10 in E2E.
-- [ ] RED/GREEN evidence in `docs/sprints/sprint-3/evidence/`; F-01 … F-06 tests still pass.
+- [x] AC-07-01 … 09 implemented; TEST-07-01 … 09 in `npm test` (`server/tests/peer.unit.test.js`, `peer.api.test.js`, 27 tests), TEST-07-10 in E2E (`e2e/peer.spec.js`).
+- [x] RED/GREEN evidence: `evidence/F-07-tdd-red.txt` (26 failed / 1 passed on `c44305b`), `evidence/F-07-tdd-green.txt` (27/27; whole server suite 269/269; E2E 12/12); screenshots `F07-1-student-rated.png`, `F07-2-instructor-summary.png`.
 - [ ] PR into `sprint-3` reviewed by jaruwan18; `Closes #44`.
 
 ## 9. Known limitations
