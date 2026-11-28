@@ -27,14 +27,14 @@ Merge-commit differences: `staging`/`main` receive merge commits only; the tree 
 | Previously accepted Sprint 1 behaviour unchanged | Auto: TEST-01-*, TEST-02-01 … 02-20b all pass (only TEST-02-01 changed one expected pair, as approved). Post-deploy: F-01 and F-02 submit / approve / reject routes answer 401 without session (NFR-02), version and readiness PASS | same; `post-deploy-v2.1-lab7.txt` (14/14 PASS) |
 | Automated tests | Server 242 passed / 0 failed / 0 skipped (CI, `c6c4b62`). E2E 11 / 0 / 0 (**local only**, not in CI) | M3 |
 | Selected user tests (manual) | *jaruwan18, on the deployed URL, after deploy:* withdraw → DRAFT → resubmit; submit → reject with reason / approve | *to fill* (manual) |
-| Defects by severity / status | **Major 1** (#36): resolved and deployed 23 Nov. **Open defects: none known** (basis: open Issues at the snapshot, UAT report, #77/#78 reviews). Review findings R-04 … R-07 (Sprint 2/3 code) resolved in D2 | M4; `docs/uat/findings-and-acceptance.md` |
+| Defects by severity / status | **Major 1** (#36): resolved and deployed 23 Nov. **Open defects: none known** (basis: open Issues at the snapshot, UAT report, #77/#78 reviews). **Open item:** #36 residual data (proposal #3 keeps an empty reject reason from before the fix) is **waiting for UAT Team acceptance** as a known limitation, see outstanding items. Review findings R-04 … R-07 (Sprint 2/3 code) resolved in D2 | M4; `docs/uat/findings-and-acceptance.md` |
 | Technical debt | 6 items, §3 | |
 | Configuration / secrets | DB URL and session secret in GCP Secret Manager; GitHub → GCP via Workload Identity Federation (no key file); no secrets in Git; synthetic seed accounts only | `docs/labs/lab05/deployment.md` |
 | Documentation / run instructions | README (local run, tests, E2E DB); `deployment.md`; F-02 contract v1.7, SRS v0.4, SDS v0.4, traceability v0.9 updated for the change | repo |
 | Deployment / smoke | CI Docker smoke test passed on `c6c4b62` and on PR #79. Deploy success; post-deploy check 14/14 PASS (27 Nov 18:14 UTC) | Part B; `post-deploy-v2.1-lab7.txt` |
 | No schema / data migration | Confirmed: no migration, seed unchanged | #78 review |
 
-**Decision: _READY / NOT READY — to state after the post-deploy check_.** Proposed: **READY** for the maintained Sprint 1 scope if the post-deploy and manual checks pass, with the outstanding items below (none blocks the Sprint 1 behaviour).
+**Decision:** the automated tests and the post-deploy check (14/14 PASS, 27 Nov 18:14 UTC) support **READY** for the maintained Sprint 1 scope. The final decision is stated here after jaruwan18's manual test on the deployed URL: **READY** if it passes, **NOT READY** if any selected test fails. Either way the outstanding items below stay open (none blocks the Sprint 1 behaviour), including the #36 residual data still waiting for UAT Team acceptance.
 
 | Outstanding item | Owner | Action / due |
 |---|---|---|
@@ -80,5 +80,6 @@ Claude Code (Anthropic) was used by Film26 to draft the impact analysis, contrac
 
 - E2E results are from local runs (not CI).
 - The instructor's approval of #74 was verbal; the record is the Issue comment written by Film26 on 27 Nov 2026 (exact date of the statement as reported by Film26).
-- #77 was merged before its code review; the code review is the #78 review (26 Nov 18:15 UTC).
+- #77 was merged before its code review. Its reviews before merge were on the contract (jaruwan18 *changes requested* 17:15 UTC, still her latest review state at merge; Nontok9164 *approved* 17:51 UTC); the RED/GREEN commits came after them. M2 therefore counts #77 as reviewed (any review), while it had no code review; the code review is the #78 review (jaruwan18 approved 26 Nov 18:15 UTC).
+- #36 residual data (proposal #3, empty reject reason from before the fix) is not yet accepted by the UAT Team; it is an open item, not a closed limitation.
 - Metric values are a snapshot; Issues for delivered Sprint 2 features were still open at the snapshot (M1 understates completed work).

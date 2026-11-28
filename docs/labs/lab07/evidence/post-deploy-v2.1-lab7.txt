@@ -14,5 +14,5 @@ PASS  F-02 approve (Sprint 1 path) without session  POST /api/proposals/1/approv
 PASS  F-02 reject (Sprint 1 path) without session  POST /api/proposals/1/reject → 401 UNAUTHENTICATED
 RESULT: all checks passed
 # Release: PR #79 merge commit f0142cd (tag v2.1-lab7), Deploy demo run 46047397951 (success, 2026-11-27 18:13 UTC), Cloud Run revision cpms-00008-vtz serving 100 %.
-# 401 on POST /api/proposals/1/withdraw shows the new route is deployed and needs a session (an unknown route answers 404, see D2 F-09 line). Logged-in withdraw / submit / reject / approve on the deployed URL: manual test by jaruwan18 (Part D §2).
+# 401 on POST /api/proposals/1/withdraw shows the new route is deployed and needs a session (an unknown route answers 404, see D2 F-09 line). Logged-in withdraw / submit / reject / approve on the deployed URL: manual test by jaruwan18, PENDING at the time of this check (result recorded in Part D §2).
 # No password is used by this script: node docs/labs/lab07/post-deploy-check.mjs <URL> <commit> [out]
