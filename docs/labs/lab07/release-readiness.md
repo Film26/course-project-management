@@ -54,11 +54,13 @@ Merge-commit differences: `staging`/`main` receive merge commits only; the tree 
 | Withdraw button visibility uses the browser clock | button may show/hide wrongly near the deadline; API still decides (409) | Low | accepted; use server time from `GET my-team` if reported |
 | BR-01 by row lock, not a DB constraint (G-01) | a future code path could bypass it | Low | existing; partial unique index planned (traceability G-01) |
 
-## 4. Retrospective (one or two sentences each) — *jaruwan18 to write*
+## 4. Retrospective
 
-1. **What helped?** _…_
-2. **What hurt?** _…_
-3. **What will change for the final release (concrete next action)?** _…_
+**Not provided.** The retrospective was assigned to jaruwan18, who did not give her answers before this report was finalised (28 Nov 2026). The three questions are left unanswered; no answer was written on her behalf.
+
+1. **What helped?** — not provided by jaruwan18
+2. **What hurt?** — not provided by jaruwan18
+3. **What will change for the final release (concrete next action)?** — not provided by jaruwan18
 
 ## 5. Contributions
 
@@ -67,11 +69,11 @@ Merge-commit differences: `staging`/`main` receive merge commits only; the tree 
 | Change request #74, impact analysis, contract v1.6/v1.7 | author | reviewer (#77, requested 3 changes) |
 | RED / GREEN code and evidence | author | code reviewer (#78) |
 | Release PRs, deploy, post-deploy check | author / merger, tag, automated post-deploy check | approver (#78, #79) |
-| Manual test on the deployed URL | — | tester (28 Nov, MT-1 … MT-6) |
-| Metrics (Part C) | data and source tables | interpretation *(to confirm)* |
-| Readiness, debt (Part D) | draft | retrospective, check |
+| Manual test on the deployed URL | automated-browser runs for the screenshots (Claude Code) | manual tester (28 Nov, MT-1 … MT-6; MT-3 incomplete) |
+| Metrics (Part C) | data, source tables, interpretation draft | interpretation not confirmed |
+| Readiness, debt (Part D) | author | retrospective not provided |
 
-Pair work: *to fill*. Nontok9164 also helped (contract approval on #77, earlier release approvals).
+Pair work: no pair-programming session was recorded; the two students worked together through reviews (#77 contract, #78 code, #79 release) and the manual test. Nontok9164 also helped (contract approval on #77, reviews of #80 and #81).
 
 ## 6. AI-use declaration
 
@@ -80,6 +82,7 @@ Claude Code (Anthropic) was used by Film26 to draft the impact analysis, contrac
 ## 7. Known limitations
 
 - E2E results are from local runs (not CI).
+- The retrospective (§4) was not provided by jaruwan18, and she did not confirm the Part C interpretation (written by Film26).
 - Manual test (28 Nov): MT-3 was incomplete in the manual run and was completed by an automated browser run (Playwright, run by Claude Code for Film26), not by hand; the manual screenshots of jaruwan18 were not supplied to the repository, so all screenshots (L7-C1 … L7-C9) come from automated-browser runs on the deployed application. Details in `evidence/manual/manual-test-results.md`.
 - PR #81 merged `sprint-3` → `main` directly (docs only), skipping `staging`; it triggered a redeploy (`cpms-00009-2ft`) with unchanged application code.
 - The instructor's approval of #74 was verbal; the record is the Issue comment written by Film26 on 27 Nov 2026 (exact date of the statement as reported by Film26).
