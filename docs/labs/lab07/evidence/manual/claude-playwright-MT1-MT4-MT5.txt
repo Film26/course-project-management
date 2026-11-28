@@ -1,0 +1,15 @@
+# Lab 7 — MT-1, MT-4, MT-5 screenshots with Playwright on https://cpms-t4xsm3f7aa-as.a.run.app (Chromium, headless, 1280×900)
+2026-11-28T12:14:49.498Z  deployed version: {"commit":"f0599f657d1e0553433cfa5c5057fc957a7e37af"}
+2026-11-28T12:14:53.211Z  signed in as student5@cpms.test (shown: "Student Five STUDENT")
+2026-11-28T12:14:53.585Z  student: "Team Gamma - Lab 7 v2" status SUBMITTED, Withdraw buttons = 1
+2026-11-28T12:14:53.679Z  screenshot L7-C7-MT1-submitted.png
+2026-11-28T12:14:54.331Z  signed in as instructor1@cpms.test (shown: "Instructor One INSTRUCTOR")
+2026-11-28T12:14:54.613Z  instructor: Confirm reject with empty reason → "A reason is required"; row status = SUBMITTED
+2026-11-28T12:14:54.687Z  screenshot L7-C8-MT4-reject-needs-reason.png
+2026-11-28T12:14:55.087Z  instructor (Rejected filter): "Team Gamma - Lab 7 v2" status = REJECTED; text: Team Gamma — Team Gamma - Lab 7 v2 REJECTED Synthetic proposal for the Lab 7 manual check (withdraw, edit, submit again). Submitted: 28 Nov 2026, 18:58 · Decided: 28 Nov 2026, 19:14 by Instructor One 
+2026-11-28T12:14:55.393Z  screenshot L7-C9-MT5-rejected-instructor.png
+2026-11-28T12:14:56.001Z  signed in as student5@cpms.test (shown: "Student Five STUDENT")
+2026-11-28T12:14:56.325Z  student: rejected proposal with the reason shown in History
+2026-11-28T12:14:56.402Z  screenshot L7-C9-MT5-rejected-student.png
+RESULT: all steps passed
+# Data left on production: "Team Gamma - Lab 7 v2" REJECTED (synthetic).

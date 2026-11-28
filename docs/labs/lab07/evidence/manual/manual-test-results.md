@@ -30,8 +30,20 @@ Run by **Claude Code with Playwright (Chromium, headless) for Film26** on the de
 **Result: all steps PASS.** Combined with the manual run: MT-1 … MT-6 all PASS on the deployed release, 0 FAIL.
 The student screenshots show the join code of the synthetic Team Gamma (test data only).
 
+## Screenshot run — MT-1, MT-4, MT-5 (automated browser, not manual)
+
+The manual screenshots of jaruwan18 for MT-1, MT-4 and MT-5 were not supplied to the repository, so the same steps were captured by **Claude Code with Playwright for Film26** on **28 Nov 2026 12:14 UTC (19:14 Bangkok)** on revision `cpms-00009-2ft` (`/api/version` = `f0599f6`; same application code as `f0142cd`, see `../post-deploy-f0599f6.txt`). Script `docs/labs/lab07/manual-complete-prod-2.mjs`; log [`claude-playwright-MT1-MT4-MT5.txt`](claude-playwright-MT1-MT4-MT5.txt).
+
+| ID | Step | Expected | Actual | Evidence |
+|---|---|---|---|---|
+| MT-1 | `student5` opens the team page with "Team Gamma - Lab 7 v2" submitted | SUBMITTED + *Withdraw submission* | as expected, 1 Withdraw button | `L7-C7-MT1-submitted.png` |
+| MT-4 | `instructor1`, filter Submitted → Reject → *Confirm reject* with an empty reason | refused | "A reason is required", status stays SUBMITTED | `L7-C8-MT4-reject-needs-reason.png` |
+| MT-5 | enter a reason → *Confirm reject* | REJECTED, reason stored and shown | instructor: REJECTED, "Decided: 28 Nov 2026, 19:14 by Instructor One"; student: banner and History show the reason | `L7-C9-MT5-rejected-instructor.png`, `L7-C9-MT5-rejected-student.png` |
+
+**Result: all steps PASS.** Every selected user test MT-1 … MT-6 now has a passing result and a screenshot on the deployed application.
+
 **Limitations of this evidence**
 - Screenshots exist for MT-1, MT-4, MT-5 only; MT-2, MT-3, MT-6 rely on the tester's written notes. The screenshots do not show the computer clock; times are the tester's notes, and MT-5 shows the decision time on the page.
 - `L7-M5-rejected.png` is a **composite**: the page header was joined to the proposal card by the tester (stated by the tester). No content was changed.
 - The Claude desktop built-in browser dismisses `window.confirm()` (returns Cancel), so the withdraw step had to be done in Chrome. This is a limitation of the test tool, not of CPMS.
-- Test data left on production: Team Beta proposal APPROVED; Team Gamma (`student5`, `student6`) with a REJECTED proposal and "Team Gamma - Lab 7 v2" SUBMITTED (synthetic data).
+- Test data left on production: Team Beta proposal APPROVED; Team Gamma (`student5`, `student6`) with two REJECTED proposals ("… Reject Test", "… Lab 7 v2") (synthetic data).
