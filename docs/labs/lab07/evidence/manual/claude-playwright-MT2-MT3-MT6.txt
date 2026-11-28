@@ -1,0 +1,19 @@
+# Lab 7 — MT-2, MT-3, MT-6 completed with Playwright on https://cpms-t4xsm3f7aa-as.a.run.app (Chromium, headless, 1280×900)
+2026-11-28T11:58:31.284Z  signed in as student5@cpms.test (shown: "Student Five STUDENT")
+2026-11-28T11:58:31.899Z  status = DRAFT
+2026-11-28T11:58:32.148Z  status = SUBMITTED
+2026-11-28T11:58:32.226Z  screenshot L7-C1-submitted.png
+2026-11-28T11:58:32.258Z  confirm dialog: "Withdraw this submission? The proposal goes back to draft so your team can edit it and submit again." → OK
+2026-11-28T11:58:32.446Z  status = DRAFT
+2026-11-28T11:58:32.451Z  Withdraw button count after withdraw: 0
+2026-11-28T11:58:32.539Z  screenshot L7-C2-withdrawn-draft.png
+2026-11-28T11:58:33.062Z  status = SUBMITTED
+2026-11-28T11:58:33.072Z  student sees title: "Team Gamma - Lab 7 v2"
+2026-11-28T11:58:33.109Z  screenshot L7-C3-resubmitted-v2-student.png
+2026-11-28T11:58:33.742Z  signed in as instructor1@cpms.test (shown: "Instructor One INSTRUCTOR")
+2026-11-28T11:58:33.985Z  instructor (Submitted filter): "Team Gamma - Lab 7 v2" rows = 1, status = SUBMITTED
+2026-11-28T11:58:34.026Z  screenshot L7-C3-resubmitted-v2-instructor.png
+2026-11-28T11:58:34.133Z  instructor (Approved filter): "Team Beta - Lab 7 Manual Test" status = APPROVED
+2026-11-28T11:58:34.178Z  screenshot L7-C6-approved.png
+RESULT: all steps passed
+# Data left on production: Team Gamma proposal "Team Gamma - Lab 7 v2" SUBMITTED (synthetic).

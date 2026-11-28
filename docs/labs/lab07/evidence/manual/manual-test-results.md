@@ -14,10 +14,24 @@ Original notes of the tester (Thai, join code redacted): [`jaruwan18-results-ori
 | MT-5 | reject with a reason | REJECTED, reason shown | **PASS**: REJECTED, "Decided 28 Nov 2026 18:40 by Instructor One", reason shown | `L7-M5-rejected.png` |
 | MT-6 | instructor approves | APPROVED | **PASS** (18:30), Team Beta proposal of MT-1…3 (order differs from the plan) | tester notes (no screenshot) |
 
-**Summary:** 5 PASS, 1 incomplete (MT-3), 0 FAIL. No defect found.
+**Summary (jaruwan18, manual):** 5 PASS, 1 incomplete (MT-3), 0 FAIL. No defect found.
+
+## Completion run — MT-2, MT-3, MT-6 with screenshots (automated browser, not manual)
+
+Run by **Claude Code with Playwright (Chromium, headless) for Film26** on the deployed URL, **28 Nov 2026 11:58 UTC (18:58 Bangkok)**, release `f0142cd` / `cpms-00008-vtz`, because the manual run left MT-3 incomplete and MT-2 / MT-6 without screenshots. Script `docs/labs/lab07/manual-complete-prod.mjs` (password read from a temporary file outside the repository, deleted after the run); full timestamped log [`claude-playwright-MT2-MT3-MT6.txt`](claude-playwright-MT2-MT3-MT6.txt).
+
+| ID | Step (Team Gamma, `student5`, then `instructor1`) | Expected | Actual | Evidence |
+|---|---|---|---|---|
+| MT-1 | new proposal "Team Gamma - Lab 7" → Submit (the earlier Team Gamma proposal is REJECTED, so a new one is allowed) | SUBMITTED, *Withdraw submission* shown | SUBMITTED 11:58:32 | `L7-C1-submitted.png` |
+| MT-2 | *Withdraw submission* → confirm "Withdraw this submission? …" → OK | DRAFT, button gone, edit form shown | DRAFT 11:58:32, button count 0 | `L7-C2-withdrawn-draft.png` |
+| MT-3 | title → "Team Gamma - Lab 7 v2" → Save draft → Submit | SUBMITTED with the new title; instructor sees only v2 | student: SUBMITTED, title "Team Gamma - Lab 7 v2"; instructor (filter Submitted): 1 row "Team Gamma - Lab 7 v2", SUBMITTED, "Submitted: 28 Nov 2026, 18:58" | `L7-C3-resubmitted-v2-student.png`, `L7-C3-resubmitted-v2-instructor.png` |
+| MT-6 | instructor, filter Approved (view only) | "Team Beta - Lab 7 Manual Test" APPROVED | APPROVED, "Decided: 28 Nov 2026, 18:30 by Instructor One" | `L7-C6-approved.png` |
+
+**Result: all steps PASS.** Combined with the manual run: MT-1 … MT-6 all PASS on the deployed release, 0 FAIL.
+The student screenshots show the join code of the synthetic Team Gamma (test data only).
 
 **Limitations of this evidence**
 - Screenshots exist for MT-1, MT-4, MT-5 only; MT-2, MT-3, MT-6 rely on the tester's written notes. The screenshots do not show the computer clock; times are the tester's notes, and MT-5 shows the decision time on the page.
 - `L7-M5-rejected.png` is a **composite**: the page header was joined to the proposal card by the tester (stated by the tester). No content was changed.
 - The Claude desktop built-in browser dismisses `window.confirm()` (returns Cancel), so the withdraw step had to be done in Chrome. This is a limitation of the test tool, not of CPMS.
-- Test data left on production: Team Beta proposal APPROVED; Team Gamma (`student5`, `student6`) with a REJECTED proposal (synthetic data).
+- Test data left on production: Team Beta proposal APPROVED; Team Gamma (`student5`, `student6`) with a REJECTED proposal and "Team Gamma - Lab 7 v2" SUBMITTED (synthetic data).
