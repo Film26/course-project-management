@@ -37,6 +37,8 @@ model User {
   auditEntries     AuditEntry[]
   submissions      Submission[]
   grades           Grade[]
+  ratingsGiven     PeerRating[] @relation("PeerRater")
+  ratingsReceived  PeerRating[] @relation("PeerRatee")
 }
 
 // Server-side session: the cookie holds a random token, only its SHA-256 hash is stored.
@@ -93,6 +95,7 @@ model Team {
   members     TeamMember[]
   proposals   Proposal[]
   submissions Submission[]
+  peerRatings PeerRating[]
 
   @@unique([courseId, name])
 }
@@ -171,6 +174,7 @@ model Milestone {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   submissions Submission[]
+  peerRatings PeerRating[]
 
   @@index([courseId])
 }
@@ -210,4 +214,24 @@ model Grade {
   gradedAt     DateTime
   releasedAt   DateTime?
   updatedAt    DateTime   @updatedAt
+}
+
+// F-07 (FR-19, FR-20, BR-13): one rating per (milestone, rater, ratee); no edit, no delete. The migration adds
+// CHECK (score BETWEEN 1 AND 5) and CHECK ("raterId" <> "rateeId"). teamId is the rater's team when rating.
+model PeerRating {
+  id          Int       @id @default(autoincrement())
+  milestoneId Int
+  milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  teamId      Int
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  raterId     Int
+  rater       User      @relation("PeerRater", fields: [raterId], references: [id])
+  rateeId     Int
+  ratee       User      @relation("PeerRatee", fields: [rateeId], references: [id])
+  score       Int
+  comment     String    @default("")
+  createdAt   DateTime  @default(now())
+
+  @@unique([milestoneId, raterId, rateeId])
+  @@index([rateeId])
 }

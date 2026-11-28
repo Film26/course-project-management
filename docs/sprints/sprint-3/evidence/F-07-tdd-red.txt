@@ -1,0 +1,62 @@
+# F-07 TDD RED run
+# branch: feature/F-07-peer-eval (from sprint-3 6d8e837; contract v1.0, PR #54)  commit: this commit (tests + PeerRating schema/migration + rules stub, before implementation)
+# date: 2026-11-28T21:10:06+07:00
+# command: cd server && npx vitest run --reporter=verbose tests/peer.unit.test.js tests/peer.api.test.js
+# note: the one passing test ('unknown course → 404') passes only because the route does not exist yet (generic 404); it is kept as a regression check.
+
+ × tests/peer.api.test.js > rate — POST /api/milestones/:id/peer-ratings (FR-19, BR-13) > TEST-07-03 a member rates a teammate; the rater comes from the session (AC-07-01) 295ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/peer.api.test.js > rate — POST /api/milestones/:id/peer-ratings (FR-19, BR-13) > TEST-07-04 invalid input → 400 naming the field, nothing stored; scores 1 and 5 are accepted (AC-07-02) 168ms
+   → {"score":4}: expected 404 to be 400 // Object.is equality
+ × tests/peer.api.test.js > rate — POST /api/milestones/:id/peer-ratings (FR-19, BR-13) > TEST-07-05 self, another team, unknown user and a former member are refused (AC-07-03, AC-07-04) 117ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/peer.api.test.js > rate — POST /api/milestones/:id/peer-ratings (FR-19, BR-13) > TEST-07-06 once per teammate and milestone; another milestone is fine; a race stores one (AC-07-05) 110ms
+   → expected 404 to be 201 // Object.is equality
+ × tests/peer.api.test.js > rate — POST /api/milestones/:id/peer-ratings (FR-19, BR-13) > a student without a team gets 409 NO_TEAM; an unknown milestone 404 142ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/peer.api.test.js > my ratings — GET /api/milestones/:id/peer-ratings/mine (BR-13 privacy) > TEST-07-07 lists teammates with only the ratings the student gave (AC-07-06) 135ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/peer.api.test.js > my ratings — GET /api/milestones/:id/peer-ratings/mine (BR-13 privacy) > no team → 409 NO_TEAM; another course's milestone → 403 126ms
+   → expected 404 to be 409 // Object.is equality
+ × tests/peer.api.test.js > instructor summary — GET /api/courses/:courseId/peer-ratings (FR-20) > TEST-07-08 per-student average and count, all milestones and per milestone (AC-07-07) 122ms
+   → expected 404 to be 200 // Object.is equality
+ × tests/peer.api.test.js > instructor summary — GET /api/courses/:courseId/peer-ratings (FR-20) > a bad milestone filter → 400; a milestone of another course → 404 117ms
+   → expected 404 to be 400 // Object.is equality
+ × tests/peer.api.test.js > access control (NFR-02, NFR-03) > TEST-07-09 forbidden roles and outsiders get 403 without data; no session 401 (AC-07-08) 108ms
+   → expected 404 to be 403 // Object.is equality
+ ✓ tests/peer.api.test.js > access control (NFR-02, NFR-03) > unknown course → 404 for its instructor-only summary 102ms
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > accepts score 1 and trims the comment; other fields are ignored 10ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, …(1) }
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > accepts score 5 and trims the comment; other fields are ignored 1ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, …(1) }
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > comment is optional (stored as "") and may be exactly 500 characters 1ms
+   → expected { ok: true, value: {} } to deeply equal { ok: true, …(1) }
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field score: {"rateeId":2,"score":0} 1ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field score: {"rateeId":2,"score":6} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field score: {"rateeId":2,"score":3.5} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field score: {"rateeId":2,"score":"4"} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field score: {"rateeId":2} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field comment: {"rateeId":2,"score":4,"comment":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field comment: {"rateeId":2,"score":4,"comment":42} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field rateeId: {"score":4} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field rateeId: {"rateeId":0,"score":4} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field rateeId: {"rateeId":"2","score":4} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects and names the field rateeId: {"rateeId":2.5,"score":4} 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-01 validateRatingInput (AC-07-02) > rejects a missing body 0ms
+   → expected true to be false // Object.is equality
+ × tests/peer.unit.test.js > TEST-07-02 averageOf (AC-07-07, E6) > returns null for no scores, the score for one, and rounds to 2 decimals 0ms
+   → expected undefined to be null
+⎯⎯⎯⎯⎯⎯ Failed Tests 26 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  2 failed (2)
+      Tests  26 failed | 1 passed (27)

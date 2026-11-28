@@ -6,6 +6,7 @@ import { requireAuth, requireRole } from '../auth/middleware.js';
 import { parseStatusFilter } from '../proposals/rules.js';
 import { listCourseProposals, getMyTeam } from '../proposals/service.js';
 import { parseId } from './proposals.js';
+import { courseDashboard } from '../dashboard/service.js';
 
 export const coursesRouter = Router();
 
@@ -90,6 +91,15 @@ coursesRouter.get('/:courseId/proposals', requireAuth, requireRole('INSTRUCTOR')
 coursesRouter.get('/:courseId/my-team', requireAuth, requireRole('STUDENT'), async (req, res, next) => {
   try {
     res.json(await getMyTeam(parseId(req.params.courseId, 'courseId'), req.user));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// F-08 FR-21: course dashboard — INSTRUCTOR who teaches the course (D5). Read-only.
+coursesRouter.get('/:courseId/dashboard', requireAuth, requireRole('INSTRUCTOR'), async (req, res, next) => {
+  try {
+    res.json(await courseDashboard(parseId(req.params.courseId, 'courseId'), req.user));
   } catch (err) {
     next(err);
   }

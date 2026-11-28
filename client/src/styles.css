@@ -176,3 +176,50 @@ button.secondary {
   background: #fde68a;
   color: #78350f;
 }
+
+/* F-07 / F-08: data tables (peer ratings, course dashboard); scroll horizontally on narrow screens */
+.table-scroll {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th,
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eaeef2;
+  text-align: left;
+  vertical-align: top;
+}
+.table th {
+  background: #f6f8fa;
+  white-space: nowrap;
+}
+.table ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+/* F-08: dashboard summary tiles */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tile strong {
+  font-size: 22px;
+}
+.table .badge {
+  white-space: nowrap;
+}
