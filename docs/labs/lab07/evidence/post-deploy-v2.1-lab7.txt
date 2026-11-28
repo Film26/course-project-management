@@ -1,0 +1,18 @@
+# Post-deployment check — https://cpms-t4xsm3f7aa-as.a.run.app — 2026-11-27T18:14:51.671Z
+PASS  GET /api/version  → 200 {"commit":"f0142cd3ebaeb30fde4dfbc9aa3744f3451ed8cf"} (expected f0142cd)
+PASS  GET /api/ready  → 200 {"status":"ready","db":"connected"}
+PASS  F-01 courses without session  GET /api/courses → 401 UNAUTHENTICATED
+PASS  F-02 proposals list without session  GET /api/courses/1/proposals → 401 UNAUTHENTICATED
+PASS  F-03 join team without session  POST /api/courses/1/teams/join → 401 UNAUTHENTICATED
+PASS  F-04 milestones without session  GET /api/courses/1/milestones → 401 UNAUTHENTICATED
+PASS  F-05 submissions without session  GET /api/milestones/1/submissions → 401 UNAUTHENTICATED
+PASS  F-06 my grades without session  GET /api/courses/1/my-grades → 401 UNAUTHENTICATED
+PASS  F-09 audit log without session  GET /api/courses/1/audit → 401 UNAUTHENTICATED
+PASS  Lab 7 withdraw (new route) without session  POST /api/proposals/1/withdraw → 401 UNAUTHENTICATED
+PASS  F-02 submit (Sprint 1 path) without session  POST /api/proposals/1/submit → 401 UNAUTHENTICATED
+PASS  F-02 approve (Sprint 1 path) without session  POST /api/proposals/1/approve → 401 UNAUTHENTICATED
+PASS  F-02 reject (Sprint 1 path) without session  POST /api/proposals/1/reject → 401 UNAUTHENTICATED
+RESULT: all checks passed
+# Release: PR #79 merge commit f0142cd (tag v2.1-lab7), Deploy demo run 46047397951 (success, 2026-11-27 18:13 UTC), Cloud Run revision cpms-00008-vtz serving 100 %.
+# 401 on POST /api/proposals/1/withdraw shows the new route is deployed and needs a session (an unknown route answers 404, see D2 F-09 line). Logged-in withdraw / submit / reject / approve on the deployed URL: manual test by jaruwan18, PENDING at the time of this check (result recorded in Part D §2).
+# No password is used by this script: node docs/labs/lab07/post-deploy-check.mjs <URL> <commit> [out]
